@@ -20,7 +20,7 @@ public class CharacterMovements : MonoBehaviour
     private Vector3 playerVelocity;
     private Vector3 currentMove;
     private Vector3 moveVelocity;
-
+    
     private readonly Vector3 isoForward = new Vector3(1, 0, 1).normalized;
     private readonly Vector3 isoRight = new Vector3(1, 0, -1).normalized;
 
@@ -37,7 +37,7 @@ public class CharacterMovements : MonoBehaviour
         {
             playerVelocity.y = -2f;
         }
-
+        
         Vector2 movementInput = GetMovementInput();
 
         Vector3 targetMove = (isoForward * movementInput.y + isoRight * movementInput.x);
