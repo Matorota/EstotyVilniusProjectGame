@@ -16,6 +16,8 @@ public class CharacterMovements : MonoBehaviour
     [Tooltip("The exact height the player will jump in Unity units (e.g., 1.3 blocks)")]
     [SerializeField] float jumpHeight = 1.3f;
     [SerializeField] float smoothTime = 0.15f;
+    [SerializeField] Transform movementCamera;
+    [SerializeField] bool useCameraRelativeMovement = true;
 
     private Vector3 playerVelocity;
     private Vector3 currentMove;
@@ -27,6 +29,11 @@ public class CharacterMovements : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+
+        if (movementCamera == null && Camera.main != null)
+        {
+            movementCamera = Camera.main.transform;
+        }
     }
 
     void Update()
@@ -40,7 +47,7 @@ public class CharacterMovements : MonoBehaviour
         
         Vector2 movementInput = GetMovementInput();
 
-        Vector3 targetMove = (isoForward * movementInput.y + isoRight * movementInput.x);
+        Vector3 targetMove = GetMoveDirection(movementInput);
         if (targetMove.magnitude > 1f) targetMove.Normalize();
         targetMove *= speed;
 
@@ -66,6 +73,29 @@ public class CharacterMovements : MonoBehaviour
         finalMovement.y = playerVelocity.y;
 
         controller.Move(finalMovement * Time.deltaTime);
+    }
+
+    private Vector3 GetMoveDirection(Vector2 movementInput)
+    {
+        if (!useCameraRelativeMovement || movementCamera == null)
+        {
+            return isoForward * movementInput.y + isoRight * movementInput.x;
+        }
+
+        Vector3 cameraForward = movementCamera.forward;
+        Vector3 cameraRight = movementCamera.right;
+        cameraForward.y = 0f;
+        cameraRight.y = 0f;
+
+        if (cameraForward.sqrMagnitude < 0.0001f || cameraRight.sqrMagnitude < 0.0001f)
+        {
+            return isoForward * movementInput.y + isoRight * movementInput.x;
+        }
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        return cameraForward * movementInput.y + cameraRight * movementInput.x;
     }
 
     private Vector2 GetMovementInput()
