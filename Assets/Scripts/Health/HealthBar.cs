@@ -46,6 +46,7 @@ public class HealthBar : MonoBehaviour
 
         Debug.Log($"{name} taking {damageAmount} damage from {other.name}", this);
         TakeDamage(damageAmount);
+        
     }
 
     public void TakeDamage(float damage)
@@ -73,7 +74,7 @@ public class HealthBar : MonoBehaviour
     {
         if (healthFillImage == null)
         {
-            Debug.LogWarning($"{name} has no Health Fill Image assigned.", this);
+            Debug.LogWarning($"{name} has no Health Image assigned.", this);
             return;
         }
 
