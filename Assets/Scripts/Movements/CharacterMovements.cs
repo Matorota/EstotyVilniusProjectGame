@@ -21,6 +21,8 @@ public class CharacterMovements : MonoBehaviour
     private Vector3 currentMove;
     private Vector3 moveVelocity;
     
+    // test
+    
     private readonly Vector3 isoForward = new Vector3(1, 0, 1).normalized;
     private readonly Vector3 isoRight = new Vector3(1, 0, -1).normalized;
 
