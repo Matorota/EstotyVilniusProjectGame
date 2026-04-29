@@ -22,6 +22,21 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        TryApplyDamage(other);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        TryApplyDamage(collision.collider);
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        TryApplyDamage(hit.collider);
+    }
+
+    void TryApplyDamage(Collider other)
+    {
         if (health == null || !IsDamagingTag(other))
         {
             return;
