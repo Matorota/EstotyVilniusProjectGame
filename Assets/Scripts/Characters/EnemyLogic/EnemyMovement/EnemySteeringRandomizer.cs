@@ -5,6 +5,7 @@ public class EnemySteeringRandomizer : MonoBehaviour
     [Header("Approach")]
     [SerializeField] float approachTightness = 1f;
     [SerializeField] float keepPressureRange = 0.6f;
+    [SerializeField] float minimumApproachFactor = 0.45f;
 
     [Header("Unpredictability")]
     [SerializeField] float orbitStrength = 0.65f;
@@ -34,13 +35,19 @@ public class EnemySteeringRandomizer : MonoBehaviour
 
         Vector3 approachDirection = toTarget / distance;
         float pressureDistance = Mathf.Max(0.05f, stopDistance + keepPressureRange);
-        float approachFactor = Mathf.Clamp01((distance - stopDistance) / pressureDistance) * approachTightness;
+        float distancePastStopDistance = Mathf.Max(0f, distance - stopDistance);
+        float pressureFactor = Mathf.Clamp01(distancePastStopDistance / pressureDistance);
+        float approachFactor = Mathf.Lerp(minimumApproachFactor, 1f, pressureFactor) * approachTightness;
 
         UpdateOrbitDirection();
         UpdateJitterDirection();
 
         Vector3 orbitDirection = Vector3.Cross(Vector3.up, approachDirection) * orbitDirectionSign;
-        Vector3 desired = approachDirection * approachFactor + orbitDirection * orbitStrength + jitterDirection * jitterStrength;
+        float randomInfluence = pressureFactor;
+        Vector3 desired =
+            approachDirection * approachFactor +
+            orbitDirection * orbitStrength * randomInfluence +
+            jitterDirection * jitterStrength * randomInfluence;
 
         if (desired.sqrMagnitude <= 0.0001f)
         {
@@ -77,6 +84,7 @@ public class EnemySteeringRandomizer : MonoBehaviour
     {
         approachTightness = Mathf.Max(0f, approachTightness);
         keepPressureRange = Mathf.Max(0f, keepPressureRange);
+        minimumApproachFactor = Mathf.Clamp01(minimumApproachFactor);
         orbitStrength = Mathf.Max(0f, orbitStrength);
         jitterStrength = Mathf.Max(0f, jitterStrength);
 

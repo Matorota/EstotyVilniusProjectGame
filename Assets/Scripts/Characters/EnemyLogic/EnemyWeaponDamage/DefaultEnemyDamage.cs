@@ -3,34 +3,40 @@ using System.Collections.Generic;
 
 public class DefaultEnemyDamage : MonoBehaviour, IDamageSource
 {
+    const float MaximumDamageAmount = 4f;
+    const float MinimumHitCooldown = 1f;
+    const float MinimumInitialContactDelay = 0.2f;
+
     [Header("Damage")]
-    [SerializeField] float damageAmount = 10f;
+    [SerializeField] float damageAmount = 3f;
     [SerializeField] string targetTag = "Player";
-    [SerializeField] float hitCooldownSeconds = 0.4f;
+    [SerializeField] float hitCooldownSeconds = 1.2f;
+    [SerializeField] float initialContactDelaySeconds = 0.6f;
+
+    [Header("Contact")]
+    [SerializeField] float damageRadius = 1.25f;
 
     readonly Dictionary<int, float> nextHitTimeByTarget = new Dictionary<int, float>();
 
     public float DamageAmount => damageAmount;
 
-    void OnTriggerEnter(Collider other)
+    void Awake()
     {
-        TryDamage(other);
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        TryDamage(collision.collider);
-    }
-
-    void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        TryDamage(hit.collider);
+        NormalizeDamageValues();
     }
 
     void OnValidate()
     {
-        damageAmount = Mathf.Max(0f, damageAmount);
-        hitCooldownSeconds = Mathf.Max(0f, hitCooldownSeconds);
+        NormalizeDamageValues();
+    }
+
+    void FixedUpdate()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, damageRadius, Physics.AllLayers, QueryTriggerInteraction.Collide);
+        for (int i = 0; i < nearbyColliders.Length; i++)
+        {
+            TryDamage(nearbyColliders[i]);
+        }
     }
 
     void TryDamage(Collider other)
@@ -50,7 +56,13 @@ public class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         }
 
         int targetId = targetHealth.GetInstanceID();
-        if (nextHitTimeByTarget.TryGetValue(targetId, out float nextHitTime) && Time.time < nextHitTime)
+        if (!nextHitTimeByTarget.TryGetValue(targetId, out float nextHitTime))
+        {
+            nextHitTimeByTarget[targetId] = Time.time + initialContactDelaySeconds;
+            return;
+        }
+
+        if (Time.time < nextHitTime)
         {
             return;
         }
@@ -72,5 +84,13 @@ public class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         }
 
         return other.transform.root.CompareTag(targetTag);
+    }
+
+    void NormalizeDamageValues()
+    {
+        damageAmount = Mathf.Clamp(damageAmount, 0f, MaximumDamageAmount);
+        hitCooldownSeconds = Mathf.Max(MinimumHitCooldown, hitCooldownSeconds);
+        initialContactDelaySeconds = Mathf.Max(MinimumInitialContactDelay, initialContactDelaySeconds);
+        damageRadius = Mathf.Max(0.1f, damageRadius);
     }
 }
