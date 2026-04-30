@@ -47,6 +47,13 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
             other.GetComponentInParent<IDamageSource>() ??
             other.GetComponentInChildren<IDamageSource>();
 
+        // DefaultEnemyDamage already applies timed contact damage on the enemy side.
+        // Skipping it here prevents extra burst damage when moving into enemies.
+        if (damageSource is DefaultEnemyDamage)
+        {
+            return;
+        }
+
         float damageAmount = damageSource != null ? damageSource.DamageAmount : defaultTriggerDamage;
 
         health.TakeDamage(damageAmount);
