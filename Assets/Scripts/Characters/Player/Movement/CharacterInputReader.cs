@@ -9,8 +9,6 @@ public class CharacterInputReader : MonoBehaviour
     [SerializeField] int joystickId;
     [SerializeField] bool useJoystick = true;
 
-    bool queuedJump;
-
     public Vector2 ReadMovementInput()
     {
         Vector2 joystickInput = ReadJoystickInput();
@@ -20,19 +18,6 @@ public class CharacterInputReader : MonoBehaviour
         }
 
         return ReadKeyboardInput();
-    }
-
-    public bool ConsumeJumpPressed()
-    {
-        bool keyboardJumpPressed = Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame;
-        bool shouldJump = keyboardJumpPressed || queuedJump;
-        queuedJump = false;
-        return shouldJump;
-    }
-
-    public void QueueJump()
-    {
-        queuedJump = true;
     }
 
     Vector2 ReadJoystickInput()

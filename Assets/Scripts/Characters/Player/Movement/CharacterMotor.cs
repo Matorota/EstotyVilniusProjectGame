@@ -3,13 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class CharacterMotor : MonoBehaviour
 {
-    [SerializeField] CharacterController controller;
+    CharacterController controller;
 
     [Header("Movement")]
     [SerializeField] float gravity = -20f;
     [SerializeField] float speed = 4f;
-    [Tooltip("The exact height the player will jump in Unity units (e.g., 1.3 blocks)")]
-    [SerializeField] float jumpHeight = 1.3f;
     [SerializeField] float movementSmoothTime = 0.15f;
     [SerializeField] float rotationLerpSpeed = 15f;
     [SerializeField] float groundedVerticalVelocity = -2f;
@@ -20,26 +18,14 @@ public class CharacterMotor : MonoBehaviour
 
     void Awake()
     {
-        CacheDependencies();
+        controller = GetComponent<CharacterController>();
         ClampValues();
     }
 
-    void OnValidate()
-    {
-        CacheDependencies();
-        ClampValues();
-    }
-
-    public void Tick(Vector3 moveDirection, bool jumpRequested)
+    public void Tick(Vector3 moveDirection)
     {
         ApplyGroundStick();
         ApplyHorizontalMovement(moveDirection);
-
-        if (jumpRequested)
-        {
-            TryJump();
-        }
-
         ApplyGravity();
         MoveCharacter();
     }
@@ -76,16 +62,6 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
-    void TryJump()
-    {
-        if (!controller.isGrounded)
-        {
-            return;
-        }
-
-        verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-    }
-
     void ApplyGravity()
     {
         verticalVelocity += gravity * Time.deltaTime;
@@ -98,20 +74,11 @@ public class CharacterMotor : MonoBehaviour
         controller.Move(frameMovement * Time.deltaTime);
     }
 
-    void CacheDependencies()
-    {
-        if (controller == null)
-        {
-            controller = GetComponent<CharacterController>();
-        }
-    }
-
     void ClampValues()
     {
         gravity = Mathf.Min(-0.01f, gravity);
         groundedVerticalVelocity = Mathf.Min(0f, groundedVerticalVelocity);
         speed = Mathf.Max(0f, speed);
-        jumpHeight = Mathf.Max(0f, jumpHeight);
         movementSmoothTime = Mathf.Max(0f, movementSmoothTime);
         rotationLerpSpeed = Mathf.Max(0f, rotationLerpSpeed);
     }

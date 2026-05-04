@@ -21395,7 +21395,6 @@ GameObject:
   - component: {fileID: 1188586092}
   - component: {fileID: 1188586090}
   - component: {fileID: 1188586091}
-  - component: {fileID: 1188586089}
   - component: {fileID: 1188586100}
   m_Layer: 0
   m_Name: Enemy
@@ -21404,25 +21403,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1188586089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1188586088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e77d76c4df1c5de4e82c4759f1157e11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemySteeringRandomizer
-  approachTightness: 1
-  keepPressureRange: 0.6
-  minimumApproachFactor: 0.45
-  orbitStrength: 0.65
-  orbitSwitchTimeRange: {x: 0.7, y: 1.6}
-  jitterStrength: 0.35
-  jitterSwitchTimeRange: {x: 0.2, y: 0.5}
 --- !u!114 &1188586090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21435,9 +21415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206e35be1ee5c84887d9a258ef29a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
-  controller: {fileID: 1188586092}
-  targetTracker: {fileID: 1188586091}
-  steeringRandomizer: {fileID: 1188586089}
   speed: 3
   stopDistance: 1.1
   smoothTime: 0.12
@@ -21456,8 +21433,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58d1fd0261d6e874f99fb44bc12f8868, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTargetTracker
-  playerTag: Player
-  refreshInterval: 0.3
 --- !u!143 &1188586092
 CharacterController:
   m_ObjectHideFlags: 0
@@ -26554,34 +26529,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206e35be1ee5c84887d9a258ef29a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
-  controller: {fileID: 1472166170}
-  targetTracker: {fileID: 1472166169}
-  steeringRandomizer: {fileID: 1472166168}
   speed: 3
   stopDistance: 1.1
   smoothTime: 0.12
   rotationLerpSpeed: 14
   gravityValue: -20
   groundedVerticalVelocity: -2
---- !u!114 &1472166168
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1472166164}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e77d76c4df1c5de4e82c4759f1157e11, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemySteeringRandomizer
-  approachTightness: 1
-  keepPressureRange: 0.6
-  minimumApproachFactor: 0.45
-  orbitStrength: 0.65
-  orbitSwitchTimeRange: {x: 0.7, y: 1.6}
-  jitterStrength: 0.35
-  jitterSwitchTimeRange: {x: 0.2, y: 0.5}
 --- !u!114 &1472166169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26594,8 +26547,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58d1fd0261d6e874f99fb44bc12f8868, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyTargetTracker
-  playerTag: Player
-  refreshInterval: 0.3
 --- !u!143 &1472166170
 CharacterController:
   m_ObjectHideFlags: 0
@@ -31833,9 +31784,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166169}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1472166168}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166167}

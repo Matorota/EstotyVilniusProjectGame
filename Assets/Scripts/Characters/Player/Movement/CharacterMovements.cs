@@ -5,52 +5,37 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterMotor))]
 public class CharacterMovements : MonoBehaviour
 {
-    [SerializeField] CharacterInputReader inputReader;
-    [SerializeField] MovementDirectionResolver directionResolver;
-    [SerializeField] CharacterMotor motor;
+    public static CharacterMovements MainCharacter { get; private set; }
+
+    CharacterInputReader inputReader;
+    MovementDirectionResolver directionResolver;
+    CharacterMotor motor;
 
     void Awake()
     {
-        CacheDependencies();
+        MainCharacter = this;
+        inputReader = GetComponent<CharacterInputReader>();
+        directionResolver = GetComponent<MovementDirectionResolver>();
+        motor = GetComponent<CharacterMotor>();
     }
 
-    void OnValidate()
+    void OnDestroy()
     {
-        CacheDependencies();
+        if (MainCharacter == this)
+        {
+            MainCharacter = null;
+        }
     }
 
     void Update()
     {
         Vector2 movementInput = inputReader.ReadMovementInput();
         Vector3 moveDirection = directionResolver.ResolveMoveDirection(movementInput);
-        bool jumpRequested = inputReader.ConsumeJumpPressed();
-        motor.Tick(moveDirection, jumpRequested);
+        motor.Tick(moveDirection);
     }
 
-    public void Jump()
-    {
-        inputReader.QueueJump();
-    }
     public void ResetVelocity()
     {
         motor.ResetVelocity();
-    }
-
-    void CacheDependencies()
-    {
-        if (inputReader == null)
-        {
-            inputReader = GetComponent<CharacterInputReader>();
-        }
-
-        if (directionResolver == null)
-        {
-            directionResolver = GetComponent<MovementDirectionResolver>();
-        }
-
-        if (motor == null)
-        {
-            motor = GetComponent<CharacterMotor>();
-        }
     }
 }
