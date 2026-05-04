@@ -17,6 +17,7 @@ public class Health : MonoBehaviour
         ClampValues();
         NotifyHealthChanged();
     }
+    
 
     void OnValidate()
     {

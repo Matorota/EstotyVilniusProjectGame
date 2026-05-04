@@ -65,6 +65,7 @@ public class DeathScreen : MonoBehaviour
             Time.timeScale = 0f;
             changedTimeScale = true;
         }
+        
     }
 
     private void OnHealthChanged(float currentHealth, float _)

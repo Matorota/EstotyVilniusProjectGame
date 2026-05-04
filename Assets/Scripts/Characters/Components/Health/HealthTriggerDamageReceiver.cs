@@ -4,20 +4,14 @@ using UnityEngine;
 public class HealthTriggerDamageReceiver : MonoBehaviour
 {
     [Header("Trigger Damage")]
-    [SerializeField] string damagingTag = "Enemy";
     [SerializeField] float defaultTriggerDamage = 10f;
 
     Health health;
 
     void Awake()
     {
-        CacheDependencies();
-    }
-
-    void OnValidate()
-    {
+        health = GetComponent<Health>();
         defaultTriggerDamage = Mathf.Max(0f, defaultTriggerDamage);
-        CacheDependencies();
     }
 
     void OnTriggerEnter(Collider other)
@@ -37,7 +31,12 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
 
     void TryApplyDamage(Collider other)
     {
-        if (health == null || !IsDamagingTag(other))
+        EnemyMovement enemyMovement =
+            other.GetComponent<EnemyMovement>() ??
+            other.GetComponentInParent<EnemyMovement>() ??
+            other.GetComponentInChildren<EnemyMovement>();
+
+        if (enemyMovement == null)
         {
             return;
         }
@@ -55,28 +54,5 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
         }
 
         health.TakeDamage(defaultTriggerDamage);
-    }
-
-    bool IsDamagingTag(Collider other)
-    {
-        if (other.CompareTag(damagingTag))
-        {
-            return true;
-        }
-
-        if (other.attachedRigidbody != null && other.attachedRigidbody.CompareTag(damagingTag))
-        {
-            return true;
-        }
-
-        return other.transform.root.CompareTag(damagingTag);
-    }
-
-    void CacheDependencies()
-    {
-        if (health == null)
-        {
-            health = GetComponent<Health>();
-        }
     }
 }

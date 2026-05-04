@@ -8,32 +8,20 @@ public class HealthBar : MonoBehaviour
     [SerializeField] Image healthFillImage;
     Health health;
 
-    void OnValidate()
-    {
-        CacheDependencies();
-        UpdateHealthBar();
-    }
-
     void Awake()
     {
-        CacheDependencies();
+        health = GetComponent<Health>();
     }
 
     void OnEnable()
     {
-        if (health != null)
-        {
-            health.HealthChanged += OnHealthChanged;
-            UpdateHealthBar();
-        }
+        health.HealthChanged += OnHealthChanged;
+        UpdateHealthBar();
     }
 
     void OnDisable()
     {
-        if (health != null)
-        {
-            health.HealthChanged -= OnHealthChanged;
-        }
+        health.HealthChanged -= OnHealthChanged;
     }
 
     void OnHealthChanged(float current, float capacity)
@@ -62,13 +50,5 @@ public class HealthBar : MonoBehaviour
 
         float safeHealthCapacity = Mathf.Max(1f, healthCapacity);
         healthFillImage.fillAmount = currentHealth / safeHealthCapacity;
-    }
-
-    void CacheDependencies()
-    {
-        if (health == null)
-        {
-            health = GetComponent<Health>();
-        }
     }
 }

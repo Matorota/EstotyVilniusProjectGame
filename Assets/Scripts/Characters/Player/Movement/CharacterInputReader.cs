@@ -8,6 +8,8 @@ public class CharacterInputReader : MonoBehaviour
     [SerializeField] VirtualJoystick joystick;
     [SerializeField] int joystickId;
     [SerializeField] bool useJoystick = true;
+    
+    
 
     public Vector2 ReadMovementInput()
     {
