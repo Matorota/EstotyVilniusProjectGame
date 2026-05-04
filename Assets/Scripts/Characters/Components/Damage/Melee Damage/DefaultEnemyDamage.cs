@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
+public partial class DefaultEnemyDamage : MonoBehaviour
 {
     const float MinimumDamageAmount = 10f;
     const float MaximumDamageAmount = 20f;
@@ -33,8 +33,6 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         public float CurrentTime;
         public float TowardSpeed;
     }
-
-    public float DamageAmount => damageAmount;
 
     void Awake()
     {

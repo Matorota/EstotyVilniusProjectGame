@@ -1,16 +1,40 @@
 using UnityEngine;
 
-public class OnDeath : MonoBehaviour
+[RequireComponent(typeof(Health))]
+public class DestroyOnDeath : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    Health health;
+    bool hasDestroyed;
+
+    void Awake()
     {
-        
+        health = GetComponent<Health>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnEnable()
     {
-        
+        health.HealthChanged += OnHealthChanged;
+        TryDestroyIfDepleted(health.CurrentHealth);
+    }
+
+    void OnDisable()
+    {
+        health.HealthChanged -= OnHealthChanged;
+    }
+
+    void OnHealthChanged(float currentHealth, float _)
+    {
+        TryDestroyIfDepleted(currentHealth);
+    }
+
+    void TryDestroyIfDepleted(float currentHealth)
+    {
+        if (hasDestroyed || currentHealth > 0f)
+        {
+            return;
+        }
+
+        hasDestroyed = true;
+        Destroy(gameObject);
     }
 }

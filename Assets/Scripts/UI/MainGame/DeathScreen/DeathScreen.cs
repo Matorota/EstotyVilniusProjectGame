@@ -3,8 +3,9 @@ using UnityEngine;
 public class DeathScreen : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Health playerHealth;
+    [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private GameObject deathScreenRoot;
+    private Health playerHealth;
 
     [Header("Behaviour")]
     [SerializeField] private bool pauseGameOnDeath = true;
@@ -12,14 +13,9 @@ public class DeathScreen : MonoBehaviour
     private bool isShown;
     private bool changedTimeScale;
 
-    private void OnValidate()
-    {
-        CacheReferences();
-    }
-
     private void Awake()
     {
-        CacheReferences();
+        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<Health>() : null;
 
         if (deathScreenRoot != null)
         {
@@ -31,7 +27,8 @@ public class DeathScreen : MonoBehaviour
     {
         if (playerHealth != null)
         {
-            playerHealth.Died += ShowDeathScreen;
+            playerHealth.HealthChanged += OnHealthChanged;
+            OnHealthChanged(playerHealth.CurrentHealth, playerHealth.HealthCapacity);
         }
     }
 
@@ -39,7 +36,7 @@ public class DeathScreen : MonoBehaviour
     {
         if (playerHealth != null)
         {
-            playerHealth.Died -= ShowDeathScreen;
+            playerHealth.HealthChanged -= OnHealthChanged;
         }
 
         if (changedTimeScale)
@@ -70,11 +67,11 @@ public class DeathScreen : MonoBehaviour
         }
     }
 
-    private void CacheReferences()
+    private void OnHealthChanged(float currentHealth, float _)
     {
-        if (playerHealth == null)
+        if (currentHealth <= 0f)
         {
-            playerHealth = FindObjectOfType<Health>();
+            ShowDeathScreen();
         }
     }
 }

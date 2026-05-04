@@ -42,21 +42,19 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
             return;
         }
 
-        IDamageSource damageSource =
-            other.GetComponent<IDamageSource>() ??
-            other.GetComponentInParent<IDamageSource>() ??
-            other.GetComponentInChildren<IDamageSource>();
-
         // DefaultEnemyDamage already applies timed contact damage on the enemy side.
         // Skipping it here prevents extra burst damage when moving into enemies.
-        if (damageSource is DefaultEnemyDamage)
+        DefaultEnemyDamage enemyDamage =
+            other.GetComponent<DefaultEnemyDamage>() ??
+            other.GetComponentInParent<DefaultEnemyDamage>() ??
+            other.GetComponentInChildren<DefaultEnemyDamage>();
+
+        if (enemyDamage != null)
         {
             return;
         }
 
-        float damageAmount = damageSource != null ? damageSource.DamageAmount : defaultTriggerDamage;
-
-        health.TakeDamage(damageAmount);
+        health.TakeDamage(defaultTriggerDamage);
     }
 
     bool IsDamagingTag(Collider other)
