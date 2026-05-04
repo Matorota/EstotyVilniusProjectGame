@@ -3,24 +3,24 @@ using UnityEngine;
 public class CameraControls : MonoBehaviour
 {
     [Header("Follow")]
+    [SerializeField] CharacterMovements mainCharacter;
     [SerializeField] Transform target;
     [SerializeField] Vector3 offset = new Vector3(0f, 12f, -12f);
 
-    void Start()
+    private void Start()
     {
-        if (target == null)
+        if (target == null && mainCharacter != null)
         {
-            CharacterMovements player = FindObjectOfType<CharacterMovements>();
-            if (player != null) target = player.transform;
+            target = mainCharacter.transform;
         }
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         FollowTargetIfAvailable();
     }
 
-    void FollowTargetIfAvailable()
+    private void FollowTargetIfAvailable()
     {
         if (target == null)
         {

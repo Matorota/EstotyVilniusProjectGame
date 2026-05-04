@@ -8,30 +8,30 @@ public class HealthBar : MonoBehaviour
     [SerializeField] Image healthFillImage;
     Health health;
 
-    void Awake()
+    private void Awake()
     {
         health = GetComponent<Health>();
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         health.HealthChanged += OnHealthChanged;
         UpdateHealthBar();
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         health.HealthChanged -= OnHealthChanged;
     }
 
-    void OnHealthChanged(float current, float capacity)
+    private void OnHealthChanged(float current, float capacity)
     {
         UpdateHealthBar(current, capacity);
     }
     
     
 
-    void UpdateHealthBar()
+    private void UpdateHealthBar()
     {
         if (health == null)
         {
@@ -41,7 +41,7 @@ public class HealthBar : MonoBehaviour
         UpdateHealthBar(health.CurrentHealth, health.HealthCapacity);
     }
 
-    void UpdateHealthBar(float currentHealth, float healthCapacity)
+    private void UpdateHealthBar(float currentHealth, float healthCapacity)
     {
         if (healthFillImage == null)
         {

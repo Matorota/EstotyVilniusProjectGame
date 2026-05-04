@@ -8,28 +8,28 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
 
     Health health;
 
-    void Awake()
+    private void Awake()
     {
         health = GetComponent<Health>();
         defaultTriggerDamage = Mathf.Max(0f, defaultTriggerDamage);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         TryApplyDamage(other);
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         TryApplyDamage(collision.collider);
     }
 
-    void OnControllerColliderHit(ControllerColliderHit hit)
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         TryApplyDamage(hit.collider);
     }
 
-    void TryApplyDamage(Collider other)
+    private void TryApplyDamage(Collider other)
     {
         EnemyMovement enemyMovement =
             other.GetComponent<EnemyMovement>() ??
@@ -41,8 +41,6 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
             return;
         }
 
-        // DefaultEnemyDamage already applies timed contact damage on the enemy side.
-        // Skipping it here prevents extra burst damage when moving into enemies.
         DefaultEnemyDamage enemyDamage =
             other.GetComponent<DefaultEnemyDamage>() ??
             other.GetComponentInParent<DefaultEnemyDamage>() ??

@@ -16,7 +16,7 @@ public class CharacterMotor : MonoBehaviour
     Vector3 horizontalVelocitySmoothing;
     float verticalVelocity;
 
-    void Awake()
+    private void Awake()
     {
         controller = GetComponent<CharacterController>();
         ClampValues();
@@ -37,7 +37,7 @@ public class CharacterMotor : MonoBehaviour
         horizontalVelocitySmoothing = Vector3.zero;
     }
 
-    void ApplyGroundStick()
+    private void ApplyGroundStick()
     {
         if (controller.isGrounded && verticalVelocity < 0f)
         {
@@ -45,7 +45,7 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
-    void ApplyHorizontalMovement(Vector3 moveDirection)
+    private void ApplyHorizontalMovement(Vector3 moveDirection)
     {
         Vector3 targetHorizontalVelocity = moveDirection * speed;
         smoothedHorizontalVelocity = Vector3.SmoothDamp(
@@ -62,19 +62,19 @@ public class CharacterMotor : MonoBehaviour
         }
     }
 
-    void ApplyGravity()
+    private void ApplyGravity()
     {
         verticalVelocity += gravity * Time.deltaTime;
     }
 
-    void MoveCharacter()
+    private void MoveCharacter()
     {
         Vector3 frameMovement = smoothedHorizontalVelocity;
         frameMovement.y = verticalVelocity;
         controller.Move(frameMovement * Time.deltaTime);
     }
 
-    void ClampValues()
+    private void ClampValues()
     {
         gravity = Mathf.Min(-0.01f, gravity);
         groundedVerticalVelocity = Mathf.Min(0f, groundedVerticalVelocity);

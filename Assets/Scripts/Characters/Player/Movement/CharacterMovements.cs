@@ -5,29 +5,18 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterMotor))]
 public class CharacterMovements : MonoBehaviour
 {
-    public static CharacterMovements MainCharacter { get; private set; }
-
     CharacterInputReader inputReader;
     MovementDirectionResolver directionResolver;
     CharacterMotor motor;
 
-    void Awake()
+    private void Awake()
     {
-        MainCharacter = this;
         inputReader = GetComponent<CharacterInputReader>();
         directionResolver = GetComponent<MovementDirectionResolver>();
         motor = GetComponent<CharacterMotor>();
     }
 
-    void OnDestroy()
-    {
-        if (MainCharacter == this)
-        {
-            MainCharacter = null;
-        }
-    }
-
-    void Update()
+    private void Update()
     {
         Vector2 movementInput = inputReader.ReadMovementInput();
         Vector3 moveDirection = directionResolver.ResolveMoveDirection(movementInput);

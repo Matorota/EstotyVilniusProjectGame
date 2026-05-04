@@ -9,7 +9,7 @@ public class MovementDirectionResolver : MonoBehaviour
     static readonly Vector3 IsoForward = new Vector3(1f, 0f, 1f).normalized;
     static readonly Vector3 IsoRight = new Vector3(1f, 0f, -1f).normalized;
 
-    void Start()
+    private void Start()
     {
         if (movementCamera == null && Camera.main != null)
         {

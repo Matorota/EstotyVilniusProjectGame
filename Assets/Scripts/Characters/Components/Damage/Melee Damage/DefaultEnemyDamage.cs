@@ -34,17 +34,17 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         public float TowardSpeed;
     }
 
-    void Awake()
+    private void Awake()
     {
         NormalizeDamageValues();
     }
 
-    void OnValidate()
+    private void OnValidate()
     {
         NormalizeDamageValues();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         Collider[] contacts = Physics.OverlapSphere(
             transform.position,
@@ -59,7 +59,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         }
     }
 
-    void TryDamage(Collider other)
+    private void TryDamage(Collider other)
     {
         if (!TryCreateTargetContext(other, out TargetContactContext context))
         {
@@ -110,7 +110,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         return true;
     }
 
-    void ApplyDamage(TargetContactContext context)
+    private void ApplyDamage(TargetContactContext context)
     {
         float appliedDamage = ResolveAppliedDamage(context.TowardSpeed);
         context.TargetHealth.TakeDamage(appliedDamage);
@@ -118,7 +118,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         nextGlobalHitTimeByTarget[context.TargetId] = context.CurrentTime + globalHitCooldownSeconds;
     }
 
-    void NormalizeDamageValues()
+    private void NormalizeDamageValues()
     {
         damageAmount = Mathf.Clamp(damageAmount, MinimumDamageAmount, MaximumDamageAmount);
         hitCooldownSeconds = Mathf.Max(MinimumHitCooldown, hitCooldownSeconds);

@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class EnemyTargetTracker : MonoBehaviour
 {
+    [SerializeField] CharacterMovements targetCharacter;
+
     public Transform ResolveTarget()
     {
-        return CharacterMovements.MainCharacter != null ? CharacterMovements.MainCharacter.transform : null;
+        return targetCharacter != null ? targetCharacter.transform : null;
     }
 }

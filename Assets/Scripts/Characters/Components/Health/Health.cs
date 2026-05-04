@@ -12,14 +12,14 @@ public class Health : MonoBehaviour
 
     public event Action<float, float> HealthChanged;
 
-    void Awake()
+    private void Awake()
     {
         ClampValues();
         NotifyHealthChanged();
     }
     
 
-    void OnValidate()
+    private void OnValidate()
     {
         ClampValues();
         NotifyHealthChanged();
@@ -38,13 +38,13 @@ public class Health : MonoBehaviour
         NotifyHealthChanged();
     }
 
-    void ClampValues()
+    private void ClampValues()
     {
         healthCapacity = Mathf.Max(1f, healthCapacity);
         currentHealth = Mathf.Clamp(currentHealth, 0f, healthCapacity);
     }
 
-    void NotifyHealthChanged()
+    private void NotifyHealthChanged()
     {
         HealthChanged?.Invoke(currentHealth, healthCapacity);
     }

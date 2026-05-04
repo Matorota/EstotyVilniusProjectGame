@@ -21,19 +21,19 @@ public class EnemyMovement : MonoBehaviour
     Vector3 moveVelocity;
     float verticalVelocity;
 
-    void Awake()
+    private void Awake()
     {
         controller = GetComponent<CharacterController>();
         targetTracker = GetComponent<EnemyTargetTracker>();
         ClampValues();
     }
 
-    void Update()
+    private void Update()
     {
         MoveTowardsTarget();
     }
 
-    void MoveTowardsTarget()
+    private void MoveTowardsTarget()
     {
         if (controller.isGrounded && verticalVelocity < 0f)
         {
@@ -75,7 +75,7 @@ public class EnemyMovement : MonoBehaviour
         return toTarget / distanceToTarget;
     }
 
-    void ClampValues()
+    private void ClampValues()
     {
         speed = Mathf.Max(0f, speed);
         stopDistance = Mathf.Max(0f, stopDistance);
