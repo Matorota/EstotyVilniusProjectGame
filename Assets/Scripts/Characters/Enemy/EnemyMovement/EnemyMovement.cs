@@ -2,12 +2,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(EnemyTargetTracker))]
-[RequireComponent(typeof(EnemySteeringRandomizer))]
 public class EnemyMovement : MonoBehaviour
 {
-    [SerializeField] CharacterController controller;
-    [SerializeField] EnemyTargetTracker targetTracker;
-    [SerializeField] EnemySteeringRandomizer steeringRandomizer;
+    CharacterController controller;
+    EnemyTargetTracker targetTracker;
 
     [Header("Movement")]
     [SerializeField] float speed = 3f;
@@ -23,24 +21,19 @@ public class EnemyMovement : MonoBehaviour
     Vector3 moveVelocity;
     float verticalVelocity;
 
-    void Awake()
+    private void Awake()
     {
-        CacheDependencies();
+        controller = GetComponent<CharacterController>();
+        targetTracker = GetComponent<EnemyTargetTracker>();
         ClampValues();
     }
 
-    void OnValidate()
-    {
-        CacheDependencies();
-        ClampValues();
-    }
-
-    void Update()
+    private void Update()
     {
         MoveTowardsTarget();
     }
 
-    void MoveTowardsTarget()
+    private void MoveTowardsTarget()
     {
         if (controller.isGrounded && verticalVelocity < 0f)
         {
@@ -48,7 +41,7 @@ public class EnemyMovement : MonoBehaviour
         }
 
         Transform target = targetTracker.ResolveTarget();
-        Vector3 desiredDirection = steeringRandomizer.ResolveMoveDirection(transform.position, target, stopDistance);
+        Vector3 desiredDirection = ResolveDirectMoveDirection(target);
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
@@ -64,25 +57,25 @@ public class EnemyMovement : MonoBehaviour
         controller.Move(frameMovement * Time.deltaTime);
     }
 
-    void CacheDependencies()
+    Vector3 ResolveDirectMoveDirection(Transform target)
     {
-        if (controller == null)
+        if (target == null)
         {
-            controller = GetComponent<CharacterController>();
+            return Vector3.zero;
         }
 
-        if (targetTracker == null)
+        Vector3 toTarget = target.position - transform.position;
+        toTarget.y = 0f;
+        float distanceToTarget = toTarget.magnitude;
+        if (distanceToTarget <= stopDistance || distanceToTarget <= 0.001f)
         {
-            targetTracker = GetComponent<EnemyTargetTracker>();
+            return Vector3.zero;
         }
 
-        if (steeringRandomizer == null)
-        {
-            steeringRandomizer = GetComponent<EnemySteeringRandomizer>();
-        }
+        return toTarget / distanceToTarget;
     }
 
-    void ClampValues()
+    private void ClampValues()
     {
         speed = Mathf.Max(0f, speed);
         stopDistance = Mathf.Max(0f, stopDistance);

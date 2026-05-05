@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
+public partial class DefaultEnemyDamage : MonoBehaviour
 {
     const float MinimumDamageAmount = 10f;
     const float MaximumDamageAmount = 20f;
@@ -11,12 +11,13 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
 
     [Header("Damage")]
     [SerializeField] float damageAmount = 20f;
-    [SerializeField] string targetTag = "Player";
     [SerializeField] float hitCooldownSeconds = 1.4f;
     [SerializeField] float initialContactDelaySeconds = 0.7f;
     [SerializeField] float globalHitCooldownSeconds = 0.8f;
     [SerializeField] float movingTowardDamageMultiplier = 1.2f;
     [SerializeField] float movingTowardSpeedThreshold = 0.45f;
+    [SerializeField] float enemyDamageMultiplier = 1.5f;
+    [SerializeField] float characterDamageMultiplier = 1f;
 
     [Header("Contact")]
     [SerializeField] float damageRadius = 1.25f;
@@ -32,21 +33,20 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         public Health TargetHealth;
         public float CurrentTime;
         public float TowardSpeed;
+        public float TargetDamageMultiplier;
     }
 
-    public float DamageAmount => damageAmount;
-
-    void Awake()
+    private void Awake()
     {
         NormalizeDamageValues();
     }
 
-    void OnValidate()
+    private void OnValidate()
     {
         NormalizeDamageValues();
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         Collider[] contacts = Physics.OverlapSphere(
             transform.position,
@@ -61,7 +61,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         }
     }
 
-    void TryDamage(Collider other)
+    private void TryDamage(Collider other)
     {
         if (!TryCreateTargetContext(other, out TargetContactContext context))
         {
@@ -83,17 +83,25 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
 
     bool IsTarget(Collider other)
     {
-        if (other.CompareTag(targetTag))
+        if (other == null)
         {
-            return true;
+            return false;
         }
 
-        if (other.attachedRigidbody != null && other.attachedRigidbody.CompareTag(targetTag))
+        bool attackerIsEnemy = GetComponent<EnemyMovement>() != null;
+        bool attackerIsCharacter = GetComponent<CharacterMotor>() != null;
+
+        if (attackerIsEnemy)
         {
-            return true;
+            return TryGetCharacterMotor(other, out _);
         }
 
-        return other.transform.root.CompareTag(targetTag);
+        if (attackerIsCharacter)
+        {
+            return TryGetEnemyMovement(other, out _);
+        }
+
+        return TryGetEnemyMovement(other, out _) || TryGetCharacterMotor(other, out _);
     }
 
     bool TryCreateTargetContext(Collider other, out TargetContactContext context)
@@ -109,18 +117,19 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         context.TargetHealth = targetHealth;
         context.CurrentTime = Time.time;
         context.TowardSpeed = SampleTargetTowardSpeed(targetId, targetHealth.transform.position);
+        context.TargetDamageMultiplier = ResolveTargetDamageMultiplier(other);
         return true;
     }
 
-    void ApplyDamage(TargetContactContext context)
+    private void ApplyDamage(TargetContactContext context)
     {
-        float appliedDamage = ResolveAppliedDamage(context.TowardSpeed);
+        float appliedDamage = ResolveAppliedDamage(context.TowardSpeed) * context.TargetDamageMultiplier;
         context.TargetHealth.TakeDamage(appliedDamage);
         nextHitTimeByTarget[context.TargetId] = context.CurrentTime + hitCooldownSeconds;
         nextGlobalHitTimeByTarget[context.TargetId] = context.CurrentTime + globalHitCooldownSeconds;
     }
 
-    void NormalizeDamageValues()
+    private void NormalizeDamageValues()
     {
         damageAmount = Mathf.Clamp(damageAmount, MinimumDamageAmount, MaximumDamageAmount);
         hitCooldownSeconds = Mathf.Max(MinimumHitCooldown, hitCooldownSeconds);
@@ -129,6 +138,43 @@ public partial class DefaultEnemyDamage : MonoBehaviour, IDamageSource
         movingTowardDamageMultiplier = Mathf.Clamp(movingTowardDamageMultiplier, 1f, 1.5f);
         movingTowardSpeedThreshold = Mathf.Max(0.01f, movingTowardSpeedThreshold);
         damageRadius = Mathf.Max(0.1f, damageRadius);
+        enemyDamageMultiplier = Mathf.Max(0f, enemyDamageMultiplier);
+        characterDamageMultiplier = Mathf.Max(0f, characterDamageMultiplier);
+    }
+
+    float ResolveTargetDamageMultiplier(Collider other)
+    {
+        if (TryGetEnemyMovement(other, out _))
+        {
+            return enemyDamageMultiplier;
+        }
+
+        if (TryGetCharacterMotor(other, out _))
+        {
+            return characterDamageMultiplier;
+        }
+
+        return 1f;
+    }
+
+    bool TryGetEnemyMovement(Collider other, out EnemyMovement enemyMovement)
+    {
+        enemyMovement =
+            other.GetComponent<EnemyMovement>() ??
+            other.GetComponentInParent<EnemyMovement>() ??
+            other.GetComponentInChildren<EnemyMovement>();
+
+        return enemyMovement != null;
+    }
+
+    bool TryGetCharacterMotor(Collider other, out CharacterMotor characterMotor)
+    {
+        characterMotor =
+            other.GetComponent<CharacterMotor>() ??
+            other.GetComponentInParent<CharacterMotor>() ??
+            other.GetComponentInChildren<CharacterMotor>();
+
+        return characterMotor != null;
     }
 
     float SampleTargetTowardSpeed(int targetId, Vector3 targetPosition)

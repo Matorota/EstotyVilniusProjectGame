@@ -1,35 +1,25 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+public partial class Health : MonoBehaviour
 {
     [Header("Health")]
     [SerializeField] float healthCapacity = 100f;
     [SerializeField] float currentHealth = 100f;
 
-    [Header("Death")]
-    [SerializeField] bool destroyWhenDead;
-
     public float HealthCapacity => healthCapacity;
     public float CurrentHealth => currentHealth;
-    public bool IsDead => currentHealth <= 0f;
 
     public event Action<float, float> HealthChanged;
-    public event Action Died;
-    bool hasDied;
 
-    void Awake()
+    private void Awake()
     {
         ClampValues();
         NotifyHealthChanged();
-
-        if (IsDead)
-        {
-            Die();
-        }
     }
+    
 
-    void OnValidate()
+    private void OnValidate()
     {
         ClampValues();
         NotifyHealthChanged();
@@ -39,43 +29,22 @@ public class Health : MonoBehaviour
     {
         float damage = Mathf.Max(0f, amount);
 
-        if (damage <= 0f || hasDied)
+        if (damage <= 0f || currentHealth <= 0f)
         {
             return;
         }
 
         currentHealth = Mathf.Clamp(currentHealth - damage, 0f, healthCapacity);
         NotifyHealthChanged();
-
-        if (IsDead)
-        {
-            Die();
-        }
     }
 
-    void Die()
-    {
-        if (hasDied)
-        {
-            return;
-        }
-
-        hasDied = true;
-        Died?.Invoke();
-
-        if (destroyWhenDead)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    void ClampValues()
+    private void ClampValues()
     {
         healthCapacity = Mathf.Max(1f, healthCapacity);
         currentHealth = Mathf.Clamp(currentHealth, 0f, healthCapacity);
     }
 
-    void NotifyHealthChanged()
+    private void NotifyHealthChanged()
     {
         HealthChanged?.Invoke(currentHealth, healthCapacity);
     }

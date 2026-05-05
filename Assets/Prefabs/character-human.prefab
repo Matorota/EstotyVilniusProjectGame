@@ -530,7 +530,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   healthCapacity: 100
   currentHealth: 100
-  destroyWhenDead: 0
 --- !u!114 &2761419194767028287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -556,5 +555,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1494d6a8796ea8445b0560f647da3a01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthTriggerDamageReceiver
-  damagingTag: Enemy
   defaultTriggerDamage: 10
