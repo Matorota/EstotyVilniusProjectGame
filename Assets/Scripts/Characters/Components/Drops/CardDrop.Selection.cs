@@ -1,7 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public partial class CardDrop
 {
+    static GameObject lastDroppedCardPrefab;
+
     bool TryResolveRandomCardPrefab(out GameObject prefab)
     {
         prefab = null;
@@ -17,25 +20,41 @@ public partial class CardDrop
             return false;
         }
 
-        int randomValidIndex = Random.Range(0, validPrefabCount);
+        List<GameObject> validPrefabs = new List<GameObject>(validPrefabCount);
         for (int i = 0; i < cardDropPrefabs.Length; i++)
         {
             GameObject currentPrefab = cardDropPrefabs[i];
-            if (currentPrefab == null)
+            if (currentPrefab != null)
             {
-                continue;
+                validPrefabs.Add(currentPrefab);
             }
-
-            if (randomValidIndex == 0)
-            {
-                prefab = currentPrefab;
-                return true;
-            }
-
-            randomValidIndex--;
         }
 
-        return false;
+        if (validPrefabs.Count == 0)
+        {
+            return false;
+        }
+
+        if (validPrefabs.Count > 1 && lastDroppedCardPrefab != null)
+        {
+            validPrefabs.RemoveAll(candidate => candidate == lastDroppedCardPrefab);
+            if (validPrefabs.Count == 0)
+            {
+                for (int i = 0; i < cardDropPrefabs.Length; i++)
+                {
+                    GameObject currentPrefab = cardDropPrefabs[i];
+                    if (currentPrefab != null)
+                    {
+                        validPrefabs.Add(currentPrefab);
+                    }
+                }
+            }
+        }
+
+        int randomValidIndex = Random.Range(0, validPrefabs.Count);
+        prefab = validPrefabs[randomValidIndex];
+        lastDroppedCardPrefab = prefab;
+        return true;
     }
 
     int CountValidPrefabs()

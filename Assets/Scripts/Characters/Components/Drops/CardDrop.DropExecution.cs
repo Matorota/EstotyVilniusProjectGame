@@ -2,6 +2,8 @@ using UnityEngine;
 
 public partial class CardDrop
 {
+    const float CardDropWorldY = 1.5f;
+
     void EvaluateDrop(float currentHealth)
     {
         if (hasDropped || currentHealth > 0f)
@@ -21,6 +23,8 @@ public partial class CardDrop
 
     Vector3 ResolveDropPosition()
     {
-        return transform.position;
+        Vector3 position = transform.position;
+        position.y = CardDropWorldY;
+        return position;
     }
 }
