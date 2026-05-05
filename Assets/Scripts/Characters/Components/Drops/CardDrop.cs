@@ -2,30 +2,23 @@ using UnityEngine;
 
 [DefaultExecutionOrder(-100)]
 [RequireComponent(typeof(Health))]
-public class CardDrop : MonoBehaviour
+public partial class CardDrop : MonoBehaviour
 {
-    [Header("Card")]
-    [SerializeField] GameObject cardObject;
-    [SerializeField] bool hideCardUntilDeath = true;
-    [SerializeField] bool detachCardOnReveal = true;
+    [Header("Loot Drop")]
+    [SerializeField] GameObject[] cardDropPrefabs;
 
     Health health;
-    bool hasRevealed;
+    bool hasDropped;
 
     private void Awake()
     {
         health = GetComponent<Health>();
-
-        if (hideCardUntilDeath && cardObject != null && cardObject.scene.IsValid())
-        {
-            cardObject.SetActive(false);
-        }
     }
 
     private void OnEnable()
     {
         health.HealthChanged += OnHealthChanged;
-        TryRevealCard(health.CurrentHealth);
+        EvaluateDrop(health.CurrentHealth);
     }
 
     private void OnDisable()
@@ -35,23 +28,6 @@ public class CardDrop : MonoBehaviour
 
     private void OnHealthChanged(float currentHealth, float _)
     {
-        TryRevealCard(currentHealth);
-    }
-
-    private void TryRevealCard(float currentHealth)
-    {
-        if (hasRevealed || currentHealth > 0f || cardObject == null)
-        {
-            return;
-        }
-
-        hasRevealed = true;
-
-        if (detachCardOnReveal && cardObject.scene.IsValid())
-        {
-            cardObject.transform.SetParent(null, true);
-        }
-
-        cardObject.SetActive(true);
+        EvaluateDrop(currentHealth);
     }
 }
