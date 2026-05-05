@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+public partial class Health : MonoBehaviour
 {
     [Header("Health")]
     [SerializeField] float healthCapacity = 100f;
