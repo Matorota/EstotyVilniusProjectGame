@@ -16,6 +16,21 @@ public class CharacterMotor : MonoBehaviour
     Vector3 horizontalVelocitySmoothing;
     float verticalVelocity;
 
+    public Vector3 HorizontalVelocity => smoothedHorizontalVelocity;
+    public float NormalizedHorizontalSpeed
+    {
+        get
+        {
+            if (speed <= 0f)
+            {
+                return 0f;
+            }
+
+            Vector2 planarVelocity = new Vector2(smoothedHorizontalVelocity.x, smoothedHorizontalVelocity.z);
+            return Mathf.Clamp01(planarVelocity.magnitude / speed);
+        }
+    }
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();

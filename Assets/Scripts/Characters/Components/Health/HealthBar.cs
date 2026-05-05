@@ -33,11 +33,6 @@ public class HealthBar : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        if (health == null)
-        {
-            return;
-        }
-
         UpdateHealthBar(health.CurrentHealth, health.HealthCapacity);
     }
 
