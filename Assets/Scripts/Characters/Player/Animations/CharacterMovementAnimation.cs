@@ -19,21 +19,12 @@ public class CharacterMovementAnimation : MonoBehaviour
 
     private void Awake()
     {
-        if (animator == null)
-        {
-            animator = GetComponent<Animator>();
-        }
-
+        animator = GetComponent<Animator>();
         NormalizeValues();
     }
 
     public void Tick(Vector2 movementInput, Vector3 worldMoveDirection, float normalizedSpeed, Vector3 worldVelocity)
     {
-        if (animator == null)
-        {
-            return;
-        }
-
         float inputSpeed = Mathf.Clamp01(movementInput.magnitude);
         float targetSpeed = Mathf.Max(inputSpeed, Mathf.Clamp01(normalizedSpeed));
         animator.SetFloat(speedParameter, targetSpeed, parameterDampTime, Time.deltaTime);
