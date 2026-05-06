@@ -2,12 +2,10 @@ using UnityEngine;
 
 public class DeathScreen : MonoBehaviour
 {
-    [Header("References")]
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private GameObject deathScreenRoot;
     private Health playerHealth;
 
-    [Header("Behaviour")]
     [SerializeField] private bool pauseGameOnDeath = true;
 
     private bool isShown;
@@ -15,29 +13,19 @@ public class DeathScreen : MonoBehaviour
 
     private void Awake()
     {
-        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<Health>() : null;
-
-        if (deathScreenRoot != null)
-        {
-            deathScreenRoot.SetActive(false);
-        }
+        playerHealth = mainCharacter.GetComponent<Health>();
+        deathScreenRoot.SetActive(false);
     }
     
     private void OnEnable()
     {
-        if (playerHealth != null)
-        {
-            playerHealth.HealthChanged += OnHealthChanged;
-            OnHealthChanged(playerHealth.CurrentHealth, playerHealth.HealthCapacity);
-        }
+        playerHealth.OnHealthChanged += OnHealthChanged;
+        OnHealthChanged(playerHealth.CurrentHealth);
     }
 
     private void OnDisable()
     {
-        if (playerHealth != null)
-        {
-            playerHealth.HealthChanged -= OnHealthChanged;
-        }
+        playerHealth.OnHealthChanged -= OnHealthChanged;
 
         if (changedTimeScale)
         {
@@ -55,10 +43,7 @@ public class DeathScreen : MonoBehaviour
 
         isShown = true;
 
-        if (deathScreenRoot != null)
-        {
-            deathScreenRoot.SetActive(true);
-        }
+        deathScreenRoot.SetActive(true);
 
         if (pauseGameOnDeath)
         {
@@ -68,7 +53,7 @@ public class DeathScreen : MonoBehaviour
         
     }
 
-    private void OnHealthChanged(float currentHealth, float _)
+    private void OnHealthChanged(float currentHealth)
     {
         if (currentHealth <= 0f)
         {

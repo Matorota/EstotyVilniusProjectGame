@@ -1,6 +1,6 @@
 public partial class DefaultEnemyDamage
 {
-    bool CanHitTargetLocally(int targetId, float currentTime)
+    private bool CanHitTargetLocally(int targetId, float currentTime)
     {
         if (!nextHitTimeByTarget.TryGetValue(targetId, out float nextHitTime))
         {

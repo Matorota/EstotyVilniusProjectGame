@@ -4,9 +4,8 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Health))]
 public class HealthBar : MonoBehaviour
 {
-    [Header("UI")]
-    [SerializeField] Image healthFillImage;
-    Health health;
+    [SerializeField] private Image healthFillImage;
+    private Health health;
 
     private void Awake()
     {
@@ -15,34 +14,24 @@ public class HealthBar : MonoBehaviour
 
     private void OnEnable()
     {
-        health.HealthChanged += OnHealthChanged;
-        UpdateHealthBar();
+        health.OnHealthChanged += OnHealthChanged;
+        UpdateHealthBar(health.CurrentHealth, health.MaxHealth);
     }
 
     private void OnDisable()
     {
-        health.HealthChanged -= OnHealthChanged;
+        health.OnHealthChanged -= OnHealthChanged;
     }
 
-    private void OnHealthChanged(float current, float capacity)
+    private void OnHealthChanged(float currentHealth)
     {
-        UpdateHealthBar(current, capacity);
+        UpdateHealthBar(currentHealth, health.MaxHealth);
     }
     
     
-
-    private void UpdateHealthBar()
-    {
-        UpdateHealthBar(health.CurrentHealth, health.HealthCapacity);
-    }
 
     private void UpdateHealthBar(float currentHealth, float healthCapacity)
     {
-        if (healthFillImage == null)
-        {
-            return;
-        }
-
         float safeHealthCapacity = Mathf.Max(1f, healthCapacity);
         healthFillImage.fillAmount = currentHealth / safeHealthCapacity;
     }

@@ -3,9 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class CardPickup : MonoBehaviour
 {
-    [Header("Card")]
-    [SerializeField] string cardId;
-    [SerializeField] bool destroyIfAlreadyOwned;
+    [SerializeField] private string cardId;
+    [SerializeField] private bool destroyIfAlreadyOwned;
 
     private void Reset()
     {
@@ -15,7 +14,11 @@ public class CardPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (!TryGetInventory(other, out CardInventory inventory))
+        CardInventory inventory =
+            other.GetComponent<CardInventory>() ??
+            other.GetComponentInParent<CardInventory>() ??
+            other.GetComponentInChildren<CardInventory>();
+        if (inventory == null)
         {
             return;
         }
@@ -30,15 +33,5 @@ public class CardPickup : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    bool TryGetInventory(Collider other, out CardInventory inventory)
-    {
-        inventory =
-            other.GetComponent<CardInventory>() ??
-            other.GetComponentInParent<CardInventory>() ??
-            other.GetComponentInChildren<CardInventory>();
-
-        return inventory != null;
     }
 }

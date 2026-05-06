@@ -4,11 +4,10 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public partial class CardDrop : MonoBehaviour
 {
-    [Header("Loot Drop")]
-    [SerializeField] GameObject[] cardDropPrefabs;
+    [SerializeField] private GameObject[] cardDropPrefabs;
 
-    Health health;
-    bool hasDropped;
+    private Health health;
+    private bool hasDropped;
 
     private void Awake()
     {
@@ -17,16 +16,16 @@ public partial class CardDrop : MonoBehaviour
 
     private void OnEnable()
     {
-        health.HealthChanged += OnHealthChanged;
+        health.OnHealthChanged += OnHealthChanged;
         EvaluateDrop(health.CurrentHealth);
     }
 
     private void OnDisable()
     {
-        health.HealthChanged -= OnHealthChanged;
+        health.OnHealthChanged -= OnHealthChanged;
     }
 
-    private void OnHealthChanged(float currentHealth, float _)
+    private void OnHealthChanged(float currentHealth)
     {
         EvaluateDrop(currentHealth);
     }

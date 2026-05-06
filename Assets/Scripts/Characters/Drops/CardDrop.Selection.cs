@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 public partial class CardDrop
 {
-    static GameObject lastDroppedCardPrefab;
+    private static GameObject lastDroppedCardPrefab;
 
-    bool TryResolveRandomCardPrefab(out GameObject prefab)
+    private bool TryResolveRandomCardPrefab(out GameObject prefab)
     {
         prefab = null;
 
-        if (cardDropPrefabs == null || cardDropPrefabs.Length == 0)
+        if (cardDropPrefabs.Length == 0)
         {
             return false;
         }
@@ -57,7 +57,7 @@ public partial class CardDrop
         return true;
     }
 
-    int CountValidPrefabs()
+    private int CountValidPrefabs()
     {
         int validCount = 0;
         for (int i = 0; i < cardDropPrefabs.Length; i++)

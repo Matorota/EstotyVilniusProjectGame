@@ -7800,8 +7800,6 @@ MonoBehaviour:
   hitCooldownSeconds: 1.4
   initialContactDelaySeconds: 0.7
   globalHitCooldownSeconds: 0.8
-  movingTowardDamageMultiplier: 1.2
-  movingTowardSpeedThreshold: 0.45
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
@@ -7842,7 +7840,6 @@ MonoBehaviour:
   animator: {fileID: 412086718}
   speedParameter: Speed
   moveXParameter: MoveX
-  moveYParameter: MoveY
   useDirectionalParameters: 1
   parameterDampTime: 0.12
 --- !u!114 &412086720
@@ -11605,9 +11602,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 851633321}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 851633320}
   m_SourcePrefab: {fileID: 100100000, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
 --- !u!1001 &653999967
 PrefabInstance:
@@ -15006,28 +15000,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
   m_PrefabInstance: {fileID: 650733817}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &851633320
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 851633318}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88b8fa78a18b8b944bbf817f367cddce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterAttack
-  animator: {fileID: 851633321}
-  attackTriggerName: Attack
-  allowMouseInput: 1
-  mouseButton: 0
-  attackCooldownSeconds: 0.25
-  attackDamage: 25
-  attackRadius: 1.25
-  forwardOffset: 1
-  attackTriggerHash: 0
-  nextAttackTime: 0
 --- !u!95 &851633321
 Animator:
   serializedVersion: 7
@@ -17344,7 +17316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf72f2e4408f924d8885c4e52a1fca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  healthCapacity: 100
+  maxHealth: 100
   currentHealth: 100
 --- !u!114 &952281489
 MonoBehaviour:
@@ -17358,11 +17330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30da9f349ccd8c44ba0c8822aa602938, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterMotor
-  gravity: -20
   speed: 4
   movementSmoothTime: 0.15
   rotationLerpSpeed: 15
-  groundedVerticalVelocity: -2
 --- !u!114 &952281490
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17390,7 +17360,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterInputReader
   joystick: {fileID: 0}
-  joystickId: 0
   useJoystick: 1
 --- !u!114 &952281492
 MonoBehaviour:
@@ -21369,7 +21338,6 @@ GameObject:
   - component: {fileID: 1188586102}
   - component: {fileID: 1188586101}
   - component: {fileID: 1188586090}
-  - component: {fileID: 1188586091}
   - component: {fileID: 1188586100}
   - component: {fileID: 1188586104}
   - component: {fileID: 1188586105}
@@ -21392,25 +21360,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206e35be1ee5c84887d9a258ef29a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
+  target: {fileID: 412086683}
   speed: 3
   stopDistance: 1.1
   smoothTime: 0.12
   rotationLerpSpeed: 14
-  gravityValue: -20
-  groundedVerticalVelocity: -2
---- !u!114 &1188586091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1188586088}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58d1fd0261d6e874f99fb44bc12f8868, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyTargetTracker
-  targetCharacter: {fileID: 412086697}
 --- !u!143 &1188586092
 CharacterController:
   m_ObjectHideFlags: 0
@@ -21552,7 +21506,7 @@ Transform:
   m_GameObject: {fileID: 1188586088}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 2, z: 11}
+  m_LocalPosition: {x: 3, y: 2.17, z: 11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -21575,8 +21529,6 @@ MonoBehaviour:
   hitCooldownSeconds: 1.2
   initialContactDelaySeconds: 0.6
   globalHitCooldownSeconds: 0.8
-  movingTowardDamageMultiplier: 1.2
-  movingTowardSpeedThreshold: 0.45
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.5
@@ -21618,7 +21570,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf72f2e4408f924d8885c4e52a1fca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  healthCapacity: 100
+  maxHealth: 100
   currentHealth: 100
 --- !u!114 &1188586104
 MonoBehaviour:
@@ -26630,8 +26582,6 @@ MonoBehaviour:
   hitCooldownSeconds: 1.4
   initialContactDelaySeconds: 0.7
   globalHitCooldownSeconds: 0.8
-  movingTowardDamageMultiplier: 1.2
-  movingTowardSpeedThreshold: 0.45
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
@@ -26647,25 +26597,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8206e35be1ee5c84887d9a258ef29a29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyMovement
+  target: {fileID: 412086683}
   speed: 3
   stopDistance: 1.1
   smoothTime: 0.12
   rotationLerpSpeed: 14
-  gravityValue: -20
-  groundedVerticalVelocity: -2
---- !u!114 &1472166169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1472166164}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58d1fd0261d6e874f99fb44bc12f8868, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyTargetTracker
-  targetCharacter: {fileID: 412086697}
 --- !u!143 &1472166170
 CharacterController:
   m_ObjectHideFlags: 0
@@ -26746,7 +26682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf72f2e4408f924d8885c4e52a1fca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  healthCapacity: 100
+  maxHealth: 100
   currentHealth: 100
 --- !u!114 &1472166176
 MonoBehaviour:
@@ -26778,7 +26714,6 @@ MonoBehaviour:
   animator: {fileID: 1472166178}
   speedParameter: Speed
   moveXParameter: MoveX
-  moveYParameter: MoveY
   useDirectionalParameters: 1
   parameterDampTime: 0.12
 --- !u!95 &1472166178
@@ -31244,6 +31179,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
   m_PrefabInstance: {fileID: 484353101}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1743225575 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8577594272768695915, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
+  m_PrefabInstance: {fileID: 484353101}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f9ac44728580c41ad91debed290eab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1745285248 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -32004,9 +31950,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166174}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1472166169}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166173}
@@ -38066,6 +38009,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1844158470688933829, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      propertyPath: movementCamera
+      value: 
+      objectReference: {fileID: 330585546}
+    - target: {fileID: 2281658734349838882, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      propertyPath: joystick
+      value: 
+      objectReference: {fileID: 1743225575}
     - target: {fileID: 2629702589210448740, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       propertyPath: m_Size.y
       value: 2

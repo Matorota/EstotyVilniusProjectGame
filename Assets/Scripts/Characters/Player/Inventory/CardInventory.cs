@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    readonly Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
 
     public IReadOnlyDictionary<string, int> CardCountsById => cardCountsById;
 

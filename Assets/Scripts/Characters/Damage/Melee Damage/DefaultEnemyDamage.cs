@@ -3,47 +3,24 @@ using System.Collections.Generic;
 
 public partial class DefaultEnemyDamage : MonoBehaviour
 {
-    const float MinimumDamageAmount = 10f;
-    const float MaximumDamageAmount = 20f;
-    const float MinimumHitCooldown = 1f;
-    const float MinimumInitialContactDelay = 0.2f;
-    const float MinimumGlobalHitCooldown = 0.4f;
+    [SerializeField] private float damageAmount = 20f;
+    [SerializeField] private float hitCooldownSeconds = 1.4f;
+    [SerializeField] private float initialContactDelaySeconds = 0.7f;
+    [SerializeField] private float globalHitCooldownSeconds = 0.8f;
+    [SerializeField] private float enemyDamageMultiplier = 1.5f;
+    [SerializeField] private float characterDamageMultiplier = 1f;
 
-    [Header("Damage")]
-    [SerializeField] float damageAmount = 20f;
-    [SerializeField] float hitCooldownSeconds = 1.4f;
-    [SerializeField] float initialContactDelaySeconds = 0.7f;
-    [SerializeField] float globalHitCooldownSeconds = 0.8f;
-    [SerializeField] float movingTowardDamageMultiplier = 1.2f;
-    [SerializeField] float movingTowardSpeedThreshold = 0.45f;
-    [SerializeField] float enemyDamageMultiplier = 1.5f;
-    [SerializeField] float characterDamageMultiplier = 1f;
+    [SerializeField] private float damageRadius = 1.25f;
 
-    [Header("Contact")]
-    [SerializeField] float damageRadius = 1.25f;
+    private readonly Dictionary<int, float> nextHitTimeByTarget = new Dictionary<int, float>();
+    private static readonly Dictionary<int, float> nextGlobalHitTimeByTarget = new Dictionary<int, float>();
 
-    readonly Dictionary<int, float> nextHitTimeByTarget = new Dictionary<int, float>();
-    static readonly Dictionary<int, float> nextGlobalHitTimeByTarget = new Dictionary<int, float>();
-    readonly Dictionary<int, Vector3> lastTargetPositionById = new Dictionary<int, Vector3>();
-    readonly Dictionary<int, float> lastTargetSampleTimeById = new Dictionary<int, float>();
-
-    struct TargetContactContext
+    private struct TargetContactContext
     {
         public int TargetId;
         public Health TargetHealth;
         public float CurrentTime;
-        public float TowardSpeed;
         public float TargetDamageMultiplier;
-    }
-
-    private void Awake()
-    {
-        NormalizeDamageValues();
-    }
-
-    private void OnValidate()
-    {
-        NormalizeDamageValues();
     }
 
     private void FixedUpdate()
@@ -81,7 +58,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         ApplyDamage(context);
     }
 
-    bool IsTarget(Collider other)
+    private bool IsTarget(Collider other)
     {
         if (other == null)
         {
@@ -104,7 +81,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         return TryGetEnemyMovement(other, out _) || TryGetCharacterMotor(other, out _);
     }
 
-    bool TryCreateTargetContext(Collider other, out TargetContactContext context)
+    private bool TryCreateTargetContext(Collider other, out TargetContactContext context)
     {
         context = default;
         if (other == null || !IsTarget(other) || !TryGetTargetHealth(other, out Health targetHealth))
@@ -116,33 +93,19 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         context.TargetId = targetId;
         context.TargetHealth = targetHealth;
         context.CurrentTime = Time.time;
-        context.TowardSpeed = SampleTargetTowardSpeed(targetId, targetHealth.transform.position);
         context.TargetDamageMultiplier = ResolveTargetDamageMultiplier(other);
         return true;
     }
 
     private void ApplyDamage(TargetContactContext context)
     {
-        float appliedDamage = ResolveAppliedDamage(context.TowardSpeed) * context.TargetDamageMultiplier;
+        float appliedDamage = damageAmount * context.TargetDamageMultiplier;
         context.TargetHealth.TakeDamage(appliedDamage);
         nextHitTimeByTarget[context.TargetId] = context.CurrentTime + hitCooldownSeconds;
         nextGlobalHitTimeByTarget[context.TargetId] = context.CurrentTime + globalHitCooldownSeconds;
     }
 
-    private void NormalizeDamageValues()
-    {
-        damageAmount = Mathf.Clamp(damageAmount, MinimumDamageAmount, MaximumDamageAmount);
-        hitCooldownSeconds = Mathf.Max(MinimumHitCooldown, hitCooldownSeconds);
-        initialContactDelaySeconds = Mathf.Max(MinimumInitialContactDelay, initialContactDelaySeconds);
-        globalHitCooldownSeconds = Mathf.Max(MinimumGlobalHitCooldown, globalHitCooldownSeconds);
-        movingTowardDamageMultiplier = Mathf.Clamp(movingTowardDamageMultiplier, 1f, 1.5f);
-        movingTowardSpeedThreshold = Mathf.Max(0.01f, movingTowardSpeedThreshold);
-        damageRadius = Mathf.Max(0.1f, damageRadius);
-        enemyDamageMultiplier = Mathf.Max(0f, enemyDamageMultiplier);
-        characterDamageMultiplier = Mathf.Max(0f, characterDamageMultiplier);
-    }
-
-    float ResolveTargetDamageMultiplier(Collider other)
+    private float ResolveTargetDamageMultiplier(Collider other)
     {
         if (TryGetEnemyMovement(other, out _))
         {
@@ -157,7 +120,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         return 1f;
     }
 
-    bool TryGetEnemyMovement(Collider other, out EnemyMovement enemyMovement)
+    private bool TryGetEnemyMovement(Collider other, out EnemyMovement enemyMovement)
     {
         enemyMovement =
             other.GetComponent<EnemyMovement>() ??
@@ -167,7 +130,7 @@ public partial class DefaultEnemyDamage : MonoBehaviour
         return enemyMovement != null;
     }
 
-    bool TryGetCharacterMotor(Collider other, out CharacterMotor characterMotor)
+    private bool TryGetCharacterMotor(Collider other, out CharacterMotor characterMotor)
     {
         characterMotor =
             other.GetComponent<CharacterMotor>() ??
@@ -175,31 +138,5 @@ public partial class DefaultEnemyDamage : MonoBehaviour
             other.GetComponentInChildren<CharacterMotor>();
 
         return characterMotor != null;
-    }
-
-    float SampleTargetTowardSpeed(int targetId, Vector3 targetPosition)
-    {
-        float currentTime = Time.time;
-        float towardSpeed = 0f;
-
-        if (lastTargetPositionById.TryGetValue(targetId, out Vector3 previousPosition) &&
-            lastTargetSampleTimeById.TryGetValue(targetId, out float previousTime))
-        {
-            float deltaTime = currentTime - previousTime;
-            if (deltaTime > 0.0001f)
-            {
-                Vector3 targetVelocity = (targetPosition - previousPosition) / deltaTime;
-                Vector3 towardEnemy = transform.position - targetPosition;
-                towardEnemy.y = 0f;
-                if (towardEnemy.sqrMagnitude > 0.0001f)
-                {
-                    towardSpeed = Vector3.Dot(targetVelocity, towardEnemy.normalized);
-                }
-            }
-        }
-
-        lastTargetPositionById[targetId] = targetPosition;
-        lastTargetSampleTimeById[targetId] = currentTime;
-        return Mathf.Max(0f, towardSpeed);
     }
 }

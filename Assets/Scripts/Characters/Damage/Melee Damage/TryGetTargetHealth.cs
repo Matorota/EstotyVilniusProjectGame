@@ -2,7 +2,7 @@ using UnityEngine;
 
 public partial class DefaultEnemyDamage
 {
-    bool TryGetTargetHealth(Collider other, out Health targetHealth)
+    private bool TryGetTargetHealth(Collider other, out Health targetHealth)
     {
         targetHealth =
             other.GetComponent<Health>() ??

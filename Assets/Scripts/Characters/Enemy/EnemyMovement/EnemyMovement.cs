@@ -3,23 +3,17 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class EnemyMovement : MonoBehaviour
 {
-    CharacterController controller;
+    private CharacterController controller;
 
     [SerializeField] private Transform target;
 
-    [Header("Movement")]
-    [SerializeField] float speed = 3f;
-    [SerializeField] float stopDistance = 1.1f;
-    [SerializeField] float smoothTime = 0.12f;
-    [SerializeField] float rotationLerpSpeed = 14f;
+    [SerializeField] private float speed = 3f;
+    [SerializeField] private float stopDistance = 1.1f;
+    [SerializeField] private float smoothTime = 0.12f;
+    [SerializeField] private float rotationLerpSpeed = 14f;
 
-    [Header("Vertical")]
-    [SerializeField] float gravityValue = -20f;
-    [SerializeField] float groundedVerticalVelocity = -2f;
-
-    Vector3 currentMove;
-    Vector3 moveVelocity;
-    float verticalVelocity;
+    private Vector3 currentMove;
+    private Vector3 moveVelocity;
 
     private void Awake()
     {
@@ -28,17 +22,18 @@ public class EnemyMovement : MonoBehaviour
 
     private void Update()
     {
-        MoveTowardsTarget();
-    }
-
-    private void MoveTowardsTarget()
-    {
-        if (controller.isGrounded && verticalVelocity < 0f)
+        if (target == null)
         {
-            verticalVelocity = groundedVerticalVelocity;
+            return;
         }
-
-        Vector3 desiredDirection = ResolveDirectMoveDirection();
+        
+        Vector3 toTarget = target.position - transform.position;
+        toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
+        float distanceToTarget = toTarget.magnitude;
+        Vector3 desiredDirection =
+            (distanceToTarget <= stopDistance || distanceToTarget <= 0.001f)
+            ? Vector3.zero
+            : toTarget / distanceToTarget;
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
@@ -48,28 +43,6 @@ public class EnemyMovement : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
         }
 
-        verticalVelocity += gravityValue * Time.deltaTime;
-        Vector3 frameMovement = currentMove;
-        frameMovement.y = verticalVelocity;
-        controller.Move(frameMovement * Time.deltaTime);
-    }
-
-    Vector3 ResolveDirectMoveDirection()
-    {
-        if (target == null)
-        {
-            Debug.LogError("You forgot to add target");
-            return Vector3.zero;
-        }
-
-        Vector3 toTarget = target.position - transform.position;
-        toTarget.y = 0f;
-        float distanceToTarget = toTarget.magnitude;
-        if (distanceToTarget <= stopDistance || distanceToTarget <= 0.001f)
-        {
-            return Vector3.zero;
-        }
-
-        return toTarget / distanceToTarget;
+        controller.Move(currentMove * Time.deltaTime);
     }
 }

@@ -3,8 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public class DestroyOnDeath : MonoBehaviour
 {
-    Health health;
-    bool hasDestroyed;
+    private Health health;
+    private bool hasDestroyed;
 
     private void Awake()
     {
@@ -13,16 +13,16 @@ public class DestroyOnDeath : MonoBehaviour
 
     private void OnEnable()
     {
-        health.HealthChanged += OnHealthChanged;
+        health.OnHealthChanged += OnHealthChanged;
         TryDestroyIfDepleted(health.CurrentHealth);
     }
 
     private void OnDisable()
     {
-        health.HealthChanged -= OnHealthChanged;
+        health.OnHealthChanged -= OnHealthChanged;
     }
 
-    private void OnHealthChanged(float currentHealth, float _)
+    private void OnHealthChanged(float currentHealth)
     {
         TryDestroyIfDepleted(currentHealth);
     }

@@ -5,10 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterMotor))]
 public class CharacterMovements : MonoBehaviour
 {
-    CharacterInputReader inputReader;
-    MovementDirectionResolver directionResolver;
-    CharacterMotor motor;
-    CharacterMovementAnimation movementAnimation;
+    private CharacterInputReader inputReader;
+    private MovementDirectionResolver directionResolver;
+    private CharacterMotor motor;
+    private CharacterMovementAnimation movementAnimation;
 
     private void Awake()
     {

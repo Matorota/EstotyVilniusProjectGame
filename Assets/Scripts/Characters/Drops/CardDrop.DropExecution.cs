@@ -2,9 +2,9 @@ using UnityEngine;
 
 public partial class CardDrop
 {
-    const float CardDropWorldY = 1.5f;
+    private const float CardDropWorldY = 1.5f;
 
-    void EvaluateDrop(float currentHealth)
+    private void EvaluateDrop(float currentHealth)
     {
         if (hasDropped || currentHealth > 0f)
         {
@@ -17,14 +17,8 @@ public partial class CardDrop
         }
 
         hasDropped = true;
-        Vector3 spawnPosition = ResolveDropPosition();
+        Vector3 spawnPosition = transform.position;
+        spawnPosition.y = CardDropWorldY;
         Instantiate(selectedCardPrefab, spawnPosition, Quaternion.identity);
-    }
-
-    Vector3 ResolveDropPosition()
-    {
-        Vector3 position = transform.position;
-        position.y = CardDropWorldY;
-        return position;
     }
 }

@@ -3,10 +3,9 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public class HealthTriggerDamageReceiver : MonoBehaviour
 {
-    [Header("Trigger Damage")]
-    [SerializeField] float defaultTriggerDamage = 10f;
+    [SerializeField] private float defaultTriggerDamage = 10f;
 
-    Health health;
+    private Health health;
 
     private void Awake()
     {
