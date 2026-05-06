@@ -10,7 +10,10 @@ public class HealthTriggerDamageReceiver : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<Health>();
-        defaultTriggerDamage = Mathf.Max(0f, defaultTriggerDamage);
+        if (defaultTriggerDamage < 0f)
+        {
+            defaultTriggerDamage = 0f;
+        }
     }
 
     private void OnTriggerEnter(Collider other)

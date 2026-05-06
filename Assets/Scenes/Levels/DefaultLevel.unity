@@ -6626,7 +6626,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7803,6 +7803,7 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
+  attackAnimation: {fileID: 0}
 --- !u!95 &412086718
 Animator:
   serializedVersion: 7
@@ -7842,6 +7843,7 @@ MonoBehaviour:
   moveXParameter: MoveX
   useDirectionalParameters: 1
   parameterDampTime: 0.12
+  minimumMovingAnimationSpeed: 0.2
 --- !u!114 &412086720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7854,6 +7856,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80e1dbef8a6a09e4baec77be6ab59ec6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardInventory
+--- !u!114 &412086728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b37c8af9d9ad7f4ea60fdb59e4be92f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
+  animator: {fileID: 412086718}
+  attackTriggerParameter: Attack
 --- !u!4 &414009098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -11543,66 +11559,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
---- !u!1001 &650733817
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 412086683}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.266
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.316
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.106
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      propertyPath: m_Name
-      value: weapon-sword
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 851633321}
-  m_SourcePrefab: {fileID: 100100000, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
 --- !u!1001 &653999967
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14990,38 +14946,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
---- !u!1 &851633318 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-  m_PrefabInstance: {fileID: 650733817}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &851633319 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: cef62c54da62fdc46a7996f22129b73a, type: 3}
-  m_PrefabInstance: {fileID: 650733817}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &851633321
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 851633318}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4f822c0436fa8594898c8fe7c623ff8d, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!4 &851759498 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -21532,6 +21456,7 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.5
+  attackAnimation: {fileID: 0}
 --- !u!114 &1188586101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26585,6 +26510,7 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
+  attackAnimation: {fileID: 0}
 --- !u!114 &1472166167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26716,6 +26642,7 @@ MonoBehaviour:
   moveXParameter: MoveX
   useDirectionalParameters: 1
   parameterDampTime: 0.12
+  minimumMovingAnimationSpeed: 0.2
 --- !u!95 &1472166178
 Animator:
   serializedVersion: 7
@@ -26738,6 +26665,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1472166179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1472166164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b37c8af9d9ad7f4ea60fdb59e4be92f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
+  animator: {fileID: 1472166178}
+  attackTriggerParameter: Attack
 --- !u!1001 &1474458956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31971,6 +31912,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166177}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1472166179}
   m_SourcePrefab: {fileID: 100100000, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
 --- !u!4 &1798471332 stripped
 Transform:
@@ -38107,10 +38051,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 6220127944176848535, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 851633319}
+    m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
@@ -38127,6 +38068,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 412086720}
+    - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 412086728}
   m_SourcePrefab: {fileID: 100100000, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
 --- !u!1001 &1369323377848064825
 PrefabInstance:

@@ -18,14 +18,28 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        float damage = Mathf.Max(0f, amount);
+        float damage = amount;
+        if (damage < 0f)
+        {
+            damage = 0f;
+        }
 
         if (damage <= 0f || currentHealth <= 0f)
         {
             return;
         }
 
-        currentHealth = Mathf.Clamp(currentHealth - damage, 0f, maxHealth);
+        float updatedHealth = currentHealth - damage;
+        if (updatedHealth < 0f)
+        {
+            updatedHealth = 0f;
+        }
+        else if (updatedHealth > maxHealth)
+        {
+            updatedHealth = maxHealth;
+        }
+
+        currentHealth = updatedHealth;
         OnHealthChanged?.Invoke(currentHealth);
     }
 }

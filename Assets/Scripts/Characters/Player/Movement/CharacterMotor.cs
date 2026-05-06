@@ -6,7 +6,7 @@ public class CharacterMotor : MonoBehaviour
     private CharacterController controller;
 
     [SerializeField] private float speed = 4f;
-    [SerializeField] private float movementSmoothTime = 0.15f;
+    [SerializeField] private float movementSmoothTime = 0.08f;
     [SerializeField] private float rotationLerpSpeed = 15f;
 
     private Vector3 smoothedHorizontalVelocity;
@@ -23,7 +23,18 @@ public class CharacterMotor : MonoBehaviour
             }
 
             Vector2 planarVelocity = new Vector2(smoothedHorizontalVelocity.x, smoothedHorizontalVelocity.z);
-            return Mathf.Clamp01(planarVelocity.magnitude / speed);
+            float normalizedSpeed = planarVelocity.magnitude / speed;
+            if (normalizedSpeed < 0f)
+            {
+                return 0f;
+            }
+
+            if (normalizedSpeed > 1f)
+            {
+                return 1f;
+            }
+
+            return normalizedSpeed;
         }
     }
 

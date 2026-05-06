@@ -10,6 +10,7 @@ public class DefaultEnemyDamage : MonoBehaviour
     [SerializeField] private float characterDamageMultiplier = 1f;
 
     [SerializeField] private float damageRadius = 1.25f;
+    [SerializeField] private CharacterAttackAnimation attackAnimation;
 
     private DefaultEnemyDamageTargetResolver targetResolver;
     private DefaultEnemyDamageCooldowns cooldowns;
@@ -18,6 +19,7 @@ public class DefaultEnemyDamage : MonoBehaviour
     {
         targetResolver = new DefaultEnemyDamageTargetResolver(this, enemyDamageMultiplier, characterDamageMultiplier);
         cooldowns = new DefaultEnemyDamageCooldowns();
+        attackAnimation ??= GetComponent<CharacterAttackAnimation>();
     }
 
     private void FixedUpdate()
@@ -53,6 +55,7 @@ public class DefaultEnemyDamage : MonoBehaviour
         }
 
         float appliedDamage = damageAmount * context.TargetDamageMultiplier;
+        attackAnimation?.TryPlayAttack();
         context.TargetHealth.TakeDamage(appliedDamage);
         cooldowns.RegisterHit(context.TargetId, context.CurrentTime, hitCooldownSeconds, globalHitCooldownSeconds);
     }

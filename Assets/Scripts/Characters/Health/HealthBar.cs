@@ -32,7 +32,12 @@ public class HealthBar : MonoBehaviour
 
     private void UpdateHealthBar(float currentHealth, float healthCapacity)
     {
-        float safeHealthCapacity = Mathf.Max(1f, healthCapacity);
+        float safeHealthCapacity = healthCapacity;
+        if (safeHealthCapacity < 1f)
+        {
+            safeHealthCapacity = 1f;
+        }
+
         healthFillImage.fillAmount = currentHealth / safeHealthCapacity;
     }
 }

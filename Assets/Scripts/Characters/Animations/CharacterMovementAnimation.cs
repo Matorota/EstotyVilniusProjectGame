@@ -11,10 +11,11 @@ public class CharacterMovementAnimation : MonoBehaviour
     [SerializeField] private string moveXParameter = DefaultMoveXParameter;
     [SerializeField] private bool useDirectionalParameters = true;
 
-    [SerializeField] private float parameterDampTime = 0.12f;
+    [SerializeField] private float parameterDampTime = 0.05f;
+    [SerializeField] private float minimumMovingAnimationSpeed = 0.25f;
     private bool hasSpeedParameter;
     private bool hasMoveXParameter;
-
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -28,7 +29,18 @@ public class CharacterMovementAnimation : MonoBehaviour
             moveXParameter = DefaultMoveXParameter;
         }
 
-        parameterDampTime = Mathf.Max(0f, parameterDampTime);
+        if (parameterDampTime < 0f)
+        {
+            parameterDampTime = 0f;
+        }
+        if (minimumMovingAnimationSpeed < 0f)
+        {
+            minimumMovingAnimationSpeed = 0f;
+        }
+        else if (minimumMovingAnimationSpeed > 1f)
+        {
+            minimumMovingAnimationSpeed = 1f;
+        }
         hasSpeedParameter = false;
         hasMoveXParameter = false;
 
@@ -54,11 +66,36 @@ public class CharacterMovementAnimation : MonoBehaviour
 
     public void Tick(Vector2 movementInput, Vector3 worldMoveDirection, float normalizedSpeed, Vector3 worldVelocity)
     {
-        float inputSpeed = Mathf.Clamp01(movementInput.magnitude);
-        float targetSpeed = Mathf.Max(inputSpeed, Mathf.Clamp01(normalizedSpeed));
+        float inputSpeed = movementInput.magnitude;
+        if (inputSpeed > 1f)
+        {
+            inputSpeed = 1f;
+        }
+
+        float cappedNormalizedSpeed = normalizedSpeed;
+        if (cappedNormalizedSpeed < 0f)
+        {
+            cappedNormalizedSpeed = 0f;
+        }
+        else if (cappedNormalizedSpeed > 1f)
+        {
+            cappedNormalizedSpeed = 1f;
+        }
+
+        bool hasMovementInput = movementInput.sqrMagnitude > 0.0001f || worldMoveDirection.sqrMagnitude > 0.0001f;
+        float targetSpeed = inputSpeed > cappedNormalizedSpeed ? inputSpeed : cappedNormalizedSpeed;
+        if (hasMovementInput && targetSpeed < minimumMovingAnimationSpeed)
+        {
+            targetSpeed = minimumMovingAnimationSpeed;
+        }
+        else if (!hasMovementInput)
+        {
+            targetSpeed = 0f;
+        }
+
         if (hasSpeedParameter)
         {
-            animator.SetFloat(speedParameter, targetSpeed, parameterDampTime, Time.deltaTime);
+            animator.SetFloat(speedParameter, targetSpeed);
         }
 
         if (!useDirectionalParameters || !hasMoveXParameter)
@@ -68,7 +105,15 @@ public class CharacterMovementAnimation : MonoBehaviour
 
         Vector3 directionSource = worldVelocity.sqrMagnitude > 0.0001f ? worldVelocity : worldMoveDirection;
         Vector3 localDirection = transform.InverseTransformDirection(directionSource);
-        float moveX = Mathf.Clamp(localDirection.x, -1f, 1f);
+        float moveX = localDirection.x;
+        if (moveX < -1f)
+        {
+            moveX = -1f;
+        }
+        else if (moveX > 1f)
+        {
+            moveX = 1f;
+        }
 
         animator.SetFloat(moveXParameter, moveX, parameterDampTime, Time.deltaTime);
     }
