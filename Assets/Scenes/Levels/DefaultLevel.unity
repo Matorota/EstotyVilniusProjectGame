@@ -7803,6 +7803,9 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
+  minForwardDot: 0.5
+  attackRotationSpeedDegrees: 540
+  useAnimationHitWindow: 0
   attackAnimation: {fileID: 0}
 --- !u!95 &412086718
 Animator:
@@ -21271,7 +21274,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1188586090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21287,6 +21290,7 @@ MonoBehaviour:
   target: {fileID: 412086683}
   speed: 3
   stopDistance: 1.1
+  resumeDistanceBuffer: 0.2
   smoothTime: 0.12
   rotationLerpSpeed: 14
 --- !u!143 &1188586092
@@ -21456,6 +21460,9 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.5
+  minForwardDot: 0.5
+  attackRotationSpeedDegrees: 540
+  useAnimationHitWindow: 0
   attackAnimation: {fileID: 0}
 --- !u!114 &1188586101
 MonoBehaviour:
@@ -26510,6 +26517,9 @@ MonoBehaviour:
   enemyDamageMultiplier: 1.5
   characterDamageMultiplier: 1
   damageRadius: 1.25
+  minForwardDot: 0.5
+  attackRotationSpeedDegrees: 540
+  useAnimationHitWindow: 0
   attackAnimation: {fileID: 0}
 --- !u!114 &1472166167
 MonoBehaviour:
@@ -26526,6 +26536,7 @@ MonoBehaviour:
   target: {fileID: 412086683}
   speed: 3
   stopDistance: 1.1
+  resumeDistanceBuffer: 0.2
   smoothTime: 0.12
   rotationLerpSpeed: 14
 --- !u!143 &1472166170

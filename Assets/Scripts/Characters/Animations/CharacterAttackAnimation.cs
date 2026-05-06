@@ -9,6 +9,7 @@ public class CharacterAttackAnimation : MonoBehaviour
     [SerializeField] private string attackTriggerParameter = DefaultAttackTrigger;
 
     private bool hasAttackTriggerParameter;
+    public bool IsHitWindowOpen { get; private set; }
 
     private void Awake()
     {
@@ -39,6 +40,18 @@ public class CharacterAttackAnimation : MonoBehaviour
             return;
         }
 
+        IsHitWindowOpen = false;
         animator.SetTrigger(attackTriggerParameter);
+    }
+
+    // Will use them dont delete
+    public void OnAttackHitStart()
+    {
+        IsHitWindowOpen = true;
+    }
+
+    public void OnAttackHitEnd()
+    {
+        IsHitWindowOpen = false;
     }
 }
