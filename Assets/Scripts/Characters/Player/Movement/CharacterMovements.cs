@@ -5,10 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterMotor))]
 public class CharacterMovements : MonoBehaviour
 {
-    CharacterInputReader inputReader;
-    MovementDirectionResolver directionResolver;
-    CharacterMotor motor;
-    CharacterMovementAnimation movementAnimation;
+    private CharacterInputReader inputReader;
+    private MovementDirectionResolver directionResolver;
+    private CharacterMotor motor;
+    private CharacterMovementAnimation movementAnimation;
 
     private void Awake()
     {
@@ -27,10 +27,5 @@ public class CharacterMovements : MonoBehaviour
         {
             movementAnimation.Tick(movementInput, moveDirection, motor.NormalizedHorizontalSpeed, motor.HorizontalVelocity);
         }
-    }
-
-    public void ResetVelocity()
-    {
-        motor.ResetVelocity();
     }
 }

@@ -1,47 +1,60 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(EnemyTargetTracker))]
 public class EnemyMovement : MonoBehaviour
 {
-    CharacterController controller;
-    EnemyTargetTracker targetTracker;
+    private CharacterController controller;
+    private CharacterMovementAnimation movementAnimation;
 
-    [Header("Movement")]
-    [SerializeField] float speed = 3f;
-    [SerializeField] float stopDistance = 1.1f;
-    [SerializeField] float smoothTime = 0.12f;
-    [SerializeField] float rotationLerpSpeed = 14f;
+    [SerializeField] private Transform target;
 
-    [Header("Vertical")]
-    [SerializeField] float gravityValue = -20f;
-    [SerializeField] float groundedVerticalVelocity = -2f;
+    [SerializeField] private float speed = 3f;
+    [SerializeField] private float stopDistance = 1.1f;
+    [SerializeField] private float resumeDistanceBuffer = 0.2f;
+    [SerializeField] private float smoothTime = 0.12f;
+    [SerializeField] private float rotationLerpSpeed = 14f;
 
-    Vector3 currentMove;
-    Vector3 moveVelocity;
-    float verticalVelocity;
+    private Vector3 currentMove;
+    private Vector3 moveVelocity;
+    private bool isStoppedByDistance;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        targetTracker = GetComponent<EnemyTargetTracker>();
-        ClampValues();
+        movementAnimation = GetComponent<CharacterMovementAnimation>();
+        if (resumeDistanceBuffer < 0f)
+        {
+            resumeDistanceBuffer = 0f;
+        }
     }
 
     private void Update()
     {
-        MoveTowardsTarget();
-    }
-
-    private void MoveTowardsTarget()
-    {
-        if (controller.isGrounded && verticalVelocity < 0f)
+        if (target == null)
         {
-            verticalVelocity = groundedVerticalVelocity;
+            if (movementAnimation != null)
+            {
+                movementAnimation.Tick(Vector2.zero, Vector3.zero, 0f, Vector3.zero);
+            }
+            return;
+        }
+        
+        Vector3 toTarget = target.position - transform.position;
+        toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
+        float distanceToTarget = toTarget.magnitude;
+        if (isStoppedByDistance)
+        {
+            if (distanceToTarget > stopDistance + resumeDistanceBuffer)
+            {
+                isStoppedByDistance = false;
+            }
+        }
+        else if (distanceToTarget <= stopDistance || distanceToTarget <= 0.001f)
+        {
+            isStoppedByDistance = true;
         }
 
-        Transform target = targetTracker.ResolveTarget();
-        Vector3 desiredDirection = ResolveDirectMoveDirection(target);
+        Vector3 desiredDirection = isStoppedByDistance ? Vector3.zero : toTarget / distanceToTarget;
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
@@ -51,37 +64,25 @@ public class EnemyMovement : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
         }
 
-        verticalVelocity += gravityValue * Time.deltaTime;
-        Vector3 frameMovement = currentMove;
-        frameMovement.y = verticalVelocity;
-        controller.Move(frameMovement * Time.deltaTime);
-    }
+        controller.Move(currentMove * Time.deltaTime);
 
-    Vector3 ResolveDirectMoveDirection(Transform target)
-    {
-        if (target == null)
+        if (movementAnimation == null)
         {
-            return Vector3.zero;
+            return;
         }
 
-        Vector3 toTarget = target.position - transform.position;
-        toTarget.y = 0f;
-        float distanceToTarget = toTarget.magnitude;
-        if (distanceToTarget <= stopDistance || distanceToTarget <= 0.001f)
+        Vector3 animationDirection = currentMove.sqrMagnitude > 0.0001f ? currentMove : desiredDirection;
+        Vector2 movementInput = new Vector2(currentMove.x, currentMove.z);
+        float normalizedSpeed = speed > 0f ? currentMove.magnitude / speed : 0f;
+        if (normalizedSpeed < 0f)
         {
-            return Vector3.zero;
+            normalizedSpeed = 0f;
+        }
+        else if (normalizedSpeed > 1f)
+        {
+            normalizedSpeed = 1f;
         }
 
-        return toTarget / distanceToTarget;
-    }
-
-    private void ClampValues()
-    {
-        speed = Mathf.Max(0f, speed);
-        stopDistance = Mathf.Max(0f, stopDistance);
-        smoothTime = Mathf.Max(0f, smoothTime);
-        rotationLerpSpeed = Mathf.Max(0f, rotationLerpSpeed);
-        gravityValue = Mathf.Min(-0.01f, gravityValue);
-        groundedVerticalVelocity = Mathf.Min(0f, groundedVerticalVelocity);
+        movementAnimation.Tick(movementInput, animationDirection, normalizedSpeed, currentMove);
     }
 }

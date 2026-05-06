@@ -4,46 +4,22 @@ using UnityEngine.InputSystem;
 
 public class CharacterInputReader : MonoBehaviour
 {
-    [Header("Input")]
-    [SerializeField] VirtualJoystick joystick;
-    [SerializeField] int joystickId;
-    [SerializeField] bool useJoystick = true;
+    [SerializeField] private VirtualJoystick joystick;
+    [SerializeField] private bool useJoystick = true;
     
     
 
     public Vector2 ReadMovementInput()
     {
-        Vector2 joystickInput = ReadJoystickInput();
-        if (joystickInput.sqrMagnitude > 0.0001f)
+        if (useJoystick && joystick.isActiveAndEnabled)
         {
-            return joystickInput;
+            Vector2 joystickInput = Vector2.ClampMagnitude(joystick.GetAxis(), 1f);
+            if (joystickInput.sqrMagnitude > 0.0001f)
+            {
+                return joystickInput;
+            }
         }
 
-        return ReadKeyboardInput();
-    }
-
-    Vector2 ReadJoystickInput()
-    {
-        if (!useJoystick)
-        {
-            return Vector2.zero;
-        }
-
-        if (joystick == null && VirtualJoystick.CountActiveInstances() > 0)
-        {
-            joystick = VirtualJoystick.GetInstance(joystickId);
-        }
-
-        if (joystick != null && joystick.isActiveAndEnabled)
-        {
-            return Vector2.ClampMagnitude(joystick.GetAxis(), 1f);
-        }
-
-        return Vector2.zero;
-    }
-
-    static Vector2 ReadKeyboardInput()
-    {
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null)
         {
