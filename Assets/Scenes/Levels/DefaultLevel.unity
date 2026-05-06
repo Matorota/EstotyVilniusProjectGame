@@ -157,7 +157,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 100, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1975998
 MonoBehaviour:
@@ -9210,11 +9210,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 355.90787
+      value: 218.57195
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 355.90787
+      value: 218.57195
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9246,11 +9246,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1000
+      value: -742.7028
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -450
+      value: -230.32434
       objectReference: {fileID: 0}
     - target: {fileID: 8577594272768695912, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9278,11 +9278,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8577594273766282456, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 237.2719
+      value: 145.71461
       objectReference: {fileID: 0}
     - target: {fileID: 8577594273766282456, guid: 2339bf4c92ccc3d4d9f567ee367d8b45, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 237.2719
+      value: 145.71461
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -32937,10 +32937,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

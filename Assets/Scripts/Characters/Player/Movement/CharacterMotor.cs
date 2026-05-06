@@ -32,13 +32,6 @@ public class CharacterMotor : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
-    private void OnValidate()
-    {
-        speed = Mathf.Max(0f, speed);
-        movementSmoothTime = Mathf.Max(0f, movementSmoothTime);
-        rotationLerpSpeed = Mathf.Max(0f, rotationLerpSpeed);
-    }
-
     public void Tick(Vector3 moveDirection)
     {
         Vector3 targetHorizontalVelocity = moveDirection * speed;
@@ -56,12 +49,6 @@ public class CharacterMotor : MonoBehaviour
         }
 
         controller.Move(smoothedHorizontalVelocity * Time.deltaTime);
-    }
-
-    public void ResetVelocity()
-    {
-        smoothedHorizontalVelocity = Vector3.zero;
-        horizontalVelocitySmoothing = Vector3.zero;
     }
 
 }

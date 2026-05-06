@@ -28,9 +28,4 @@ public class CharacterMovements : MonoBehaviour
             movementAnimation.Tick(movementInput, moveDirection, motor.NormalizedHorizontalSpeed, motor.HorizontalVelocity);
         }
     }
-
-    public void ResetVelocity()
-    {
-        motor.ResetVelocity();
-    }
 }

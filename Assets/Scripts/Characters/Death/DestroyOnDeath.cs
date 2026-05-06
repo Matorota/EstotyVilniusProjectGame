@@ -6,30 +6,21 @@ public class DestroyOnDeath : MonoBehaviour
     private Health health;
     private bool hasDestroyed;
 
-    private void Awake()
-    {
-        health = GetComponent<Health>();
-    }
-
     private void OnEnable()
     {
+        health ??= GetComponent<Health>();
         health.OnHealthChanged += OnHealthChanged;
-        TryDestroyIfDepleted(health.CurrentHealth);
+        OnHealthChanged(health.CurrentHealth);
     }
-
+    
     private void OnDisable()
     {
         health.OnHealthChanged -= OnHealthChanged;
     }
 
-    private void OnHealthChanged(float currentHealth)
+    private void OnHealthChanged(float _)
     {
-        TryDestroyIfDepleted(currentHealth);
-    }
-
-    private void TryDestroyIfDepleted(float currentHealth)
-    {
-        if (hasDestroyed || currentHealth > 0f)
+        if (!health.CanBeDestroyed(hasDestroyed))
         {
             return;
         }

@@ -24,11 +24,6 @@ public class CardInventory : MonoBehaviour
         return true;
     }
 
-    public bool HasCard(string cardId)
-    {
-        return GetCardCount(cardId) > 0;
-    }
-
     public int GetCardCount(string cardId)
     {
         if (string.IsNullOrWhiteSpace(cardId))

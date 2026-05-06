@@ -5,8 +5,8 @@ public class MovementDirectionResolver : MonoBehaviour
     [SerializeField] private Transform movementCamera;
     [SerializeField] private bool useCameraRelativeMovement = true;
 
-    private static readonly Vector3 IsoForward = new Vector3(1f, 0f, 1f).normalized;
-    private static readonly Vector3 IsoRight = new Vector3(1f, 0f, -1f).normalized;
+    private   Vector3 IsoForward = new Vector3(1f, 0f, 1f).normalized;
+    private   Vector3 IsoRight = new Vector3(1f, 0f, -1f).normalized;
 
     public Vector3 ResolveMoveDirection(Vector2 movementInput)
     {
@@ -31,7 +31,7 @@ public class MovementDirectionResolver : MonoBehaviour
         return moveDirection.sqrMagnitude > 1f ? moveDirection.normalized : moveDirection;
     }
 
-    private static Vector3 ToIsometricDirection(Vector2 movementInput)
+    private  Vector3 ToIsometricDirection(Vector2 movementInput)
     {
         Vector3 moveDirection = IsoForward * movementInput.y + IsoRight * movementInput.x;
         return moveDirection.sqrMagnitude > 1f ? moveDirection.normalized : moveDirection;
