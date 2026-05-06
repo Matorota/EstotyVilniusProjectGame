@@ -1,11 +1,11 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(EnemyTargetTracker))]
 public class EnemyMovement : MonoBehaviour
 {
     CharacterController controller;
-    EnemyTargetTracker targetTracker;
+
+    [SerializeField] private Transform target;
 
     [Header("Movement")]
     [SerializeField] float speed = 3f;
@@ -24,8 +24,6 @@ public class EnemyMovement : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        targetTracker = GetComponent<EnemyTargetTracker>();
-        ClampValues();
     }
 
     private void Update()
@@ -40,8 +38,7 @@ public class EnemyMovement : MonoBehaviour
             verticalVelocity = groundedVerticalVelocity;
         }
 
-        Transform target = targetTracker.ResolveTarget();
-        Vector3 desiredDirection = ResolveDirectMoveDirection(target);
+        Vector3 desiredDirection = ResolveDirectMoveDirection();
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
@@ -57,10 +54,11 @@ public class EnemyMovement : MonoBehaviour
         controller.Move(frameMovement * Time.deltaTime);
     }
 
-    Vector3 ResolveDirectMoveDirection(Transform target)
+    Vector3 ResolveDirectMoveDirection()
     {
         if (target == null)
         {
+            Debug.LogError("You forgot to add target");
             return Vector3.zero;
         }
 
@@ -73,15 +71,5 @@ public class EnemyMovement : MonoBehaviour
         }
 
         return toTarget / distanceToTarget;
-    }
-
-    private void ClampValues()
-    {
-        speed = Mathf.Max(0f, speed);
-        stopDistance = Mathf.Max(0f, stopDistance);
-        smoothTime = Mathf.Max(0f, smoothTime);
-        rotationLerpSpeed = Mathf.Max(0f, rotationLerpSpeed);
-        gravityValue = Mathf.Min(-0.01f, gravityValue);
-        groundedVerticalVelocity = Mathf.Min(0f, groundedVerticalVelocity);
     }
 }
