@@ -6726,8 +6726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8360da47375f74099a0112e406c32b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraControls
-  mainCharacter: {fileID: 0}
-  target: {fileID: 412086683}
+  player: {fileID: 412086683}
   offset: {x: 0, y: 2, z: -2}
 --- !u!4 &335472841 stripped
 Transform:
