@@ -12,8 +12,13 @@ public class Health : MonoBehaviour, IDamageable
     public float CurrentHealth => currentHealth;
 
     public event Action<float> OnHealthChanged;
-    public event Action OnDeath; // Invoke it
+    
+    public event Action OnDeath; 
+    
+    private bool isDefending;
 
+    public void SetDefending(bool value) => isDefending = value;
+    
     public bool CanBeDestroyed(bool hasDestroyed)
     {
         return !hasDestroyed && currentHealth <= 0f;
@@ -22,18 +27,23 @@ public class Health : MonoBehaviour, IDamageable
 
     public void TakeDamage(float amount)
     {
-        float damage = amount;
-        if (damage < 0f)
+        
+        if (isDefending)
         {
-            damage = 0f;
+            return;
+        }
+        
+        if (amount < 0f)
+        {
+            amount = 0f;
         }
 
-        if (damage <= 0f || currentHealth <= 0f)
+        if (amount <= 0f || currentHealth <= 0f)
         {
             return;
         }
 
-        float updatedHealth = currentHealth - damage;
+        float updatedHealth = currentHealth - amount;
         if (updatedHealth < 0f)
         {
             updatedHealth = 0f;

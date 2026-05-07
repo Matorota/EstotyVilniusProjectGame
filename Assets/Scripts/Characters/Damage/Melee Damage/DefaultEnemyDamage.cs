@@ -76,6 +76,11 @@ public class DefaultEnemyDamage : MonoBehaviour
         {
             return;
         }
+        if (attackAnimation.IsDefending)
+        {
+            return;
+        }
+
 
         attackAnimation.TryPlayAttack();
         if (useAnimationHitWindow && !attackAnimation.IsHitWindowOpen)

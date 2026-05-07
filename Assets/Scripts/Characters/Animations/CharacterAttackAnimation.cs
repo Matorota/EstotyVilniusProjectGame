@@ -7,10 +7,11 @@ public class CharacterAttackAnimation : MonoBehaviour
 
     [SerializeField] private Animator animator;
     [SerializeField] private string attackTriggerParameter = DefaultAttackTrigger;
+    [SerializeField] private CharacterDefendAnimation defendAnimation;
 
     private bool hasAttackTriggerParameter;
     public bool IsHitWindowOpen { get; private set; }
-
+    
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -33,9 +34,17 @@ public class CharacterAttackAnimation : MonoBehaviour
         }
     }
 
+    public bool IsDefending => defendAnimation != null && defendAnimation.IsDefending;
+
     public void TryPlayAttack()
     {
         if (!hasAttackTriggerParameter)
+        {
+            return;
+        }
+
+        // Prevent attacking while defending
+        if (IsDefending)
         {
             return;
         }

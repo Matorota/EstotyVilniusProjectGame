@@ -7910,6 +7910,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 412086718}
   attackTriggerParameter: Attack
+  defendAnimation: {fileID: 412086742}
+--- !u!114 &412086731 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1499086799194934694, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+  m_PrefabInstance: {fileID: 416773591339360704}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf72f2e4408f924d8885c4e52a1fca4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+--- !u!114 &412086736 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2281658734349838882, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+  m_PrefabInstance: {fileID: 416773591339360704}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 036f4069b56ab5642b3e70c636b9fe8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterInputReader
+--- !u!114 &412086742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98debf4fa9d8a8e4ca1bb5c866876632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefendAnimation
+  animator: {fileID: 412086718}
+  defendBoolParameter: IsDefending
 --- !u!4 &414009098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -21459,6 +21496,8 @@ GameObject:
   - component: {fileID: 1188586100}
   - component: {fileID: 1188586104}
   - component: {fileID: 1188586105}
+  - component: {fileID: 1188586107}
+  - component: {fileID: 1188586106}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -21722,6 +21761,43 @@ MonoBehaviour:
   cardDropPrefabs:
   - {fileID: 1452867066729091299, guid: 5d9c7b9884274bd4ebef961cb67e084d, type: 3}
   - {fileID: 7635394718674100952, guid: 20605d33e4b6c034dad96a5f62792e6a, type: 3}
+--- !u!114 &1188586106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188586088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b37c8af9d9ad7f4ea60fdb59e4be92f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
+  animator: {fileID: 0}
+  attackTriggerParameter: Attack
+  defendAnimation: {fileID: 0}
+--- !u!95 &1188586107
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1188586088}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &1191747461
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26528,6 +26604,9 @@ GameObject:
   - component: {fileID: 1463485405}
   - component: {fileID: 1463485404}
   - component: {fileID: 1463485403}
+  - component: {fileID: 1463485406}
+  - component: {fileID: 1463485407}
+  - component: {fileID: 1463485408}
   m_Layer: 5
   m_Name: Defend
   m_TagString: Untagged
@@ -26637,6 +26716,47 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1463485401}
   m_CullTransparentMesh: 1
+--- !u!114 &1463485406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463485401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
+  m_Delegates: []
+--- !u!114 &1463485407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463485401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 338b5611afc4429691349e949a955f0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDefense
+  health: {fileID: 412086731}
+  defendAnimation: {fileID: 412086742}
+  inputReader: {fileID: 412086736}
+--- !u!114 &1463485408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463485401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 137b587ee364b5446bbea0638ab1c583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DefendBtn
+  defense: {fileID: 1463485407}
 --- !u!4 &1464350909 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -27002,6 +27122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 1472166178}
   attackTriggerParameter: Attack
+  defendAnimation: {fileID: 0}
 --- !u!1001 &1474458956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38702,6 +38823,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 412086728}
+    - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 412086742}
     - targetCorrespondingSourceObject: {fileID: 8873572214573473017, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 528147861}
