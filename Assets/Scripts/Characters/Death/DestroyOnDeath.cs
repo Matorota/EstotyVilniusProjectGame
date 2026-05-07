@@ -4,28 +4,24 @@ using UnityEngine;
 public class DestroyOnDeath : MonoBehaviour
 {
     private Health health;
-    private bool hasDestroyed;
+
+    private void Awake()
+    {
+        health = GetComponent<Health>();
+    }
 
     private void OnEnable()
     {
-        health ??= GetComponent<Health>();
-        health.OnHealthChanged += OnHealthChanged;
-        OnHealthChanged(health.CurrentHealth);
+        health.OnDeath += HandleDeath;
     }
     
     private void OnDisable()
     {
-        health.OnHealthChanged -= OnHealthChanged;
+        health.OnDeath -= HandleDeath;
     }
 
-    private void OnHealthChanged(float _)
+    private void HandleDeath()
     {
-        if (!health.CanBeDestroyed(hasDestroyed))
-        {
-            return;
-        }
-
-        hasDestroyed = true;
         Destroy(gameObject);
     }
 }
