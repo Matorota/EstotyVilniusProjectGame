@@ -1,3 +1,4 @@
+using Characters.Health;
 using UnityEngine;
 
 public class DefaultEnemyDamageTargetResolver
@@ -18,13 +19,14 @@ public class DefaultEnemyDamageTargetResolver
     public bool TryCreateTargetContext(Collider other, float currentTime, out DefaultEnemyDamageTargetContext context)
     {
         context = default;
-        if (other == null || !IsTarget(other) || !TryGetTargetHealth(other, out Health targetHealth))
+        if (!IsTarget(other) || !TryGetTargetDamageable(other, out IDamageable targetDamageable))
         {
             return false;
         }
 
-        context.TargetId = targetHealth.GetInstanceID();
-        context.TargetHealth = targetHealth;
+        context.TargetId = other.gameObject.GetInstanceID();
+        context.TargetTransform = other.transform;
+        context.TargetDamageable = targetDamageable;
         context.CurrentTime = currentTime;
         context.TargetDamageMultiplier = ResolveTargetDamageMultiplier(other);
         return true;
@@ -80,13 +82,10 @@ public class DefaultEnemyDamageTargetResolver
         return characterMotor != null;
     }
 
-    private bool TryGetTargetHealth(Collider other, out Health targetHealth)
+    private bool TryGetTargetDamageable(Collider other, out IDamageable targetDamageable)
     {
-        targetHealth =
-            other.GetComponent<Health>() ??
-            other.GetComponentInParent<Health>() ??
-            other.GetComponentInChildren<Health>();
+        targetDamageable = other.gameObject.GetComponent<IDamageable>();
 
-        return targetHealth != null;
+        return targetDamageable != null;
     }
 }

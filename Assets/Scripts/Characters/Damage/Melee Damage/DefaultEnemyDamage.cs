@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterAttackAnimation))]
 public class DefaultEnemyDamage : MonoBehaviour
 {
     [SerializeField] private float damageAmount = 20f;
@@ -22,7 +23,7 @@ public class DefaultEnemyDamage : MonoBehaviour
     {
         targetResolver = new DefaultEnemyDamageTargetResolver(this, enemyDamageMultiplier, characterDamageMultiplier);
         cooldowns = new DefaultEnemyDamageCooldowns();
-        attackAnimation ??= GetComponent<CharacterAttackAnimation>();
+        attackAnimation = GetComponent<CharacterAttackAnimation>();
         if (minForwardDot < -1f)
         {
             minForwardDot = -1f;
@@ -60,8 +61,8 @@ public class DefaultEnemyDamage : MonoBehaviour
             return;
         }
 
-        RotateTowardsTarget(context.TargetHealth);
-        if (!IsFacingTarget(context.TargetHealth))
+        RotateTowardsTarget(context.TargetTransform);
+        if (!IsFacingTarget(context.TargetTransform))
         {
             return;
         }
@@ -76,20 +77,20 @@ public class DefaultEnemyDamage : MonoBehaviour
             return;
         }
 
-        attackAnimation?.TryPlayAttack();
-        if (useAnimationHitWindow && attackAnimation != null && !attackAnimation.IsHitWindowOpen)
+        attackAnimation.TryPlayAttack();
+        if (useAnimationHitWindow && !attackAnimation.IsHitWindowOpen)
         {
             return;
         }
 
         float appliedDamage = damageAmount * context.TargetDamageMultiplier;
-        context.TargetHealth.TakeDamage(appliedDamage);
+        context.TargetDamageable.TakeDamage(appliedDamage);
         cooldowns.RegisterHit(context.TargetId, context.CurrentTime, hitCooldownSeconds, globalHitCooldownSeconds);
     }
 
-    private void RotateTowardsTarget(Health targetHealth)
+    private void RotateTowardsTarget(Transform targetTransform)
     {
-        Vector3 toTarget = targetHealth.transform.position - transform.position;
+        Vector3 toTarget = targetTransform.position - transform.position;
         toTarget.y = 0f;
         if (toTarget.sqrMagnitude <= 0.000001f)
         {
@@ -101,9 +102,9 @@ public class DefaultEnemyDamage : MonoBehaviour
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, maxStep);
     }
 
-    private bool IsFacingTarget(Health targetHealth)
+    private bool IsFacingTarget(Transform targetTransform)
     {
-        Vector3 toTarget = targetHealth.transform.position - transform.position;
+        Vector3 toTarget = targetTransform.position - transform.position;
         toTarget.y = 0f;
 
         float toTargetMagnitude = toTarget.magnitude;
