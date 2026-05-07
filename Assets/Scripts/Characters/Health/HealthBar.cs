@@ -15,7 +15,7 @@ public class HealthBar : MonoBehaviour
     private void OnEnable()
     {
         health.OnHealthChanged += OnHealthChanged;
-        UpdateHealthBar(health.CurrentHealth, health.MaxHealth);
+        Refresh(health.CurrentHealth);
     }
 
     private void OnDisable()
@@ -25,19 +25,11 @@ public class HealthBar : MonoBehaviour
 
     private void OnHealthChanged(float currentHealth)
     {
-        UpdateHealthBar(currentHealth, health.MaxHealth);
+        Refresh(currentHealth);
     }
-    
-    
 
-    private void UpdateHealthBar(float currentHealth, float healthCapacity)
+    private void Refresh(float currentHealth)
     {
-        float safeHealthCapacity = healthCapacity;
-        if (safeHealthCapacity < 1f)
-        {
-            safeHealthCapacity = 1f;
-        }
-
-        healthFillImage.fillAmount = currentHealth / safeHealthCapacity;
+        healthFillImage.fillAmount = currentHealth / health.MaxHealth;
     }
 }
