@@ -2,14 +2,40 @@ using Terresquall;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-100)]
 public class CharacterInputReader : MonoBehaviour
 {
     [SerializeField] private VirtualJoystick joystick;
     [SerializeField] private bool useJoystick = true;
-    
-    
+    private Vector2 movementInput;
+    private bool mouseDefenseHeld;
+    private bool uiDefenseHeld;
+
+    public Vector2 MovementInput => movementInput;
+    public bool WantsDefense => mouseDefenseHeld || uiDefenseHeld;
+
+    private void Update()
+    {
+        movementInput = ReadMovementInputInternal();
+        mouseDefenseHeld = Mouse.current != null && Mouse.current.rightButton.isPressed;
+    }
 
     public Vector2 ReadMovementInput()
+    {
+        return movementInput;
+    }
+
+    public void ToggleUiDefense()
+    {
+        uiDefenseHeld = !uiDefenseHeld;
+    }
+
+    public void SetUiDefense(bool value)
+    {
+        uiDefenseHeld = value;
+    }
+
+    private Vector2 ReadMovementInputInternal()
     {
         if (useJoystick && joystick.isActiveAndEnabled)
         {

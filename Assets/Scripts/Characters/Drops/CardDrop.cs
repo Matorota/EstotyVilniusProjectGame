@@ -8,32 +8,31 @@ public class CardDrop : MonoBehaviour
 
     [SerializeField] private GameObject[] cardDropPrefabs;
 
-    private Health health;
+    private Characters.Health.IDamageable health;
     private bool hasDropped;
     private CardDropSelector selector;
     private CardDropSpawner spawner;
 
     private void Awake()
     {
-        health = GetComponent<Health>();
+        health = GetComponent<Characters.Health.IDamageable>();
         selector = new CardDropSelector();
         spawner = new CardDropSpawner(CardDropWorldY);
     }
 
     private void OnEnable()
     {
-        health.OnHealthChanged += OnHealthChanged;
-        OnHealthChanged(health.CurrentHealth);
+        health.OnDeath += OnDeath;
     }
 
     private void OnDisable()
     {
-        health.OnHealthChanged -= OnHealthChanged;
+        health.OnDeath -= OnDeath;
     }
 
-    private void OnHealthChanged(float currentHealth)
+    private void OnDeath()
     {
-        if (hasDropped || currentHealth > 0f)
+        if (hasDropped)
         {
             return;
         }

@@ -3,11 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public class DestroyOnDeath : MonoBehaviour
 {
-    private Health health;
+    private Characters.Health.IDamageable health;
 
     private void Awake()
     {
-        health = GetComponent<Health>();
+        health = GetComponent<Characters.Health.IDamageable>();
     }
 
     private void OnEnable()

@@ -11,6 +11,7 @@ public class CharacterMotor : MonoBehaviour
 
     private Vector3 smoothedHorizontalVelocity;
     private Vector3 horizontalVelocitySmoothing;
+    private Transform facingTarget;
 
     public Vector3 HorizontalVelocity => smoothedHorizontalVelocity;
     public float NormalizedHorizontalSpeed
@@ -43,6 +44,11 @@ public class CharacterMotor : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
 
+    public void SetFacingTarget(Transform target)
+    {
+        facingTarget = target;
+    }
+
     public void Tick(Vector3 moveDirection)
     {
         Vector3 targetHorizontalVelocity = moveDirection * speed;
@@ -53,7 +59,17 @@ public class CharacterMotor : MonoBehaviour
             movementSmoothTime
         );
 
-        if (smoothedHorizontalVelocity.sqrMagnitude >= 0.01f)
+        if (facingTarget != null)
+        {
+            Vector3 toTarget = facingTarget.position - transform.position;
+            toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
+            if (toTarget.sqrMagnitude > 0.0001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
+            }
+        }
+        else if (smoothedHorizontalVelocity.sqrMagnitude >= 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(smoothedHorizontalVelocity);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);

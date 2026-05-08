@@ -5,11 +5,11 @@ using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 {
     [SerializeField] private Image healthFillImage;
-    private Health health;
+    private Characters.Health.IDamageable health;
 
     private void Awake()
     {
-        health = GetComponent<Health>();
+        health = GetComponent<Characters.Health.IDamageable>();
     }
 
     private void OnEnable()

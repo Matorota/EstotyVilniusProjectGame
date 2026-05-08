@@ -5,60 +5,53 @@ using UnityEngine;
 public class Health : MonoBehaviour, IDamageable
 {
     [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float currentHealth = 100f;
-    private bool hasDied;
+    [SerializeField] private Characters.Team.TeamId team = Characters.Team.TeamId.Player;
+
+    private float currentHealth;
+    private CharacterAttackAnimation attackAnimation;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
+    public Characters.Team.TeamId Team => team;
+    public bool IsDefending => GetComponent<CharacterDefense>()?.IsDefending == true || GetComponentInParent<CharacterDefense>()?.IsDefending == true;
 
     public event Action<float> OnHealthChanged;
+    public event Action<float> OnDamaged;
+    public event Action OnDeath;
     
-    public event Action OnDeath; 
-    
-    private bool isDefending;
-
-    public void SetDefending(bool value) => isDefending = value;
-    
-    public bool CanBeDestroyed(bool hasDestroyed)
+    private void Awake()
     {
-        return !hasDestroyed && currentHealth <= 0f;
+        currentHealth = maxHealth;
+        attackAnimation = GetComponent<CharacterAttackAnimation>();
     }
+
+    private void Start()
+    {
+        // Ensure UI and listeners see the initial full health value after all OnEnable subscriptions
+        OnHealthChanged?.Invoke(currentHealth);
+    }
+
+    private bool IsDead => currentHealth <= 0f;
 
     public void TakeDamage(float amount)
     {
-        
-        if (isDefending)
-        {
-            return;
-        }
-        
-        if (amount < 0f)
-        {
-            amount = 0f;
-        }
+        // Input validation
+        if (amount <= 0f) return;
 
-        if (amount <= 0f || currentHealth <= 0f)
-        {
-            return;
-        }
+        // Game rules
+        if (IsDefending) return;
+        if (IsDead) return;
 
         float updatedHealth = currentHealth - amount;
-        if (updatedHealth < 0f)
-        {
-            updatedHealth = 0f;
-        }
-        else if (updatedHealth > maxHealth)
-        {
-            updatedHealth = maxHealth;
-        }
-
-        currentHealth = updatedHealth;
+        currentHealth = updatedHealth <= 0f ? 0f : updatedHealth;
+        attackAnimation?.TryPlayHit();
+        OnDamaged?.Invoke(amount);
         OnHealthChanged?.Invoke(currentHealth);
 
-        if (CanBeDestroyed(hasDied))
+        if (IsDead)
         {
-            hasDied = true;
             OnDeath?.Invoke();
+            return;
         }
     }
 }

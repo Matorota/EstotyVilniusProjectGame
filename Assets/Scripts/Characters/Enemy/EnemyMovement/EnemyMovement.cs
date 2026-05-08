@@ -58,9 +58,9 @@ public class EnemyMovement : MonoBehaviour
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
-        if (currentMove.sqrMagnitude > 0.001f)
+        if (toTarget.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(currentMove);
+            Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
         }
 

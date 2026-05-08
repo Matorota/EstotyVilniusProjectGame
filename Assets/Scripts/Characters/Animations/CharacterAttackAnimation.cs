@@ -4,12 +4,16 @@ using UnityEngine;
 public class CharacterAttackAnimation : MonoBehaviour
 {
     private const string DefaultAttackTrigger = "Attack";
+    private const string DefaultHitTrigger = "Hit";
 
     [SerializeField] private Animator animator;
     [SerializeField] private string attackTriggerParameter = DefaultAttackTrigger;
+    [SerializeField] private string hitTriggerParameter = DefaultHitTrigger;
     [SerializeField] private CharacterDefendAnimation defendAnimation;
 
     private bool hasAttackTriggerParameter;
+    private bool hasHitTriggerParameter;
+    private int hitTriggerHash;
     public bool IsHitWindowOpen { get; private set; }
     
     private void Awake()
@@ -20,7 +24,14 @@ public class CharacterAttackAnimation : MonoBehaviour
             attackTriggerParameter = DefaultAttackTrigger;
         }
 
+        if (string.IsNullOrWhiteSpace(hitTriggerParameter))
+        {
+            hitTriggerParameter = DefaultHitTrigger;
+        }
+
         hasAttackTriggerParameter = false;
+        hasHitTriggerParameter = false;
+        hitTriggerHash = Animator.StringToHash(hitTriggerParameter);
 
         AnimatorControllerParameter[] parameters = animator.parameters;
         for (int i = 0; i < parameters.Length; i++)
@@ -29,7 +40,10 @@ public class CharacterAttackAnimation : MonoBehaviour
             if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == attackTriggerParameter)
             {
                 hasAttackTriggerParameter = true;
-                break;
+            }
+            else if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == hitTriggerParameter)
+            {
+                hasHitTriggerParameter = true;
             }
         }
     }
@@ -43,24 +57,17 @@ public class CharacterAttackAnimation : MonoBehaviour
             return;
         }
 
-        // Prevent attacking while defending
-        if (IsDefending)
-        {
-            return;
-        }
-
         IsHitWindowOpen = false;
         animator.SetTrigger(attackTriggerParameter);
     }
 
-    // Will use them dont delete
-    public void OnAttackHitStart()
+    public void TryPlayHit()
     {
-        IsHitWindowOpen = true;
-    }
+        if (!hasHitTriggerParameter)
+        {
+            return;
+        }
 
-    public void OnAttackHitEnd()
-    {
-        IsHitWindowOpen = false;
+        animator.SetTrigger(hitTriggerHash);
     }
 }
