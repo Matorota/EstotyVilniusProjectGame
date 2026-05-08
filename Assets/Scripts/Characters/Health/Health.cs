@@ -27,7 +27,6 @@ public class Health : MonoBehaviour, IDamageable
 
     private void Start()
     {
-        // Ensure UI and listeners see the initial full health value after all OnEnable subscriptions
         OnHealthChanged?.Invoke(currentHealth);
     }
 
@@ -35,10 +34,8 @@ public class Health : MonoBehaviour, IDamageable
 
     public void TakeDamage(float amount)
     {
-        // Input validation
         if (amount <= 0f) return;
 
-        // Game rules
         if (IsDefending) return;
         if (IsDead) return;
 
