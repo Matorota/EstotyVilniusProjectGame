@@ -7311,7 +7311,6 @@ MonoBehaviour:
   enemyDamage: 4
   range: 1.25
   cooldown: 1.4
-  rotationLerpSpeed: 6
 --- !u!114 &364664889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7327,6 +7326,32 @@ MonoBehaviour:
   rotationLerpSpeed: 15
   motor: {fileID: 0}
   facingTarget: {fileID: 0}
+--- !u!114 &364664890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364664875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2c5a19db7e4f46bf1d9f5e4f0f43a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FindTargetables
+--- !u!114 &364664891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364664875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98debf4fa9d8a8e4ca1bb5c866876632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefendAnimation
+  animator: {fileID: 364664878}
+  defendBoolParameter: IsDefending
 --- !u!1 &365526282 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f4eed50361df342419841cb5155ea0b9, type: 3}
@@ -8350,7 +8375,18 @@ MonoBehaviour:
   enemyDamage: 4
   range: 1.25
   cooldown: 1.4
-  rotationLerpSpeed: 6
+--- !u!114 &412086749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2c5a19db7e4f46bf1d9f5e4f0f43a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FindTargetables
 --- !u!4 &414009098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -26984,6 +27020,7 @@ GameObject:
   - component: {fileID: 1463485404}
   - component: {fileID: 1463485403}
   - component: {fileID: 1463485406}
+  - component: {fileID: 1463485408}
   - component: {fileID: 1463485407}
   m_Layer: 5
   m_Name: Defend
@@ -27116,9 +27153,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1463485401}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d2a1c2d4f1b4c9b9f8c5a6f7e8d9a10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefenseButton
+  defense: {fileID: 1463485408}
+--- !u!114 &1463485408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1463485401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 338b5611afc4429691349e949a955f0d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDefense
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefense
   defendAnimation: {fileID: 412086742}
   inputReader: {fileID: 412086736}
 --- !u!4 &1464350909 stripped
@@ -27468,7 +27518,6 @@ MonoBehaviour:
   enemyDamage: 4
   range: 1.25
   cooldown: 1.4
-  rotationLerpSpeed: 6
 --- !u!114 &1472166181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27478,12 +27527,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1472166164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3be62e8309f430582f732906f03363d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1e2c5a19db7e4f46bf1d9f5e4f0f43a1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CharacterRotation
-  rotationLerpSpeed: 15
-  motor: {fileID: 0}
-  facingTarget: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::FindTargetables
+--- !u!114 &1472166182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1472166164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98debf4fa9d8a8e4ca1bb5c866876632, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefendAnimation
+  animator: {fileID: 1472166178}
+  defendBoolParameter: IsDefending
 --- !u!1001 &1474458956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32680,6 +32740,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: EnemyOrc
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -32720,6 +32784,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1472166181}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1472166182}
   m_SourcePrefab: {fileID: 100100000, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
 --- !u!4 &1798471332 stripped
 Transform:
@@ -34811,6 +34878,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 364664889}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 364664890}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 364664891}
   m_SourcePrefab: {fileID: 100100000, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
 --- !u!4 &1899817064 stripped
 Transform:
@@ -38760,7 +38833,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 6755088363869878678, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -38844,6 +38917,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 412086748}
+    - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 412086749}
     - targetCorrespondingSourceObject: {fileID: 8873572214573473017, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 528147861}
