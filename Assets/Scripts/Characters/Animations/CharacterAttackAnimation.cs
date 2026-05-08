@@ -34,7 +34,7 @@ public class CharacterAttackAnimation : MonoBehaviour
         }
     }
 
-    public bool IsDefending => defendAnimation != null && defendAnimation.IsDefending;
+    public bool IsDefending => defendAnimation?.IsDefending == true;
 
     public void TryPlayAttack()
     {

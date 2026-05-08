@@ -24,7 +24,6 @@ public class Health : MonoBehaviour, IDamageable
         return !hasDestroyed && currentHealth <= 0f;
     }
 
-
     public void TakeDamage(float amount)
     {
         

@@ -50,47 +50,50 @@ public class DefaultEnemyDamage : MonoBehaviour
 
         for (int i = 0; i < contacts.Length; i++)
         {
-            TryDamage(contacts[i]);
+            if (TryDamage(contacts[i]))
+            {
+                break;
+            }
         }
     }
 
-    private void TryDamage(Collider other)
+    private bool TryDamage(Collider other)
     {
         if (!targetResolver.TryCreateTargetContext(other, Time.time, out DefaultEnemyDamageTargetContext context))
         {
-            return;
+            return false;
         }
 
         RotateTowardsTarget(context.TargetTransform);
         if (!IsFacingTarget(context.TargetTransform))
         {
-            return;
+            return true;
         }
 
         if (!cooldowns.CanHitTargetLocally(context.TargetId, context.CurrentTime, initialContactDelaySeconds))
         {
-            return;
+            return true;
         }
 
         if (!cooldowns.CanHitTargetGlobally(context.TargetId, context.CurrentTime))
         {
-            return;
+            return true;
         }
         if (attackAnimation.IsDefending)
         {
-            return;
+            return true;
         }
-
 
         attackAnimation.TryPlayAttack();
         if (useAnimationHitWindow && !attackAnimation.IsHitWindowOpen)
         {
-            return;
+            return true;
         }
 
         float appliedDamage = damageAmount * context.TargetDamageMultiplier;
         context.TargetDamageable.TakeDamage(appliedDamage);
         cooldowns.RegisterHit(context.TargetId, context.CurrentTime, hitCooldownSeconds, globalHitCooldownSeconds);
+        return true;
     }
 
     private void RotateTowardsTarget(Transform targetTransform)

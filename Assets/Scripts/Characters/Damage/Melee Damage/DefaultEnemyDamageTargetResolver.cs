@@ -12,8 +12,8 @@ public class DefaultEnemyDamageTargetResolver
     {
         this.enemyDamageMultiplier = enemyDamageMultiplier;
         this.characterDamageMultiplier = characterDamageMultiplier;
-        attackerIsEnemy = owner.GetComponent<EnemyMovement>() != null;
-        attackerIsCharacter = owner.GetComponent<CharacterMotor>() != null;
+        attackerIsEnemy = owner.TryGetComponent(out EnemyMovement _);
+        attackerIsCharacter = owner.TryGetComponent(out CharacterMotor _);
     }
 
     public bool TryCreateTargetContext(Collider other, float currentTime, out DefaultEnemyDamageTargetContext context)
@@ -64,28 +64,61 @@ public class DefaultEnemyDamageTargetResolver
 
     private bool TryGetEnemyMovement(Collider other, out EnemyMovement enemyMovement)
     {
-        enemyMovement =
-            other.GetComponent<EnemyMovement>() ??
-            other.GetComponentInParent<EnemyMovement>() ??
-            other.GetComponentInChildren<EnemyMovement>();
+        if (other.TryGetComponent(out enemyMovement))
+        {
+            return true;
+        }
 
-        return enemyMovement != null;
+        if (other.GetComponentInParent<EnemyMovement>() is EnemyMovement parentEnemyMovement)
+        {
+            enemyMovement = parentEnemyMovement;
+            return true;
+        }
+
+        if (other.GetComponentInChildren<EnemyMovement>() is EnemyMovement childEnemyMovement)
+        {
+            enemyMovement = childEnemyMovement;
+            return true;
+        }
+
+        return false;
     }
 
     private bool TryGetCharacterMotor(Collider other, out CharacterMotor characterMotor)
     {
-        characterMotor =
-            other.GetComponent<CharacterMotor>() ??
-            other.GetComponentInParent<CharacterMotor>() ??
-            other.GetComponentInChildren<CharacterMotor>();
+        if (other.TryGetComponent(out characterMotor))
+        {
+            return true;
+        }
 
-        return characterMotor != null;
+        if (other.GetComponentInParent<CharacterMotor>() is CharacterMotor parentCharacterMotor)
+        {
+            characterMotor = parentCharacterMotor;
+            return true;
+        }
+
+        if (other.GetComponentInChildren<CharacterMotor>() is CharacterMotor childCharacterMotor)
+        {
+            characterMotor = childCharacterMotor;
+            return true;
+        }
+
+        return false;
     }
 
     private bool TryGetTargetDamageable(Collider other, out IDamageable targetDamageable)
     {
-        targetDamageable = other.gameObject.GetComponent<IDamageable>();
+        MonoBehaviour[] behaviours = other.gameObject.GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            if (behaviours[i] is IDamageable damageable)
+            {
+                targetDamageable = damageable;
+                return true;
+            }
+        }
 
-        return targetDamageable != null;
+        targetDamageable = default!;
+        return false;
     }
 }
