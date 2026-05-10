@@ -7,27 +7,16 @@ public class CharacterInputReader : MonoBehaviour
 {
     [SerializeField] private VirtualJoystick joystick;
     [SerializeField] private bool useJoystick = true;
+
     private Vector2 movementInput;
-    private bool mouseDefenseHeld;
     private bool uiDefenseHeld;
 
     public Vector2 MovementInput => movementInput;
-    public bool WantsDefense => mouseDefenseHeld || uiDefenseHeld;
+    public bool WantsDefense => uiDefenseHeld || Mouse.current != null && Mouse.current.rightButton.isPressed;
 
     private void Update()
     {
-        movementInput = ReadMovementInputInternal();
-        mouseDefenseHeld = Mouse.current != null && Mouse.current.rightButton.isPressed;
-    }
-
-    public Vector2 ReadMovementInput()
-    {
-        return movementInput;
-    }
-
-    public void ToggleUiDefense()
-    {
-        uiDefenseHeld = !uiDefenseHeld;
+        movementInput = ReadMovementInput();
     }
 
     public void SetUiDefense(bool value)
@@ -35,11 +24,12 @@ public class CharacterInputReader : MonoBehaviour
         uiDefenseHeld = value;
     }
 
-    private Vector2 ReadMovementInputInternal()
+    private Vector2 ReadMovementInput()
     {
-        if (useJoystick && joystick.isActiveAndEnabled)
+        if (useJoystick && joystick != null && joystick.isActiveAndEnabled)
         {
             Vector2 joystickInput = Vector2.ClampMagnitude(joystick.GetAxis(), 1f);
+
             if (joystickInput.sqrMagnitude > 0.0001f)
             {
                 return joystickInput;
@@ -47,12 +37,14 @@ public class CharacterInputReader : MonoBehaviour
         }
 
         Keyboard keyboard = Keyboard.current;
+
         if (keyboard == null)
         {
             return Vector2.zero;
         }
 
         Vector2 input = Vector2.zero;
+
         if (keyboard.aKey.isPressed) input.x -= 1f;
         if (keyboard.dKey.isPressed) input.x += 1f;
         if (keyboard.wKey.isPressed) input.y += 1f;

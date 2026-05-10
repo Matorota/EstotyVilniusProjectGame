@@ -3,71 +3,97 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class CharacterAttackAnimation : MonoBehaviour
 {
-    private const string DefaultAttackTrigger = "Attack";
-    private const string DefaultHitTrigger = "Hit";
+    private const string AttackParameter = "Attack";
+    private const string HitParameter = "Hit";
+
+    private static readonly int AttackHash = Animator.StringToHash(AttackParameter);
+    private static readonly int HitHash = Animator.StringToHash(HitParameter);
 
     [SerializeField] private Animator animator;
-    [SerializeField] private string attackTriggerParameter = DefaultAttackTrigger;
-    [SerializeField] private string hitTriggerParameter = DefaultHitTrigger;
-    [SerializeField] private CharacterDefendAnimation defendAnimation;
+    [SerializeField] private CharacterDefense defense;
 
-    private bool hasAttackTriggerParameter;
-    private bool hasHitTriggerParameter;
-    private int hitTriggerHash;
-    public bool IsHitWindowOpen { get; private set; }
-    
+    private bool hasAttackParameter;
+    private bool hasHitParameter;
+
+    public bool IsDefending => defense != null && defense.IsDefending;
+
     private void Awake()
     {
-        animator = GetComponent<Animator>();
-        if (string.IsNullOrWhiteSpace(attackTriggerParameter))
-        {
-            attackTriggerParameter = DefaultAttackTrigger;
-        }
+        animator ??= GetComponent<Animator>();
+        defense ??= GetComponent<CharacterDefense>();
 
-        if (string.IsNullOrWhiteSpace(hitTriggerParameter))
-        {
-            hitTriggerParameter = DefaultHitTrigger;
-        }
-
-        hasAttackTriggerParameter = false;
-        hasHitTriggerParameter = false;
-        hitTriggerHash = Animator.StringToHash(hitTriggerParameter);
-
-        AnimatorControllerParameter[] parameters = animator.parameters;
-        for (int i = 0; i < parameters.Length; i++)
-        {
-            AnimatorControllerParameter parameter = parameters[i];
-            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == attackTriggerParameter)
-            {
-                hasAttackTriggerParameter = true;
-            }
-            else if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == hitTriggerParameter)
-            {
-                hasHitTriggerParameter = true;
-            }
-        }
+        CacheAnimatorParameters();
     }
 
-    public bool IsDefending => defendAnimation?.IsDefending == true;
-
-    public void TryPlayAttack()
+    private void CacheAnimatorParameters()
     {
-        if (!hasAttackTriggerParameter)
+        if (animator == null)
         {
             return;
         }
 
-        IsHitWindowOpen = false;
-        animator.SetTrigger(attackTriggerParameter);
+        AnimatorControllerParameter[] parameters = animator.parameters;
+
+        for (int i = 0; i < parameters.Length; i++)
+        {
+            AnimatorControllerParameter parameter = parameters[i];
+
+            if (parameter.type != AnimatorControllerParameterType.Trigger)
+            {
+                continue;
+            }
+
+            if (parameter.name == AttackParameter)
+            {
+                hasAttackParameter = true;
+            }
+            else if (parameter.name == HitParameter)
+            {
+                hasHitParameter = true;
+            }
+        }
+    }
+
+    public bool TryPlayAttack()
+    {
+        if (IsDefending)
+        {
+            ClearAttackTrigger();
+            return false;
+        }
+
+        return ForcePlayAttack();
+    }
+
+    public bool ForcePlayAttack()
+    {
+        if (animator == null || !hasAttackParameter)
+        {
+            return false;
+        }
+
+        animator.ResetTrigger(AttackHash);
+        animator.SetTrigger(AttackHash);
+        return true;
+    }
+
+    public void ClearAttackTrigger()
+    {
+        if (animator == null || !hasAttackParameter)
+        {
+            return;
+        }
+
+        animator.ResetTrigger(AttackHash);
     }
 
     public void TryPlayHit()
     {
-        if (!hasHitTriggerParameter)
+        if (animator == null || !hasHitParameter || IsDefending)
         {
             return;
         }
 
-        animator.SetTrigger(hitTriggerHash);
+        animator.SetTrigger(HitHash);
     }
 }

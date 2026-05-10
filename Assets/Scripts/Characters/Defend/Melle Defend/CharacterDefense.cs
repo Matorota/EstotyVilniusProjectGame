@@ -4,33 +4,48 @@ public class CharacterDefense : MonoBehaviour
 {
     [SerializeField] private CharacterDefendAnimation defendAnimation;
     [SerializeField] private CharacterInputReader inputReader;
+    [SerializeField] private CharacterAttackAnimation attackAnimation;
 
-    private bool isDefending;
-
-    public bool IsDefending => isDefending;
+    public bool IsDefending { get; private set; }
 
     private void Awake()
     {
         defendAnimation ??= GetComponent<CharacterDefendAnimation>();
         inputReader ??= GetComponent<CharacterInputReader>();
+        attackAnimation ??= GetComponent<CharacterAttackAnimation>();
     }
 
     private void Update()
     {
-        SetDefending(inputReader != null && inputReader.WantsDefense);
+        RefreshDefense();
     }
 
     public void SetUiDefense(bool value)
     {
         inputReader?.SetUiDefense(value);
+        RefreshDefense();
     }
 
-    private void SetDefending(bool value)
+    private void RefreshDefense()
     {
-        if (isDefending == value)
-            return;
+        bool wantsDefense = inputReader != null && inputReader.WantsDefense;
 
-        isDefending = value;
-        defendAnimation?.SetDefending(value);
+        if (IsDefending == wantsDefense)
+        {
+            if (IsDefending)
+            {
+                attackAnimation?.ClearAttackTrigger();
+            }
+
+            return;
+        }
+
+        IsDefending = wantsDefense;
+        defendAnimation?.SetDefending(IsDefending);
+
+        if (IsDefending)
+        {
+            attackAnimation?.ClearAttackTrigger();
+        }
     }
 }
