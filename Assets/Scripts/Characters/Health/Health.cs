@@ -41,7 +41,6 @@ public class Health : MonoBehaviour, IDamageable
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
 
-        attackAnimation?.TryPlayHit();
         OnDamaged?.Invoke(amount);
         OnHealthChanged?.Invoke(currentHealth);
 
