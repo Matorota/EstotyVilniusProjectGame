@@ -7082,8 +7082,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 364664878}
-  attackTriggerParameter: Attack
-  hitTriggerParameter: Hit
   defense: {fileID: 1463485408}
 --- !u!114 &364664877
 MonoBehaviour:
@@ -7197,7 +7195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 100
   team: 1
-  defense: {fileID: 1463485408}
+  defense: {fileID: 0}
 --- !u!143 &364664886
 CharacterController:
   m_ObjectHideFlags: 0
@@ -7245,7 +7243,7 @@ MonoBehaviour:
   range: 1.25
   cooldown: 1.4
   hitDelay: 0.45
-  attackLockTime: 0.8
+  attackDuration: 0.8
 --- !u!114 &364664890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7272,6 +7270,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefendAnimation
   animator: {fileID: 364664878}
   defendBoolParameter: IsDefending
+--- !u!114 &364664892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 364664875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b37c8af9d9ad7f4ea60fdb59e4be92f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
+  animator: {fileID: 364664878}
+  defense: {fileID: 1463485408}
 --- !u!1 &365526282 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f4eed50361df342419841cb5155ea0b9, type: 3}
@@ -8221,9 +8233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 412086718}
-  attackTriggerParameter: Attack
-  hitTriggerParameter: Hit
-  defense: {fileID: 0}
+  defense: {fileID: 1463485408}
 --- !u!114 &412086736 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2281658734349838882, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
@@ -8266,7 +8276,7 @@ MonoBehaviour:
   range: 1.25
   cooldown: 1.4
   hitDelay: 0.45
-  attackLockTime: 0.8
+  attackDuration: 0.8
 --- !u!114 &412086749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8279,6 +8289,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2c5a19db7e4f46bf1d9f5e4f0f43a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FindTargetables
+--- !u!114 &412086755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 412086682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 338b5611afc4429691349e949a955f0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDefense
+  defendAnimation: {fileID: 412086742}
+  inputReader: {fileID: 412086736}
+  attackAnimation: {fileID: 412086728}
 --- !u!4 &414009098 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -34664,6 +34689,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
       insertIndex: -1
       addedObject: {fileID: 364664891}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 364664892}
   m_SourcePrefab: {fileID: 100100000, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
 --- !u!4 &1899817064 stripped
 Transform:
@@ -38233,7 +38261,7 @@ MonoBehaviour:
   range: 1.25
   cooldown: 1.4
   hitDelay: 0.45
-  attackLockTime: 0.8
+  attackDuration: 0.8
 --- !u!114 &2136930034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38247,8 +38275,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 2136930036}
-  attackTriggerParameter: Attack
-  hitTriggerParameter: Hit
   defense: {fileID: 1463485408}
 --- !u!114 &2136930035
 MonoBehaviour:
@@ -38362,7 +38388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   maxHealth: 100
   team: 1
-  defense: {fileID: 1463485408}
+  defense: {fileID: 0}
 --- !u!143 &2136930042
 CharacterController:
   m_ObjectHideFlags: 0
@@ -38624,6 +38650,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1499086799194934694, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      propertyPath: defense
+      value: 
+      objectReference: {fileID: 1463485408}
     - target: {fileID: 1519814365189524905, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -38789,6 +38819,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 412086749}
+    - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 412086755}
     - targetCorrespondingSourceObject: {fileID: 8873572214573473017, guid: 16c5924a9f980644c9f293e31a05f73c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 528147861}
