@@ -9,7 +9,7 @@ public class CharacterMovements : MonoBehaviour
     private MovementDirectionResolver directionResolver;
     private CharacterMotor motor;
     private CharacterMovementAnimation movementAnimation;
-    private MeleeAttack meleeAttack;
+    private CharacterMeleeAttack characterMeleeAttack;
     public bool IsMoving { get; private set; }
 
     private void Awake()
@@ -18,7 +18,11 @@ public class CharacterMovements : MonoBehaviour
         directionResolver = GetComponent<MovementDirectionResolver>();
         motor = GetComponent<CharacterMotor>();
         movementAnimation = GetComponent<CharacterMovementAnimation>();
-        meleeAttack = GetComponent<MeleeAttack>();
+        characterMeleeAttack = GetComponent<CharacterMeleeAttack>();
+        if (characterMeleeAttack == null)
+        {
+            characterMeleeAttack = GetComponent<MeleeAttack>();
+        }
     }
 
     private void Update()
@@ -26,7 +30,7 @@ public class CharacterMovements : MonoBehaviour
         Vector2 movementInput = inputReader.MovementInput;
         IsMoving = movementInput.sqrMagnitude > 0.0001f;
         Vector3 moveDirection = directionResolver.ResolveMoveDirection(movementInput);
-        motor.SetFacingTarget(meleeAttack != null ? meleeAttack.CurrentTargetTransform : null);
+        motor.SetFacingTarget(characterMeleeAttack != null ? characterMeleeAttack.CurrentTargetTransform : null);
         motor.Tick(moveDirection);
         if (movementAnimation != null)
         {

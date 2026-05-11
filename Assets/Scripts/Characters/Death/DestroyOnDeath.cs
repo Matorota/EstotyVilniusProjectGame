@@ -8,17 +8,27 @@ public class DestroyOnDeath : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<Characters.Health.IDamageable>();
+        if (health == null)
+        {
+            Debug.LogWarning($"{nameof(DestroyOnDeath)} on {name} is missing IDamageable.");
+            enabled = false;
+        }
     }
 
     private void OnEnable()
     {
-
-        health.OnDeath += HandleDeath;
+        if (health != null)
+        {
+            health.OnDeath += HandleDeath;
+        }
     }
     
     private void OnDisable()
     {
-        health.OnDeath -= HandleDeath;
+        if (health != null)
+        {
+            health.OnDeath -= HandleDeath;
+        }
     }
 
     private void HandleDeath()

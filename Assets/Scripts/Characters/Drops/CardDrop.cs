@@ -18,16 +18,28 @@ public class CardDrop : MonoBehaviour
         health = GetComponent<Characters.Health.IDamageable>();
         selector = new CardDropSelector();
         spawner = new CardDropSpawner(CardDropWorldY);
+
+        if (health == null)
+        {
+            Debug.LogWarning($"{nameof(CardDrop)} on {name} is missing IDamageable.");
+            enabled = false;
+        }
     }
 
     private void OnEnable()
     {
-        health.OnDeath += OnDeath;
+        if (health != null)
+        {
+            health.OnDeath += OnDeath;
+        }
     }
 
     private void OnDisable()
     {
-        health.OnDeath -= OnDeath;
+        if (health != null)
+        {
+            health.OnDeath -= OnDeath;
+        }
     }
 
     private void OnDeath()
