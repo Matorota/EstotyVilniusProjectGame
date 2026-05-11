@@ -8,14 +8,14 @@ public class CardDrop : MonoBehaviour
 
     [SerializeField] private GameObject[] cardDropPrefabs;
 
-    private Characters.Health.IDamageable health;
+    private IDamageable health;
     private bool hasDropped;
     private CardDropSelector selector;
     private CardDropSpawner spawner;
 
     private void Awake()
     {
-        health = GetComponent<Characters.Health.IDamageable>();
+        health = GetComponent<IDamageable>();
         selector = new CardDropSelector();
         spawner = new CardDropSpawner(CardDropWorldY);
 

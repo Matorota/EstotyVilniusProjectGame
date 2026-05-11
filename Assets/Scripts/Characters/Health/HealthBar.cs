@@ -5,11 +5,11 @@ using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 {
     [SerializeField] private Image healthFillImage;
-    private Characters.Health.IDamageable health;
+    private IDamageable health;
 
     private void Awake()
     {
-        health = GetComponent<Characters.Health.IDamageable>();
+        health = GetComponent<IDamageable>();
         if (health == null || healthFillImage == null)
         {
             Debug.LogWarning($"{nameof(HealthBar)} on {name} is missing references.");

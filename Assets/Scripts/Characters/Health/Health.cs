@@ -1,5 +1,4 @@
 using System;
-using Characters.Health;
 using UnityEngine;
 
 public class Health : MonoBehaviour, IDamageable

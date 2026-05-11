@@ -4,7 +4,7 @@ public class DeathScreen : MonoBehaviour
 {
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private GameObject deathScreenRoot;
-    private Characters.Health.IDamageable playerHealth;
+    private IDamageable playerHealth;
 
     [SerializeField] private bool pauseGameOnDeath = true;
 
@@ -13,7 +13,7 @@ public class DeathScreen : MonoBehaviour
 
     private void Awake()
     {
-        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<Characters.Health.IDamageable>() : null;
+        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<IDamageable>() : null;
 
         if (deathScreenRoot != null)
         {

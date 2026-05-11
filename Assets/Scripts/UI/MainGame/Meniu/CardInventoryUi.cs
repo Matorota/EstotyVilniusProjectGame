@@ -88,7 +88,7 @@ public class CardInventoryUi : MonoBehaviour
 
             if (entry == null || entry.Root == null) continue;
 
-            if (entry.Image != null && entry.Image.texture == null && textureByCardId.TryGetValue(cardId, out Texture texture))
+            if (entry.Image != null && entry.Image.texture == null && TryGetTexture(cardId, out Texture texture))
             {
                 entry.Image.texture = texture;
             }
@@ -113,7 +113,7 @@ public class CardInventoryUi : MonoBehaviour
         root.transform.SetParent(cardsContainer, false);
 
         RawImage image = root.GetComponent<RawImage>();
-        if (textureByCardId.TryGetValue(cardId, out Texture texture))
+        if (TryGetTexture(cardId, out Texture texture))
         {
             image.texture = texture;
         }
@@ -144,5 +144,15 @@ public class CardInventoryUi : MonoBehaviour
         int col = index % 6;
         int row = index / 6;
         rect.anchoredPosition = new Vector2(col * cell, -row * cell);
+    }
+
+    private bool TryGetTexture(string cardId, out Texture texture)
+    {
+        texture = null;
+        if (inventory != null && inventory.TryGetCardTexture(cardId, out texture))
+        {
+            return true;
+        }
+        return textureByCardId.TryGetValue(cardId, out texture);
     }
 }

@@ -1,9 +1,7 @@
-using Characters.Health;
-using Combat;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterAttackAnimation))]
-[RequireComponent(typeof(Combat.Combat))]
+[RequireComponent(typeof(Combat))]
 public class CharacterMeleeAttack : MonoBehaviour
 {
     [SerializeField] private float damage = 10f;
