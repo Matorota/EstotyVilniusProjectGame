@@ -13,8 +13,7 @@ public class Health : MonoBehaviour, IDamageable
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
     public Team Team => team;
-    // public bool IsDefending => defense != null && defense.IsDefending;
-    // try to use it in attack itself, see if no issue because of this
+    // public bool IsDefending => defense != null && defense.IsDefending; // later to not damage tru walls
 
     public event Action<float> OnHealthChanged;
     public event Action OnDeath;

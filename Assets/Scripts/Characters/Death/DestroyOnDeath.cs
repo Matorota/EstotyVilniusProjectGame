@@ -10,7 +10,6 @@ public class DestroyOnDeath : MonoBehaviour
         health = GetComponent<Characters.Health.IDamageable>();
         if (health == null)
         {
-            Debug.LogWarning($"{nameof(DestroyOnDeath)} on {name} is missing IDamageable.");
             enabled = false;
         }
     }

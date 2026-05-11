@@ -10,14 +10,12 @@ public class CharacterMeleeAttack : MonoBehaviour
     [SerializeField] private float range = 1.25f;
     [SerializeField] private float rangePadding = 0.25f;
     [SerializeField] private float cooldown = 1.5f;
-    [SerializeField] private LayerMask targetLayers = ~0;
 
     [SerializeField] private float hitDelay = 0.45f;
     [SerializeField] private float attackDuration = 0.8f;
 
     private CharacterAttackAnimation attackAnimation;
     private ICombat combat;
-    private CharacterDefense selfDefense;
 
     private float nextAttackTime;
     private float hitTime;
@@ -28,47 +26,23 @@ public class CharacterMeleeAttack : MonoBehaviour
 
     public Transform CurrentTargetTransform => combat?.TargetTransform;
     public float Range => range;
+    private float EffectiveRange => range + rangePadding;
 
     private void Awake()
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
         combat = GetComponent<ICombat>();
-        selfDefense = GetComponent<CharacterDefense>();
-        if (targetLayers.value == 0)
-        {
-            targetLayers = ~0;
-        }
         range = Mathf.Max(0f, range);
-        rangePadding = Mathf.Max(0f, rangePadding);
-        cooldown = Mathf.Max(0f, cooldown);
-        hitDelay = Mathf.Max(0f, hitDelay);
-        attackDuration = Mathf.Max(hitDelay, attackDuration);
     }
 
     private void FixedUpdate()
     {
-        if (combat == null || combat.Self == null)
+        if (!CanRunCombat())
         {
             return;
         }
 
-        IDamageable self = combat.Self;
-        IDamageable target = combat.Target;
-        float effectiveRange = range + rangePadding;
-        if (ReferenceEquals(target, self))
-        {
-            combat.SetTarget(null);
-            target = null;
-        }
-        if (!FindTargetables.IsTargetValid(transform, self, target, effectiveRange))
-        {
-            target = FindTargetables.FindTarget(transform, self, effectiveRange, targetLayers);
-            if (target == null && targetLayers.value != ~0)
-            {
-                target = FindTargetables.FindTarget(transform, self, effectiveRange, ~0);
-            }
-            combat.SetTarget(target);
-        }
+        ResolveTarget();
 
         if (isAttacking)
         {
@@ -91,19 +65,23 @@ public class CharacterMeleeAttack : MonoBehaviour
             return;
         }
 
-        if (target == null || (selfDefense != null && selfDefense.IsDefending))
+        IDamageable target = combat.Target;
+        if (target == null || combat.IsSelfDefending)
         {
             return;
         }
 
-        if (!FindTargetables.IsFacingTarget(transform, target))
+        if (!FindTargetables.IsFacingTarget(transform, target)) // leaving for now
         {
             return;
         }
 
         StartAttack();
     }
-
+    private bool CanRunCombat() // added after refactoring kept on attacking friendlies (enemy to enemy ) 
+    {
+        return combat != null && combat.HasValidSelf;
+    }
     private void StartAttack()
     {
         bool animationStarted = attackAnimation.TryPlayAttack();
@@ -124,26 +102,19 @@ public class CharacterMeleeAttack : MonoBehaviour
     private void TryApplyDamage()
     {
         hasHitThisAttack = true;
-        if (combat == null || combat.Self == null)
+        if (!CanRunCombat())
         {
             return;
         }
 
         IDamageable self = combat.Self;
         IDamageable target = combat.Target;
-        float effectiveRange = range + rangePadding;
-        if (target == null)
+        if (target == null || combat.IsSelfDefending || combat.IsTargetDefending)
         {
             return;
         }
 
-        CharacterDefense targetDefense = (target as Component)?.GetComponent<CharacterDefense>();
-        if ((targetDefense != null && targetDefense.IsDefending) || (selfDefense != null && selfDefense.IsDefending))
-        {
-            return;
-        }
-
-        if (!FindTargetables.IsTargetValid(transform, self, target, effectiveRange))
+        if (!FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
         {
             return;
         }
@@ -157,7 +128,29 @@ public class CharacterMeleeAttack : MonoBehaviour
 
         if (target.CurrentHealth <= 0f)
         {
-            combat.SetTarget(null);
+            combat.ClearTarget();
         }
     }
+
+    private void ResolveTarget()
+    {
+        IDamageable self = combat.Self;
+        IDamageable target = combat.Target;
+        if (FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
+        {
+            return;
+        }
+
+        target = FindTargetables.FindTarget(transform, self, EffectiveRange);
+
+        if (target == null)
+        {
+            combat.ClearTarget();
+            return;
+        }
+
+        combat.SetTarget(target);
+    }
+
+
 }

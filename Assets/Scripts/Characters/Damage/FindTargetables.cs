@@ -5,13 +5,13 @@ public class FindTargetables : MonoBehaviour
 {
     private const float FaceDotThreshold = 0.8f;
 
-    public static IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range, LayerMask layerMask)
+    public static IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
     {
         IDamageable best = null;
         float bestDistance = float.MaxValue;
         float rangeSqr = range * range;
 
-        foreach (Collider hit in Physics.OverlapSphere(origin.position, range, layerMask, QueryTriggerInteraction.Ignore))
+        foreach (Collider hit in Physics.OverlapSphere(origin.position, range, ~0, QueryTriggerInteraction.Ignore))
         {
             IDamageable target = hit.GetComponentInParent<IDamageable>();
             if (target == null || !IsHostile(selfDamageable, target))

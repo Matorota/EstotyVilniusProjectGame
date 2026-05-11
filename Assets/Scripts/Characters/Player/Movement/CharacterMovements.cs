@@ -19,10 +19,7 @@ public class CharacterMovements : MonoBehaviour
         motor = GetComponent<CharacterMotor>();
         movementAnimation = GetComponent<CharacterMovementAnimation>();
         characterMeleeAttack = GetComponent<CharacterMeleeAttack>();
-        if (characterMeleeAttack == null)
-        {
-            characterMeleeAttack = GetComponent<MeleeAttack>();
-        }
+
     }
 
     private void Update()
