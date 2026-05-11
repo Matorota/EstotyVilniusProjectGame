@@ -1,4 +1,3 @@
-using Characters.Health;
 using UnityEngine;
 
 public class FindTargetables : MonoBehaviour

@@ -7,6 +7,10 @@ public class AlignToCamera : MonoBehaviour
     private void Awake()
     {
         cam = Camera.main;
+        if (cam == null)
+        {
+            enabled = false;
+        }
     }
 
     private void Update()

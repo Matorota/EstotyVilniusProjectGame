@@ -14,7 +14,7 @@ public class CharacterMovements : MonoBehaviour
 
     private void Awake()
     {
-        inputReader = GetComponent<CharacterInputReader>();
+        inputReader = GetComponent<CharacterInputReader>(); 
         directionResolver = GetComponent<MovementDirectionResolver>();
         motor = GetComponent<CharacterMotor>();
         movementAnimation = GetComponent<CharacterMovementAnimation>();
