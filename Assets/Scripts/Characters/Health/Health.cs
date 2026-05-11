@@ -9,7 +9,6 @@ public class Health : MonoBehaviour, IDamageable
     [SerializeField] private CharacterDefense defense;
 
     private float currentHealth;
-    private CharacterAttackAnimation attackAnimation;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
@@ -23,7 +22,7 @@ public class Health : MonoBehaviour, IDamageable
     private void Awake()
     {
         currentHealth = maxHealth;
-        attackAnimation = GetComponent<CharacterAttackAnimation>();
+
         defense ??= GetComponent<CharacterDefense>();
     }
 

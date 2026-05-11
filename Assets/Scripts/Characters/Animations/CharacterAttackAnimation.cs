@@ -15,8 +15,8 @@ public class CharacterAttackAnimation : MonoBehaviour
 
     private void Awake()
     {
-        animator ??= GetComponent<Animator>();
-        defense ??= GetComponent<CharacterDefense>();
+        animator = GetComponent<Animator>();
+        defense = GetComponent<CharacterDefense>();
 
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {

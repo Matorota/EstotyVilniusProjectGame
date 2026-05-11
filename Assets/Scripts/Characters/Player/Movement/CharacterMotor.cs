@@ -13,29 +13,19 @@ public class CharacterMotor : MonoBehaviour
     private Vector3 horizontalVelocitySmoothing;
     private Transform facingTarget;
 
+    private float verticalVelocity;
+    private const float Gravity = -9.81f;
+    private const float GroundStick = -1f;
+    private const float MaxFallSpeed = 50f;
+
     public Vector3 HorizontalVelocity => smoothedHorizontalVelocity;
     public float NormalizedHorizontalSpeed
     {
         get
         {
-            if (speed <= 0f)
-            {
-                return 0f;
-            }
-
+            if (speed <= 0f) return 0f;
             Vector2 planarVelocity = new Vector2(smoothedHorizontalVelocity.x, smoothedHorizontalVelocity.z);
-            float normalizedSpeed = planarVelocity.magnitude / speed;
-            if (normalizedSpeed < 0f)
-            {
-                return 0f;
-            }
-
-            if (normalizedSpeed > 1f)
-            {
-                return 1f;
-            }
-
-            return normalizedSpeed;
+            return Mathf.Clamp01(planarVelocity.magnitude / speed);
         }
     }
 
@@ -51,6 +41,7 @@ public class CharacterMotor : MonoBehaviour
 
     public void Tick(Vector3 moveDirection)
     {
+        float dt = Time.deltaTime;
         Vector3 targetHorizontalVelocity = moveDirection * speed;
         smoothedHorizontalVelocity = Vector3.SmoothDamp(
             smoothedHorizontalVelocity,
@@ -66,16 +57,27 @@ public class CharacterMotor : MonoBehaviour
             if (toTarget.sqrMagnitude > 0.0001f)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * dt);
             }
         }
         else if (smoothedHorizontalVelocity.sqrMagnitude >= 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(smoothedHorizontalVelocity);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * dt);
         }
 
-        controller.Move(smoothedHorizontalVelocity * Time.deltaTime);
+        if (controller.isGrounded)
+        {
+            if (verticalVelocity < 0f) verticalVelocity = GroundStick;
+        }
+        else
+        {
+            verticalVelocity += Gravity * dt;
+            verticalVelocity = Mathf.Max(verticalVelocity, -MaxFallSpeed);
+        }
+
+        Vector3 finalMove = smoothedHorizontalVelocity + Vector3.up * verticalVelocity;
+        controller.Move(finalMove * dt);
     }
 
 }

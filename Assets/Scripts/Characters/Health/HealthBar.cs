@@ -19,7 +19,7 @@ public class HealthBar : MonoBehaviour
     }
 
     private void OnDisable()
-    {
+    { 
         health.OnHealthChanged -= OnHealthChanged;
     }
 
@@ -30,6 +30,7 @@ public class HealthBar : MonoBehaviour
 
     private void Refresh(float currentHealth)
     {
-        healthFillImage.fillAmount = currentHealth / health.MaxHealth;
+        float max = Mathf.Max(0.00001f, health.MaxHealth);
+        healthFillImage.fillAmount = Mathf.Clamp01(currentHealth / max);
     }
 }

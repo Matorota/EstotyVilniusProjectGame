@@ -13,9 +13,10 @@ public class CharacterInputReader : MonoBehaviour
 
     public Vector2 MovementInput => movementInput;
     public bool WantsDefense => uiDefenseHeld || Mouse.current != null && Mouse.current.rightButton.isPressed;
-
+    
     private void Update()
     {
+        if (useJoystick && joystick == null) useJoystick = false;
         movementInput = ReadMovementInput();
     }
 

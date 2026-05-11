@@ -15,8 +15,11 @@ public class MovementDirectionResolver : MonoBehaviour
             return ToIsometricDirection(movementInput);
         }
 
-        Vector3 cameraForward = movementCamera.forward;
-        Vector3 cameraRight = movementCamera.right;
+        Transform camTransform = movementCamera != null ? movementCamera : (Camera.main != null ? Camera.main.transform : null);
+        if (camTransform == null) return ToIsometricDirection(movementInput);
+
+        Vector3 cameraForward = camTransform.forward;
+        Vector3 cameraRight = camTransform.right;
         cameraForward = Vector3.ProjectOnPlane(cameraForward, Vector3.up);
         cameraRight = Vector3.ProjectOnPlane(cameraRight, Vector3.up);
 

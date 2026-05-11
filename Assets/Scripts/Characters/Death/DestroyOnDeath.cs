@@ -12,6 +12,7 @@ public class DestroyOnDeath : MonoBehaviour
 
     private void OnEnable()
     {
+
         health.OnDeath += HandleDeath;
     }
     
