@@ -3,64 +3,61 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class CharacterAttackAnimation : MonoBehaviour
 {
-    private const string DefaultAttackTrigger = "Attack";
+    private const string AttackParameter = "Attack";
+    private static readonly int AttackHash = Animator.StringToHash(AttackParameter);
 
     [SerializeField] private Animator animator;
-    [SerializeField] private string attackTriggerParameter = DefaultAttackTrigger;
-    [SerializeField] private CharacterDefendAnimation defendAnimation;
+    [SerializeField] private CharacterDefense defense;
 
-    private bool hasAttackTriggerParameter;
-    public bool IsHitWindowOpen { get; private set; }
-    
+    private bool hasAttackParameter;
+
+    public bool IsDefending => defense != null && defense.IsDefending;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        if (string.IsNullOrWhiteSpace(attackTriggerParameter))
-        {
-            attackTriggerParameter = DefaultAttackTrigger;
-        }
+        defense = GetComponent<CharacterDefense>();
 
-        hasAttackTriggerParameter = false;
-
-        AnimatorControllerParameter[] parameters = animator.parameters;
-        for (int i = 0; i < parameters.Length; i++)
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
-            AnimatorControllerParameter parameter = parameters[i];
-            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == attackTriggerParameter)
+            if (parameter.type == AnimatorControllerParameterType.Trigger && parameter.name == AttackParameter)
             {
-                hasAttackTriggerParameter = true;
+                hasAttackParameter = true;
                 break;
             }
         }
     }
 
-    public bool IsDefending => defendAnimation != null && defendAnimation.IsDefending;
-
-    public void TryPlayAttack()
+    public bool TryPlayAttack()
     {
-        if (!hasAttackTriggerParameter)
-        {
-            return;
-        }
-
-        // Prevent attacking while defending
         if (IsDefending)
         {
+            ClearAttackTrigger();
+            return false;
+        }
+
+        return ForcePlayAttack();
+    }
+
+    public bool ForcePlayAttack()
+    {
+        if (!hasAttackParameter)
+        {
+            return false;
+        }
+
+        animator.ResetTrigger(AttackHash);
+        animator.SetTrigger(AttackHash);
+        return true;
+    }
+
+    public void ClearAttackTrigger()
+    {
+        if (!hasAttackParameter)
+        {
             return;
         }
 
-        IsHitWindowOpen = false;
-        animator.SetTrigger(attackTriggerParameter);
-    }
-
-    // Will use them dont delete
-    public void OnAttackHitStart()
-    {
-        IsHitWindowOpen = true;
-    }
-
-    public void OnAttackHitEnd()
-    {
-        IsHitWindowOpen = false;
+        animator.ResetTrigger(AttackHash);
     }
 }

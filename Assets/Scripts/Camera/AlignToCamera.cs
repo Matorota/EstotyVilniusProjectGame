@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class FaceToCamera : MonoBehaviour
+public class AlignToCamera : MonoBehaviour
 {
     private Camera cam;
     

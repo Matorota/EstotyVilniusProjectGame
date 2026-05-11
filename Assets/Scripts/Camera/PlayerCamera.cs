@@ -7,11 +7,7 @@ public class PlayerCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (player == null)
-        {
-            return;
-        }
-
+        if (player == null) return;
         transform.position = player.position + offset;
     }
 }

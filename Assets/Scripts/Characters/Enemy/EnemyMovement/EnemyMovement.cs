@@ -18,14 +18,15 @@ public class EnemyMovement : MonoBehaviour
     private Vector3 moveVelocity;
     private bool isStoppedByDistance;
 
+    private float verticalVelocity;
+    private const float Gravity = -9.81f;
+    private const float GroundStick = -1f;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
         movementAnimation = GetComponent<CharacterMovementAnimation>();
-        if (resumeDistanceBuffer < 0f)
-        {
-            resumeDistanceBuffer = 0f;
-        }
+        if (resumeDistanceBuffer < 0f) resumeDistanceBuffer = 0f;
     }
 
     private void Update()
@@ -58,30 +59,45 @@ public class EnemyMovement : MonoBehaviour
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
-        if (currentMove.sqrMagnitude > 0.001f)
+        if (toTarget.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(currentMove);
+            Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
         }
 
-        controller.Move(currentMove * Time.deltaTime);
+        float dt = Time.deltaTime;
+
+        bool grounded = controller.isGrounded;
+        if (!grounded)
+        {
+            grounded = Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 0.25f + controller.skinWidth);
+        }
+
+        if (grounded)
+        {
+            if (verticalVelocity < 0f)
+            {
+                verticalVelocity = GroundStick; 
+            }
+        }
+        else
+        {
+            verticalVelocity += Gravity * dt;
+            verticalVelocity = Mathf.Max(verticalVelocity, -50f);
+        }
+
+        Vector3 finalMove = currentMove + Vector3.up * verticalVelocity;
+        controller.Move(finalMove * dt);
 
         if (movementAnimation == null)
         {
             return;
         }
 
-        Vector3 animationDirection = currentMove.sqrMagnitude > 0.0001f ? currentMove : desiredDirection;
-        Vector2 movementInput = new Vector2(currentMove.x, currentMove.z);
-        float normalizedSpeed = speed > 0f ? currentMove.magnitude / speed : 0f;
-        if (normalizedSpeed < 0f)
-        {
-            normalizedSpeed = 0f;
-        }
-        else if (normalizedSpeed > 1f)
-        {
-            normalizedSpeed = 1f;
-        }
+        Vector3 animationDirection = desiredDirection;
+        Vector2 movementInput = new Vector2(desiredDirection.x, desiredDirection.z);
+        float normalizedSpeed = speed > 0f ? desiredMove.magnitude / speed : 0f;
+        normalizedSpeed = Mathf.Clamp01(normalizedSpeed);
 
         movementAnimation.Tick(movementInput, animationDirection, normalizedSpeed, currentMove);
     }

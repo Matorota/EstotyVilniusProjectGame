@@ -5,61 +5,48 @@ using UnityEngine;
 public class Health : MonoBehaviour, IDamageable
 {
     [SerializeField] private float maxHealth = 100f;
-    [SerializeField] private float currentHealth = 100f;
-    private bool hasDied;
+    [SerializeField] private Characters.Team.TeamId team = Characters.Team.TeamId.Player;
+    [SerializeField] private CharacterDefense defense;
+
+    private float currentHealth;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth => currentHealth;
+    public Characters.Team.TeamId Team => team;
+    public bool IsDefending => defense != null && defense.IsDefending;
 
     public event Action<float> OnHealthChanged;
-    
-    public event Action OnDeath; 
-    
-    private bool isDefending;
+    public event Action<float> OnDamaged;
+    public event Action OnDeath;
 
-    public void SetDefending(bool value) => isDefending = value;
-    
-    public bool CanBeDestroyed(bool hasDestroyed)
+    private void Awake()
     {
-        return !hasDestroyed && currentHealth <= 0f;
+        currentHealth = maxHealth;
+
+        defense ??= GetComponent<CharacterDefense>();
     }
 
-
+    private void Start()
+    {
+        OnHealthChanged?.Invoke(currentHealth);
+    }
+    private bool IsDead => currentHealth <= 0f;
     public void TakeDamage(float amount)
     {
-        
-        if (isDefending)
-        {
-            return;
-        }
-        
-        if (amount < 0f)
-        {
-            amount = 0f;
-        }
-
-        if (amount <= 0f || currentHealth <= 0f)
+        if (amount <= 0f ||  IsDefending)
         {
             return;
         }
 
-        float updatedHealth = currentHealth - amount;
-        if (updatedHealth < 0f)
-        {
-            updatedHealth = 0f;
-        }
-        else if (updatedHealth > maxHealth)
-        {
-            updatedHealth = maxHealth;
-        }
+        currentHealth = Mathf.Max(0f, currentHealth - amount);
 
-        currentHealth = updatedHealth;
+        OnDamaged?.Invoke(amount);
         OnHealthChanged?.Invoke(currentHealth);
 
-        if (CanBeDestroyed(hasDied))
+        if (IsDead)   
         {
-            hasDied = true;
             OnDeath?.Invoke();
+            return;
         }
     }
 }
