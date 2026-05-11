@@ -5,6 +5,7 @@ public class CardPickup : MonoBehaviour
 {
     [SerializeField] private string cardId;
     [SerializeField] private bool destroyIfAlreadyOwned;
+    public string CardId => cardId;
 
     private void Reset()
     {
