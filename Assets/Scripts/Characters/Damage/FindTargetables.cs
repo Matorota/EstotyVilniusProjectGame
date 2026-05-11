@@ -5,10 +5,11 @@ public class FindTargetables : MonoBehaviour
 {
     private const float FaceDotThreshold = 0.8f;
 
-    public IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
+    public static IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
     {
         IDamageable best = null;
         float bestDistance = float.MaxValue;
+        float rangeSqr = range * range;
 
         foreach (Collider hit in Physics.OverlapSphere(origin.position, range, ~0, QueryTriggerInteraction.Ignore))
         {
@@ -18,9 +19,14 @@ public class FindTargetables : MonoBehaviour
                 continue;
             }
 
-            Vector3 offset = Vector3.ProjectOnPlane(((Component)target).transform.position - origin.position, Vector3.up);
+            if (!TryGetTargetTransform(target, out Transform targetTransform))
+            {
+                continue;
+            }
+
+            Vector3 offset = Vector3.ProjectOnPlane(targetTransform.position - origin.position, Vector3.up);
             float sqrDistance = offset.sqrMagnitude;
-            if (sqrDistance > range * range || sqrDistance >= bestDistance)
+            if (sqrDistance > rangeSqr || sqrDistance >= bestDistance)
             {
                 continue;
             }
@@ -32,25 +38,56 @@ public class FindTargetables : MonoBehaviour
         return best;
     }
 
-    public bool IsTargetValid(Transform origin, IDamageable selfDamageable, IDamageable target, float range) // without it would attack no matter what range
+    public static bool IsTargetValid(Transform origin, IDamageable selfDamageable, IDamageable target, float range)
     {
         if (target == null || target.CurrentHealth <= 0f || !IsHostile(selfDamageable, target))
         {
             return false;
         }
 
-        Vector3 offset = Vector3.ProjectOnPlane(((Component)target).transform.position - origin.position, Vector3.up);
+        if (!TryGetTargetTransform(target, out Transform targetTransform))
+        {
+            return false;
+        }
+
+        Vector3 offset = Vector3.ProjectOnPlane(targetTransform.position - origin.position, Vector3.up);
         return offset.sqrMagnitude <= range * range;
     }
 
-    public bool IsFacingTarget(Transform origin, IDamageable target)
+    public static bool IsFacingTarget(Transform origin, IDamageable target)
     {
-        Vector3 offset = Vector3.ProjectOnPlane(((Component)target).transform.position - origin.position, Vector3.up);
+        if (!TryGetTargetTransform(target, out Transform targetTransform))
+        {
+            return false;
+        }
+
+        Vector3 offset = Vector3.ProjectOnPlane(targetTransform.position - origin.position, Vector3.up);
         return offset.sqrMagnitude <= 0.0001f || Vector3.Dot(origin.forward, offset.normalized) >= FaceDotThreshold;
     }
 
-    public bool IsHostile(IDamageable selfDamageable, IDamageable target)
+    public static bool IsHostile(IDamageable selfDamageable, IDamageable target)
     {
-        return target != null && (selfDamageable == null || target.Team != selfDamageable.Team);
+        if (target == null)
+        {
+            return false;
+        }
+        if (ReferenceEquals(selfDamageable, target))
+        {
+            return false;
+        }
+
+        return selfDamageable == null || target.Team != selfDamageable.Team;
+    }
+
+    private static bool TryGetTargetTransform(IDamageable target, out Transform targetTransform)
+    {
+        if (target is Component targetComponent)
+        {
+            targetTransform = targetComponent.transform;
+            return true;
+        }
+
+        targetTransform = null;
+        return false;
     }
 }

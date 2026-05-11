@@ -8,17 +8,26 @@ public class DestroyOnDeath : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<Characters.Health.IDamageable>();
+        if (health == null)
+        {
+            enabled = false;
+        }
     }
 
     private void OnEnable()
     {
-
-        health.OnDeath += HandleDeath;
+        if (health != null)
+        {
+            health.OnDeath += HandleDeath;
+        }
     }
     
     private void OnDisable()
     {
-        health.OnDeath -= HandleDeath;
+        if (health != null)
+        {
+            health.OnDeath -= HandleDeath;
+        }
     }
 
     private void HandleDeath()

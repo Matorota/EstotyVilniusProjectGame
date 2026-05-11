@@ -1,24 +1,21 @@
 using Characters.Health;
-using Characters.Team;
+using Combat;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterAttackAnimation))]
-[RequireComponent(typeof(FindTargetables))]
-public class MeleeAttack : MonoBehaviour
+[RequireComponent(typeof(Combat.Combat))]
+public class CharacterMeleeAttack : MonoBehaviour
 {
-    [SerializeField] private float playerDamage = 10f;
-    [SerializeField] private float enemyDamage = 4f;
+    [SerializeField] private float damage = 10f;
     [SerializeField] private float range = 1.25f;
+    [SerializeField] private float rangePadding = 0.25f;
     [SerializeField] private float cooldown = 1.5f;
 
-    [Header("Code-Based Hit Timing")]
     [SerializeField] private float hitDelay = 0.45f;
     [SerializeField] private float attackDuration = 0.8f;
 
     private CharacterAttackAnimation attackAnimation;
-    private FindTargetables targetFinder;
-    private IDamageable self;
-    private IDamageable target;
+    private ICombat combat;
 
     private float nextAttackTime;
     private float hitTime;
@@ -27,30 +24,25 @@ public class MeleeAttack : MonoBehaviour
     private bool isAttacking;
     private bool hasHitThisAttack;
 
-    public Transform CurrentTargetTransform => target != null ? ((Component)target).transform : null;
+    public Transform CurrentTargetTransform => combat?.TargetTransform;
     public float Range => range;
-
-    private bool IsEnemy => self != null && self.Team == TeamId.Enemy;
-    private float Damage => IsEnemy ? enemyDamage : playerDamage;
+    private float EffectiveRange => range + rangePadding;
 
     private void Awake()
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
-        targetFinder = GetComponent<FindTargetables>();
-        self = GetComponent<IDamageable>();
-
+        combat = GetComponent<ICombat>();
         range = Mathf.Max(0f, range);
-        cooldown = Mathf.Max(0f, cooldown);
-        hitDelay = Mathf.Max(0f, hitDelay);
-        attackDuration = Mathf.Max(hitDelay, attackDuration);
     }
 
     private void FixedUpdate()
     {
-        if (!targetFinder.IsTargetValid(transform, self, target, range))
+        if (!CanRunCombat())
         {
-            target = targetFinder.FindTarget(transform, self, range);
+            return;
         }
+
+        ResolveTarget();
 
         if (isAttacking)
         {
@@ -68,29 +60,31 @@ public class MeleeAttack : MonoBehaviour
             return;
         }
 
-        if (target == null || Time.time < nextAttackTime)
+        if (Time.time < nextAttackTime)
         {
             return;
         }
 
-        if (self != null && self.IsDefending)
+        IDamageable target = combat.Target;
+        if (target == null || combat.IsSelfDefending)
         {
             return;
         }
 
-        if (!targetFinder.IsFacingTarget(transform, target))
+        if (!FindTargetables.IsFacingTarget(transform, target)) // leaving for now
         {
             return;
         }
 
         StartAttack();
     }
-
+    private bool CanRunCombat() // added after refactoring kept on attacking friendlies (enemy to enemy ) 
+    {
+        return combat != null && combat.HasValidSelf;
+    }
     private void StartAttack()
     {
-        bool animationStarted = IsEnemy
-            ? attackAnimation.ForcePlayAttack()
-            : attackAnimation.TryPlayAttack();
+        bool animationStarted = attackAnimation.TryPlayAttack();
 
         if (!animationStarted)
         {
@@ -108,32 +102,55 @@ public class MeleeAttack : MonoBehaviour
     private void TryApplyDamage()
     {
         hasHitThisAttack = true;
-
-        if (target == null || target.IsDefending)
+        if (!CanRunCombat())
         {
             return;
         }
 
-        if (self != null && self.IsDefending)
+        IDamageable self = combat.Self;
+        IDamageable target = combat.Target;
+        if (target == null || combat.IsSelfDefending || combat.IsTargetDefending)
         {
             return;
         }
 
-        if (!targetFinder.IsTargetValid(transform, self, target, range))
+        if (!FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
         {
             return;
         }
 
-        if (!targetFinder.IsFacingTarget(transform, target))
+        if (!FindTargetables.IsFacingTarget(transform, target))
         {
             return;
         }
 
-        target.TakeDamage(Damage);
+        target.TakeDamage(damage);
 
         if (target.CurrentHealth <= 0f)
         {
-            target = null;
+            combat.ClearTarget();
         }
     }
+
+    private void ResolveTarget()
+    {
+        IDamageable self = combat.Self;
+        IDamageable target = combat.Target;
+        if (FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
+        {
+            return;
+        }
+
+        target = FindTargetables.FindTarget(transform, self, EffectiveRange);
+
+        if (target == null)
+        {
+            combat.ClearTarget();
+            return;
+        }
+
+        combat.SetTarget(target);
+    }
+
+
 }

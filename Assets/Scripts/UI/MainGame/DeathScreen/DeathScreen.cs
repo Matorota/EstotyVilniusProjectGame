@@ -13,12 +13,23 @@ public class DeathScreen : MonoBehaviour
 
     private void Awake()
     {
-        playerHealth = mainCharacter.GetComponent<Characters.Health.IDamageable>();
-        deathScreenRoot.SetActive(false);
+        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<Characters.Health.IDamageable>() : null;
+
+        if (deathScreenRoot != null)
+        {
+            deathScreenRoot.SetActive(false);
+        }
+
+        if (playerHealth == null)
+        {
+            Debug.LogWarning($"{nameof(DeathScreen)} on {name} is missing a valid player health source.");
+            enabled = false;
+        }
     }
     
     private void OnEnable()
     {
+        if (playerHealth == null) return;
         playerHealth.OnHealthChanged += OnHealthChanged;
         playerHealth.OnDeath += ShowDeathScreen;
         OnHealthChanged(playerHealth.CurrentHealth);
@@ -26,8 +37,11 @@ public class DeathScreen : MonoBehaviour
 
     private void OnDisable()
     {
+        if (playerHealth != null)
+        {
             playerHealth.OnHealthChanged -= OnHealthChanged;
             playerHealth.OnDeath -= ShowDeathScreen;
+        }
 
         if (changedTimeScale)
         {
@@ -45,7 +59,10 @@ public class DeathScreen : MonoBehaviour
 
         isShown = true;
 
-        deathScreenRoot.SetActive(true);
+        if (deathScreenRoot != null)
+        {
+            deathScreenRoot.SetActive(true);
+        }
 
         if (pauseGameOnDeath)
         {

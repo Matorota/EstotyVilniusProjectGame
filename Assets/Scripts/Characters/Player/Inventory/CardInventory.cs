@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    private readonly Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
+    private Dictionary<string, int> cardCountsById = new Dictionary<string, int>(); // aray with no order
 
     public IReadOnlyDictionary<string, int> CardCountsById => cardCountsById;
+    public event Action OnInventoryChanged;
 
     public bool AddCard(string cardId)
     {
@@ -14,13 +16,9 @@ public class CardInventory : MonoBehaviour
             return false;
         }
 
-        if (!cardCountsById.TryGetValue(cardId, out int currentCount))
-        {
-            cardCountsById[cardId] = 1;
-            return true;
-        }
-
+        cardCountsById.TryGetValue(cardId, out int currentCount);
         cardCountsById[cardId] = currentCount + 1;
+        OnInventoryChanged?.Invoke();
         return true;
     }
 

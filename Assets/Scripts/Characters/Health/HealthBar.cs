@@ -10,17 +10,32 @@ public class HealthBar : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<Characters.Health.IDamageable>();
+        if (health == null || healthFillImage == null)
+        {
+            Debug.LogWarning($"{nameof(HealthBar)} on {name} is missing references.");
+            enabled = false;
+            return;
+        }
+
+        if (healthFillImage != null && healthFillImage.color == Color.white) // was having issues with health bar being white
+        {
+            healthFillImage.color = Color.red;
+        }
     }
 
     private void OnEnable()
     {
+        if (health == null) return;
         health.OnHealthChanged += OnHealthChanged;
         Refresh(health.CurrentHealth);
     }
 
     private void OnDisable()
-    { 
-        health.OnHealthChanged -= OnHealthChanged;
+    {
+        if (health != null)
+        {
+            health.OnHealthChanged -= OnHealthChanged;
+        }
     }
 
     private void OnHealthChanged(float currentHealth)
