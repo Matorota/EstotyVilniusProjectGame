@@ -37,6 +37,15 @@ public class DeathScreen : MonoBehaviour
         if (playerHealth == null) return;
         playerHealth.OnHealthChanged += OnHealthChanged;
         playerHealth.OnDeath += ShowDeathScreen;
+    }
+
+    private void Start()
+    {
+        if (playerHealth == null)
+        {
+            return;
+        }
+
         OnHealthChanged(playerHealth.CurrentHealth);
     }
 
