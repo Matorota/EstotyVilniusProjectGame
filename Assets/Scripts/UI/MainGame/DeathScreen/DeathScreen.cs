@@ -4,6 +4,7 @@ public class DeathScreen : MonoBehaviour
 {
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private GameObject deathScreenRoot;
+    [SerializeField] private GameObject hudWindowRoot;
     private IDamageable playerHealth;
 
     [SerializeField] private bool pauseGameOnDeath = true;
@@ -18,6 +19,10 @@ public class DeathScreen : MonoBehaviour
         if (deathScreenRoot != null)
         {
             deathScreenRoot.SetActive(false);
+        }
+        if (hudWindowRoot != null)
+        {
+            hudWindowRoot.SetActive(true);
         }
 
         if (playerHealth == null)
@@ -62,6 +67,10 @@ public class DeathScreen : MonoBehaviour
         if (deathScreenRoot != null)
         {
             deathScreenRoot.SetActive(true);
+        }
+        if (hudWindowRoot != null)
+        {
+            hudWindowRoot.SetActive(false);
         }
 
         if (pauseGameOnDeath)

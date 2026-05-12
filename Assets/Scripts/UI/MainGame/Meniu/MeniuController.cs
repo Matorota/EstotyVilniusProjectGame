@@ -5,6 +5,7 @@ public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject cardsPanelRoot;
+    [SerializeField] private GameObject hudWindowRoot;
     private bool isOpen;
 
     private void Start()
@@ -50,6 +51,10 @@ public class PauseMenu : MonoBehaviour
         if (menuRoot != null)
         {
             menuRoot.SetActive(open);
+        }
+        if (hudWindowRoot != null)
+        {
+            hudWindowRoot.SetActive(!open);
         }
         if (!open)
         {

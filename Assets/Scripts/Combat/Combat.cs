@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Combat : MonoBehaviour, ICombat
 {
-    [SerializeField] private IDamageable target;
+    private IDamageable target;
     [SerializeField] private CharacterDefense targetDefense;
     private IDamageable self;
     private CharacterDefense selfDefense;
