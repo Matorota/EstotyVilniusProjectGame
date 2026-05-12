@@ -12,8 +12,7 @@ public class LevelSelectButton : MonoBehaviour
             return;
         }
 
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(targetSceneName);
+        LoadScene(targetSceneName);
     }
 
     public void LoadSceneByName(string sceneName)
@@ -23,6 +22,11 @@ public class LevelSelectButton : MonoBehaviour
             return;
         }
 
+        LoadScene(sceneName);
+    }
+
+    private void LoadScene(string sceneName)
+    {
         Time.timeScale = 1f;
         SceneManager.LoadScene(sceneName);
     }

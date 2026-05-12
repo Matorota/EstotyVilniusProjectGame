@@ -17,12 +17,7 @@ public class PauseMenu : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            if (!isOpen)
-            {
-                SetMenu(true);
-                return;
-            }
-            SetMenu(false);
+            SetMenu(!isOpen);
         }
     }
 
