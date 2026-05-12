@@ -13,13 +13,11 @@ public class WinScreen : MonoBehaviour
     private int initialEnemyCount;
     private Health[] enemyHealthSources;
     private int aliveEnemyCount;
+    private bool enemiesInitialized;
 
     private void Awake()
     {
         playerHealth = mainCharacter != null ? mainCharacter.GetComponent<IDamageable>() : null;
-        enemyHealthSources = FindEnemyHealthSources();
-        initialEnemyCount = enemyHealthSources.Length;
-        aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
 
@@ -30,6 +28,12 @@ public class WinScreen : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        InitializeEnemies();
+        TryShowWinScreen();
+    }
+
     private void OnEnable()
     {
         if (playerHealth == null)
@@ -38,9 +42,12 @@ public class WinScreen : MonoBehaviour
         }
 
         playerHealth.OnDeath += HandlePlayerDeath;
-        SubscribeToEnemyDeaths();
-        aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
-        TryShowWinScreen();
+        if (enemiesInitialized)
+        {
+            SubscribeToEnemyDeaths();
+            aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
+            TryShowWinScreen();
+        }
     }
 
     private void OnDisable()
@@ -49,7 +56,10 @@ public class WinScreen : MonoBehaviour
         {
             playerHealth.OnDeath -= HandlePlayerDeath;
         }
-        UnsubscribeFromEnemyDeaths();
+        if (enemiesInitialized)
+        {
+            UnsubscribeFromEnemyDeaths();
+        }
 
         RestoreTimeScaleIfChanged();
     }
@@ -96,6 +106,19 @@ public class WinScreen : MonoBehaviour
             {
                 enemyHealth.OnDeath += HandleEnemyDeath;
             }
+        }
+    }
+
+    private void InitializeEnemies()
+    {
+        enemyHealthSources = FindEnemyHealthSources();
+        initialEnemyCount = enemyHealthSources.Length;
+        aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
+        enemiesInitialized = true;
+
+        if (isActiveAndEnabled)
+        {
+            SubscribeToEnemyDeaths();
         }
     }
 

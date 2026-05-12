@@ -6,6 +6,8 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject cardsPanelRoot;
     [SerializeField] private GameObject hudWindowRoot;
+    [SerializeField] private GameObject winScreenRoot;
+    [SerializeField] private GameObject deathScreenRoot;
     private bool isOpen;
 
     private void Start()
@@ -15,6 +17,11 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
+        if (IsEndScreenActive())
+        {
+            return;
+        }
+
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             SetMenu(!isOpen);
@@ -42,6 +49,11 @@ public class PauseMenu : MonoBehaviour
 
     private void SetMenu(bool open)
     {
+        if (open && IsEndScreenActive())
+        {
+            return;
+        }
+
         isOpen = open;
         if (menuRoot != null)
         {
@@ -56,6 +68,13 @@ public class PauseMenu : MonoBehaviour
             SetCardsPanelVisible(false);
         }
         Time.timeScale = open ? 0f : 1f; // pause
+    }
+
+    private bool IsEndScreenActive()
+    {
+        bool isWinScreenVisible = winScreenRoot != null && winScreenRoot.activeInHierarchy;
+        bool isDeathScreenVisible = deathScreenRoot != null && deathScreenRoot.activeInHierarchy;
+        return isWinScreenVisible || isDeathScreenVisible;
     }
 
     private void SetCardsPanelVisible(bool visible)

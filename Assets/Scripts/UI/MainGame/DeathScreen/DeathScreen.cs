@@ -20,7 +20,6 @@ public class DeathScreen : MonoBehaviour
 
         if (playerHealth == null)
         {
-            Debug.LogWarning($"{nameof(DeathScreen)} on {name} is missing a valid player health source.");
             enabled = false;
         }
     }

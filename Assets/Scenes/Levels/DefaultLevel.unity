@@ -2952,7 +2952,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &158442570
 RectTransform:
   m_ObjectHideFlags: 0
@@ -39143,6 +39143,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1837850371}
     m_Modifications:
+    - target: {fileID: 2582653352077626648, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0087890625
+      objectReference: {fileID: 0}
     - target: {fileID: 3419763548455577755, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
       propertyPath: m_Spacing
       value: 30
@@ -39182,6 +39186,10 @@ PrefabInstance:
     - target: {fileID: 3419763548455577755, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
       propertyPath: m_ChildForceExpandWidth
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5211174716214372041, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.025878906
       objectReference: {fileID: 0}
     - target: {fileID: 5661242624706947778, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -39269,7 +39277,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8936591081157300093, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.00012207031
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8936591081157300093, guid: d75c9f0814c3f3d40bc1f15ab3581bfb, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -39426,9 +39434,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 566761867}
     - target: {fileID: 2619255278957502482, guid: 87521ab656ac5f049b625c3d5eb1b22d, type: 3}
+      propertyPath: winScreenRoot
+      value: 
+      objectReference: {fileID: 158442569}
+    - target: {fileID: 2619255278957502482, guid: 87521ab656ac5f049b625c3d5eb1b22d, type: 3}
       propertyPath: cardsPanelRoot
       value: 
       objectReference: {fileID: 1808196446}
+    - target: {fileID: 2619255278957502482, guid: 87521ab656ac5f049b625c3d5eb1b22d, type: 3}
+      propertyPath: deathScreenRoot
+      value: 
+      objectReference: {fileID: 1975996}
     - target: {fileID: 6658701382282933240, guid: 87521ab656ac5f049b625c3d5eb1b22d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1280
