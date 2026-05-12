@@ -72,9 +72,10 @@ public class CardInventoryUi : MonoBehaviour
 
     private void RefreshImageEntries()
     {
+        IReadOnlyDictionary<string, int> cardCounts = inventory.CardCountsById;
         int visibleIndex = 0;
 
-        foreach (var pair in inventory.CardCountsById)
+        foreach (var pair in cardCounts)
         {
             string cardId = pair.Key;
             int count = pair.Value;
@@ -93,17 +94,30 @@ public class CardInventoryUi : MonoBehaviour
                 entry.Image.texture = texture;
             }
 
-            entry.Root.SetActive(true);
-            SetEntryPosition(entry.Root.GetComponent<RectTransform>(), visibleIndex);
+            ShowEntry(entry, visibleIndex);
             visibleIndex++;
         }
 
+        UpdateEntryVisibility(cardCounts);
+    }
+
+    private void ShowEntry(CardEntry entry, int visibleIndex)
+    {
+        entry.Root.SetActive(true);
+        SetEntryPosition(entry.Root.GetComponent<RectTransform>(), visibleIndex);
+    }
+
+    private void UpdateEntryVisibility(IReadOnlyDictionary<string, int> cardCounts)
+    {
         foreach (var pair in entriesByCardId)
         {
             string cardId = pair.Key;
             CardEntry entry = pair.Value;
-            bool hasCard = inventory.CardCountsById.TryGetValue(cardId, out int count) && count > 0;
-            if (entry != null && entry.Root != null) entry.Root.SetActive(hasCard);
+            bool hasCard = cardCounts.TryGetValue(cardId, out int count) && count > 0;
+            if (entry != null && entry.Root != null)
+            {
+                entry.Root.SetActive(hasCard);
+            }
         }
     }
 
@@ -137,7 +151,7 @@ public class CardInventoryUi : MonoBehaviour
         };
     }
 
-    private static void SetEntryPosition(RectTransform rect, int index)
+    private void SetEntryPosition(RectTransform rect, int index)
     {
         if (rect == null) return;
         const float cell = 108f;

@@ -4,6 +4,7 @@ public class DeathScreen : MonoBehaviour
 {
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private GameObject deathScreenRoot;
+    [SerializeField] private GameObject hudWindowRoot;
     private IDamageable playerHealth;
 
     [SerializeField] private bool pauseGameOnDeath = true;
@@ -14,15 +15,11 @@ public class DeathScreen : MonoBehaviour
     private void Awake()
     {
         playerHealth = mainCharacter != null ? mainCharacter.GetComponent<IDamageable>() : null;
-
-        if (deathScreenRoot != null)
-        {
-            deathScreenRoot.SetActive(false);
-        }
+        SetActiveIfAssigned(deathScreenRoot, false);
+        SetActiveIfAssigned(hudWindowRoot, true);
 
         if (playerHealth == null)
         {
-            Debug.LogWarning($"{nameof(DeathScreen)} on {name} is missing a valid player health source.");
             enabled = false;
         }
     }
@@ -32,6 +29,15 @@ public class DeathScreen : MonoBehaviour
         if (playerHealth == null) return;
         playerHealth.OnHealthChanged += OnHealthChanged;
         playerHealth.OnDeath += ShowDeathScreen;
+    }
+
+    private void Start()
+    {
+        if (playerHealth == null)
+        {
+            return;
+        }
+
         OnHealthChanged(playerHealth.CurrentHealth);
     }
 
@@ -43,11 +49,7 @@ public class DeathScreen : MonoBehaviour
             playerHealth.OnDeath -= ShowDeathScreen;
         }
 
-        if (changedTimeScale)
-        {
-            Time.timeScale = 1f;
-            changedTimeScale = false;
-        }
+        RestoreTimeScaleIfChanged();
     }
 
     public void ShowDeathScreen()
@@ -58,18 +60,14 @@ public class DeathScreen : MonoBehaviour
         }
 
         isShown = true;
-
-        if (deathScreenRoot != null)
-        {
-            deathScreenRoot.SetActive(true);
-        }
+        SetActiveIfAssigned(deathScreenRoot, true);
+        SetActiveIfAssigned(hudWindowRoot, false);
 
         if (pauseGameOnDeath)
         {
             Time.timeScale = 0f;
             changedTimeScale = true;
         }
-        
     }
 
     private void OnHealthChanged(float currentHealth)
@@ -77,6 +75,25 @@ public class DeathScreen : MonoBehaviour
         if (currentHealth <= 0f)
         {
             ShowDeathScreen();
+        }
+    }
+
+    private void RestoreTimeScaleIfChanged()
+    {
+        if (!changedTimeScale)
+        {
+            return;
+        }
+
+        Time.timeScale = 1f;
+        changedTimeScale = false;
+    }
+
+    private void SetActiveIfAssigned(GameObject target, bool isActive)
+    {
+        if (target != null)
+        {
+            target.SetActive(isActive);
         }
     }
 }
