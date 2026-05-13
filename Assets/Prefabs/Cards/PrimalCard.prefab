@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee03c8cea79e1c740b054f06a61c1841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
-  cardId: 2
+  cardId: 4
   destroyIfAlreadyOwned: 0
 --- !u!1 &6350254955432551745
 GameObject:
