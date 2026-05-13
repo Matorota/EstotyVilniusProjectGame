@@ -5,6 +5,8 @@ public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject cardsPanelRoot;
+    [SerializeField] private GameObject quildPanelRoot;
+    [SerializeField] private GameObject quildBacktoquildPanelRoot;
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject deathScreenRoot;
@@ -35,16 +37,32 @@ public class PauseMenu : MonoBehaviour
 
     public void OpenCardsPanel()
     {
-        if (!isOpen)
-        {
-            SetMenu(true);
-        }
-        SetCardsPanelVisible(true);
+        OpenPanel(cardsPanelRoot);
     }
 
     public void CloseCardsPanel()
     {
-        SetCardsPanelVisible(false);
+        SetPanelVisible(cardsPanelRoot, false);
+    }
+
+    public void OpenAdditionalPanel()
+    {
+        OpenPanel(quildPanelRoot);
+    }
+
+    public void CloseAdditionalPanel()
+    {
+        SetPanelVisible(quildPanelRoot, false);
+    }
+
+    public void OpenBacktoquildPanel()
+    {
+        OpenPanel(quildBacktoquildPanelRoot);
+    }
+
+    public void CloseBacktoquildPanel()
+    {
+        SetPanelVisible(quildBacktoquildPanelRoot, false);
     }
 
     private void SetMenu(bool open)
@@ -65,7 +83,7 @@ public class PauseMenu : MonoBehaviour
         }
         if (!open)
         {
-            SetCardsPanelVisible(false);
+            CloseAllPanels();
         }
         Time.timeScale = open ? 0f : 1f; // pause
     }
@@ -77,21 +95,49 @@ public class PauseMenu : MonoBehaviour
         return isWinScreenVisible || isDeathScreenVisible;
     }
 
-    private void SetCardsPanelVisible(bool visible)
+    private void OpenPanel(GameObject panelRoot)
     {
-        if (cardsPanelRoot == null)
+        if (!isOpen)
+        {
+            SetMenu(true);
+        }
+
+        CloseAllPanels();
+        SetActiveIfAssigned(winScreenRoot, false);
+        SetActiveIfAssigned(deathScreenRoot, false);
+        SetPanelVisible(panelRoot, true);
+    }
+
+    private void CloseAllPanels()
+    {
+        SetPanelVisible(cardsPanelRoot, false);
+        SetPanelVisible(quildPanelRoot, false);
+        SetPanelVisible(quildBacktoquildPanelRoot, false);
+    }
+
+    private void SetPanelVisible(GameObject panelRoot, bool visible)
+    {
+        if (panelRoot == null)
         {
             return;
         }
 
-        cardsPanelRoot.SetActive(visible);
+        panelRoot.SetActive(visible);
 
-        CanvasGroup canvasGroup = cardsPanelRoot.GetComponent<CanvasGroup>();
+        CanvasGroup canvasGroup = panelRoot.GetComponent<CanvasGroup>();
         if (canvasGroup != null)
         {
             canvasGroup.alpha = visible ? 1f : 0f;
             canvasGroup.interactable = visible;
             canvasGroup.blocksRaycasts = visible;
+        }
+    }
+
+    private void SetActiveIfAssigned(GameObject target, bool isActive)
+    {
+        if (target != null)
+        {
+            target.SetActive(isActive);
         }
     }
 }

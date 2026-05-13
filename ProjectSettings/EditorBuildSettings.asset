@@ -6,13 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MainMeniu.unity
-    guid: b3bca60810473644d9a9667cccde87b6
-  - enabled: 1
     path: Assets/Scenes/Guild/Guild.unity
     guid: 192c335a48cdff3448ad83f6eb7753ac
   - enabled: 1
-    path: Assets/Scenes/Levels/DefaultLevel.unity
+    path: Assets/Scenes/Levels/GameplayScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 4123cedf618aa6e43aa114fa1bbbd8f4, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: d4aa3b7cd89d8a94eadf11673f8e5f56, type: 2}
