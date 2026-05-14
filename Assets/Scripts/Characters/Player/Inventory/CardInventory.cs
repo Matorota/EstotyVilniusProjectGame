@@ -1,50 +1,71 @@
 using System;
 using System.Collections.Generic;
+using Characters.Player.Inventory;
+using Configs;
 using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    private  Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
-    private  Dictionary<string, Texture> texturesByCardId = new Dictionary<string, Texture>(); // will delete later
+    [SerializeField] private List<CardConfig> cards;
 
-    public IReadOnlyDictionary<string, int> CardCountsById => cardCountsById;
+    private Dictionary<CardType, int> cardCountsByType = new Dictionary<CardType, int>();
+    private Dictionary<CardType, Texture> texturesByType = new Dictionary<CardType, Texture>();
+
+    public IReadOnlyDictionary<CardType, int> CardCountsByType => cardCountsByType;
     public event Action OnInventoryChanged;
 
-    public bool AddCard(string cardId)
+    public CardConfig GetCardConfig(CardType type) // use to setup card widget
     {
-        return AddCard(cardId, null);
+        return cards != null ? cards.Find(c => c != null && c.Type == type) : null;
     }
 
-    public bool AddCard(string cardId, Texture cardTexture)
+    public CardConfig GetSpeedUpCardConfig()
     {
-        if (string.IsNullOrWhiteSpace(cardId))
-        {
-            return false;
-        }
+        return GetCardConfig(CardType.SpeedUp);
+    }
 
-        cardCountsById.TryGetValue(cardId, out int currentCount);
-        cardCountsById[cardId] = currentCount + 1;
+    public CardConfig GetDamageCardConfig()
+    {
+        return GetCardConfig(CardType.Damage);
+    }
+
+    public CardConfig GetHealthCardConfig()
+    {
+        return GetCardConfig(CardType.Health);
+    }
+
+    public bool TryGetCardConfig(CardType type, out CardConfig config)
+    {
+        config = cards != null ? cards.Find(c => c != null && c.Type == type) : null;
+        return config != null;
+    }
+
+    public bool AddCard(CardType type)
+    {
+        return AddCard(type, null);
+    }
+
+    public bool AddCard(CardType type, Texture cardTexture)
+    {
+        cardCountsByType.TryGetValue(type, out int currentCount);
+        cardCountsByType[type] = currentCount + 1;
         if (cardTexture != null)
         {
-            texturesByCardId[cardId] = cardTexture;
+            texturesByType[type] = cardTexture;
         }
+
         OnInventoryChanged?.Invoke();
         return true;
     }
 
-    public int GetCardCount(string cardId)
+    public int GetCardCount(CardType type)
     {
-        if (string.IsNullOrWhiteSpace(cardId))
-        {
-            return 0;
-        }
-
-        return cardCountsById.TryGetValue(cardId, out int count) ? count : 0;
+        return cardCountsByType.TryGetValue(type, out int count) ? count : 0;
     }
 
-    public bool TryGetCardTexture(string cardId, out Texture texture)
+    public bool TryGetCardTexture(CardType type, out Texture texture)
     {
         texture = null;
-        return !string.IsNullOrWhiteSpace(cardId) && texturesByCardId.TryGetValue(cardId, out texture);
+        return texturesByType.TryGetValue(type, out texture);
     }
 }

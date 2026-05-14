@@ -9,6 +9,7 @@ public class WinScreen : MonoBehaviour
 
     private IDamageable playerHealth;
     private bool isShown;
+    public bool HasWon;
     private bool changedTimeScale;
     private int initialEnemyCount;
     private Health[] enemyHealthSources;
@@ -72,6 +73,7 @@ public class WinScreen : MonoBehaviour
         }
 
         isShown = true;
+        HasWon = true;
         SetActiveIfAssigned(winScreenRoot, true);
         SetActiveIfAssigned(hudWindowRoot, false);
 
