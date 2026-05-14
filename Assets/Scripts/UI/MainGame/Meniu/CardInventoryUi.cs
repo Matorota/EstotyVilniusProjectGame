@@ -1,27 +1,30 @@
 using System.Collections.Generic;
+using Characters.Player.Inventory;
+using Configs;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CardInventoryUi : MonoBehaviour
 {
     [SerializeField] private CardInventory inventory;
     [SerializeField] private Transform cardsContainer;
     [SerializeField] private GameObject[] cardPrefabs;
-    private readonly Dictionary<string, Texture> textureByCardId = new Dictionary<string, Texture>();
-    private readonly Dictionary<string, CardEntry> entriesByCardId = new Dictionary<string, CardEntry>();
-    private readonly HashSet<string> missingTextureWarnings = new HashSet<string>();
+
+    private  Dictionary<string, GameObject> prefabByCardId = new Dictionary<string, GameObject>();
+    private  Dictionary<CardType, GameObject> prefabByCardType = new Dictionary<CardType, GameObject>();
+    private  Dictionary<string, CardEntry> entriesByCardId = new Dictionary<string, CardEntry>();
+    private  HashSet<string> missingPrefabWarnings = new HashSet<string>();
 
     private sealed class CardEntry
     {
         public GameObject Root;
-        public RawImage Image;
+        public CardWidget Widget;
     }
 
     private void Awake()
     {
         inventory ??= FindObjectOfType<CardInventory>();
         cardsContainer ??= transform;
-        CacheCardTextures();
+        CacheCardPrefabs();
     }
 
     private void OnEnable()
@@ -44,12 +47,13 @@ public class CardInventoryUi : MonoBehaviour
     private void Refresh()
     {
         if (inventory == null || cardsContainer == null) return;
-        RefreshImageEntries();
+        RefreshEntries();
     }
 
-    private void CacheCardTextures()
+    private void CacheCardPrefabs()
     {
-        textureByCardId.Clear();
+        prefabByCardId.Clear();
+        prefabByCardType.Clear();
 
         if (cardPrefabs == null)
         {
@@ -59,18 +63,26 @@ public class CardInventoryUi : MonoBehaviour
         foreach (GameObject cardPrefab in cardPrefabs)
         {
             if (cardPrefab == null) continue;
-            CardPickup pickup = cardPrefab.GetComponent<CardPickup>();
-            RawImage rawImage = cardPrefab.GetComponentInChildren<RawImage>(true);
-            if (pickup == null || string.IsNullOrWhiteSpace(pickup.CardId) || rawImage == null || rawImage.texture == null)
+
+            CardPickup pickup = cardPrefab.GetComponent<CardPickup>() ?? cardPrefab.GetComponentInChildren<CardPickup>(true);
+            if (pickup != null && !string.IsNullOrWhiteSpace(pickup.CardId))
             {
-                continue;
+                prefabByCardId[pickup.CardId] = cardPrefab;
             }
 
-            textureByCardId[pickup.CardId] = rawImage.texture;
+            CardWidget widget = cardPrefab.GetComponent<CardWidget>() ?? cardPrefab.GetComponentInChildren<CardWidget>(true);
+            if (widget == null) continue;
+
+            if (widget.Config != null && !string.IsNullOrWhiteSpace(widget.Config.CardId))
+            {
+                prefabByCardId[widget.Config.CardId] = cardPrefab;
+            }
+
+            prefabByCardType[widget.CardType] = cardPrefab;
         }
     }
 
-    private void RefreshImageEntries()
+    private void RefreshEntries()
     {
         IReadOnlyDictionary<string, int> cardCounts = inventory.CardCountsById;
         int visibleIndex = 0;
@@ -89,11 +101,6 @@ public class CardInventoryUi : MonoBehaviour
 
             if (entry == null || entry.Root == null) continue;
 
-            if (entry.Image != null && entry.Image.texture == null && TryGetTexture(cardId, out Texture texture))
-            {
-                entry.Image.texture = texture;
-            }
-
             ShowEntry(entry, visibleIndex);
             visibleIndex++;
         }
@@ -104,7 +111,7 @@ public class CardInventoryUi : MonoBehaviour
     private void ShowEntry(CardEntry entry, int visibleIndex)
     {
         entry.Root.SetActive(true);
-        SetEntryPosition(entry.Root.GetComponent<RectTransform>(), visibleIndex);
+        entry.Root.transform.SetSiblingIndex(visibleIndex);
     }
 
     private void UpdateEntryVisibility(IReadOnlyDictionary<string, int> cardCounts)
@@ -123,50 +130,48 @@ public class CardInventoryUi : MonoBehaviour
 
     private CardEntry CreateEntry(string cardId)
     {
-        GameObject root = new GameObject($"Card_{cardId}", typeof(RectTransform), typeof(CanvasRenderer), typeof(RawImage));
-        root.transform.SetParent(cardsContainer, false);
+        GameObject uiPrefab = ResolveUiPrefab(cardId);
+        if (uiPrefab == null)
+        {
+            if (missingPrefabWarnings.Add(cardId))
+            {
+                Debug.LogWarning($"{nameof(CardInventoryUi)}: No UI prefab found for cardId '{cardId}'. Add matching prefab to Card Prefabs.");
+            }
 
-        RawImage image = root.GetComponent<RawImage>();
-        if (TryGetTexture(cardId, out Texture texture))
-        {
-            image.texture = texture;
-        }
-        else if (missingTextureWarnings.Add(cardId))
-        {
-            Debug.LogWarning($"{nameof(CardInventoryUi)}: No image texture found for cardId '{cardId}'. Add matching prefab to Card Prefabs.");
+            return null;
         }
 
-        image.color = Color.white;
+        GameObject root = Instantiate(uiPrefab, cardsContainer);
+        root.name = $"Card_{cardId}";
 
-        RectTransform rect = root.GetComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 1f);
-        rect.anchorMax = new Vector2(0f, 1f);
-        rect.pivot = new Vector2(0f, 1f);
-        rect.sizeDelta = new Vector2(96f, 96f);
+        CardWidget widget = root.GetComponent<CardWidget>() ?? root.GetComponentInChildren<CardWidget>(true);
+        if (widget != null && inventory.TryGetCardConfig(cardId, out CardConfig config))
+        {
+            widget.SetConfig(config);
+        }
 
         return new CardEntry
         {
             Root = root,
-            Image = image
+            Widget = widget
         };
     }
 
-    private void SetEntryPosition(RectTransform rect, int index)
+    private GameObject ResolveUiPrefab(string cardId)
     {
-        if (rect == null) return;
-        const float cell = 108f;
-        int col = index % 6;
-        int row = index / 6;
-        rect.anchoredPosition = new Vector2(col * cell, -row * cell);
-    }
-
-    private bool TryGetTexture(string cardId, out Texture texture)
-    {
-        texture = null;
-        if (inventory != null && inventory.TryGetCardTexture(cardId, out texture))
+        if (prefabByCardId.TryGetValue(cardId, out GameObject directPrefab))
         {
-            return true;
+            return directPrefab;
         }
-        return textureByCardId.TryGetValue(cardId, out texture);
+
+        if (inventory != null && inventory.TryGetCardConfig(cardId, out CardConfig config) && config != null)
+        {
+            if (prefabByCardType.TryGetValue(config.Type, out GameObject typePrefab))
+            {
+                return typePrefab;
+            }
+        }
+
+        return null;
     }
 }

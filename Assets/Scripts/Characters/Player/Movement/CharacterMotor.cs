@@ -79,5 +79,4 @@ public class CharacterMotor : MonoBehaviour
         Vector3 finalMove = smoothedHorizontalVelocity + Vector3.up * verticalVelocity;
         controller.Move(finalMove * dt);
     }
-
 }

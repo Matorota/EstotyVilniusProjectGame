@@ -168,6 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
   cardId: 7
   destroyIfAlreadyOwned: 0
+  cardWidget: {fileID: 7907464063045370297, guid: 40536cf83ca57ed48a7ea20b62562beb, type: 3}
 --- !u!1 &3440059124727539711
 GameObject:
   m_ObjectHideFlags: 0

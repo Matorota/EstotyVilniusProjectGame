@@ -384,6 +384,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3000944318613670713}
   - component: {fileID: 4763879326299480549}
+  - component: {fileID: 7907464063045370297}
   m_Layer: 5
   m_Name: CardSavageAssault
   m_TagString: Untagged
@@ -455,6 +456,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7907464063045370297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635394718674100952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a06ef6d4700d2942b618e4d1119da06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardWidget
+  config: {fileID: 11400000, guid: e84a21f929b2f074a8aa9edbf52ec3c8, type: 2}
+  cardType: 1
+  nameText: {fileID: 3128932861706986751}
+  descriptionText: {fileID: 6124650367254186177}
+  iconImage: {fileID: 5055406677055322806}
 --- !u!1 &8148641366889833473
 GameObject:
   m_ObjectHideFlags: 0

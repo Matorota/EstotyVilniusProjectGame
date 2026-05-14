@@ -88,7 +88,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 1
+  m_PresetInfoIsWorld: 0
 --- !u!114 &7293885081445654296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
   cardId: 6
   destroyIfAlreadyOwned: 0
+  cardWidget: {fileID: -1093436268246669762, guid: e4540c15e916b714c8943605877d06cd, type: 3}
 --- !u!1 &8791550437203449066
 GameObject:
   m_ObjectHideFlags: 0

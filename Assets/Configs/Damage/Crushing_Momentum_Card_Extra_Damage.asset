@@ -15,5 +15,6 @@ MonoBehaviour:
   name: Card Crushing Momentum
   description: Gives +10 damage
   image: {fileID: 21300000, guid: 15f3233685d484947a5e2da924eecbd3, type: 3}
+  cardId: 3
   type: 1
   amount: 10

@@ -240,3 +240,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
   cardId: 2
   destroyIfAlreadyOwned: 0
+  cardWidget: {fileID: 1988896218743706760, guid: 817e9205a0f7fb943b81cf8c69bc3f12, type: 3}

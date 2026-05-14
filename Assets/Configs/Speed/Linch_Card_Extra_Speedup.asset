@@ -15,5 +15,6 @@ MonoBehaviour:
   name: Linch Speed
   description: Gives +30 Speed
   image: {fileID: 21300000, guid: bd38754788da35c478d93abd19238be4, type: 3}
-  type: 1
+  cardId: 5
+  type: 0
   amount: 30

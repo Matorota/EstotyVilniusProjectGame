@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Configs;
 
 [RequireComponent(typeof(Collider))]
 public class CardPickup : MonoBehaviour
 {
     [SerializeField] private string cardId;
     [SerializeField] private bool destroyIfAlreadyOwned;
+    [SerializeField] private CardWidget cardWidget;
     public string CardId => cardId;
     private Texture cardTexture;
 
@@ -17,10 +19,19 @@ public class CardPickup : MonoBehaviour
 
     private void Awake()
     {
+        cardWidget ??= GetComponent<CardWidget>();
+
         RawImage rawImage = GetComponentInChildren<RawImage>(true);
-        if (rawImage != null)
+        if (rawImage != null && rawImage.texture != null)
         {
             cardTexture = rawImage.texture;
+            return;
+        }
+
+        Image image = GetComponentInChildren<Image>(true);
+        if (image != null && image.sprite != null)
+        {
+            cardTexture = image.sprite.texture;
         }
     }
 
@@ -35,7 +46,8 @@ public class CardPickup : MonoBehaviour
             return;
         }
 
-        if (inventory.AddCard(cardId, cardTexture))
+        string pickedCardId = ResolveCardId(cardWidget != null ? cardWidget.Config : null);
+        if (inventory.AddCard(pickedCardId, cardTexture))
         {
             Destroy(gameObject);
             return;
@@ -45,5 +57,20 @@ public class CardPickup : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private string ResolveCardId(CardConfig pickedCardConfig)
+    {
+        if (!string.IsNullOrWhiteSpace(cardId))
+        {
+            return cardId;
+        }
+
+        if (pickedCardConfig != null)
+        {
+            return pickedCardConfig.Type.ToString();
+        }
+
+        return string.Empty;
     }
 }

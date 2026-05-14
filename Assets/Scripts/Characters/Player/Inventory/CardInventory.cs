@@ -9,22 +9,39 @@ public class CardInventory : MonoBehaviour
     [SerializeField] private List<CardConfig> cards;
     
     private  Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
-    private  Dictionary<string, Texture> texturesByCardId = new Dictionary<string, Texture>(); // will delete later
+    private  Dictionary<string, Texture> texturesByCardId = new Dictionary<string, Texture>();
 
     public IReadOnlyDictionary<string, int> CardCountsById => cardCountsById;
     public event Action OnInventoryChanged;
 
-    public CardConfig GetCardConfig(CardType type)// use to setup card widget
+    public CardConfig GetCardConfig(CardType type) // use to setup card widget
     {
-        
-        return cards.Find(c => c.Type == type);
+        return cards != null ? cards.Find(c => c != null && c.Type == type) : null;
+    }
+
+    public CardConfig GetSpeedUpCardConfig()
+    {
+        return GetCardConfig(CardType.SpeedUp);
+    }
+
+    public CardConfig GetDamageCardConfig()
+    {
+        return GetCardConfig(CardType.Damage);
+    }
+
+    public CardConfig GetHealthCardConfig()
+    {
+        return GetCardConfig(CardType.Health);
+    }
+
+    public bool TryGetCardConfig(string cardId, out CardConfig config)
+    {
+        config = cards != null ? cards.Find(c => c != null && c.CardId == cardId) : null;
+        return config != null;
     }
 
     public bool AddCard(string cardId)
     {
-        // example
-        CardConfig config = GetCardConfig(CardType.SpeedUp); // do this inside CardWiget
-        //
         return AddCard(cardId, null);
     }
 
@@ -41,6 +58,7 @@ public class CardInventory : MonoBehaviour
         {
             texturesByCardId[cardId] = cardTexture;
         }
+
         OnInventoryChanged?.Invoke();
         return true;
     }

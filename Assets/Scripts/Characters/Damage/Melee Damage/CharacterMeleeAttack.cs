@@ -149,6 +149,4 @@ public class CharacterMeleeAttack : MonoBehaviour
 
         combat.SetTarget(target);
     }
-
-
 }
