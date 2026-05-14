@@ -9996,7 +9996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1104518380049426697, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -448.4508
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1335860214990357571, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchorMax.y
@@ -10236,7 +10236,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7688594493581549258, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8685567284401661559, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchorMax.y
@@ -24460,9 +24460,9 @@ RectTransform:
   - {fileID: 1358812028}
   m_Father: {fileID: 447049300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960.00244, y: -448.4508}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1144270919
@@ -31708,7 +31708,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1049589639}
         m_TargetAssemblyTypeName: PauseMenu, Assembly-CSharp
-        m_MethodName: OpenCardsPanel
+        m_MethodName: OpenAdditionalPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -43671,9 +43671,9 @@ RectTransform:
   - {fileID: 1702765510}
   m_Father: {fileID: 447049300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1600.0042, y: -448.4508}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &2074116711
