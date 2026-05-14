@@ -19,19 +19,43 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
-        if (IsEndScreenActive())
-        {
-            return;
-        }
-
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
+            WinScreen win = null;
+            if (winScreenRoot != null)
+            {
+                win = winScreenRoot.GetComponent<WinScreen>();
+            }
+            if (win == null)
+            {
+                win = FindObjectOfType<WinScreen>();
+            }
+
+            if (win != null && win.HasWon)
+            {
+                win.ShowWinScreen();
+                return;
+            }
+
+            if (IsEndScreenActive())
+            {
+                return;
+            }
+
             SetMenu(!isOpen);
         }
     }
 
     public void Resume()
     {
+        if (winScreenRoot != null && winScreenRoot.activeInHierarchy)
+        {
+            SetActiveIfAssigned(winScreenRoot, false);
+            SetActiveIfAssigned(hudWindowRoot, true);
+            Time.timeScale = 1f;
+            return;
+        }
+
         SetMenu(false);
     }
 
@@ -106,6 +130,7 @@ public class PauseMenu : MonoBehaviour
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetPanelVisible(panelRoot, true);
+        
     }
 
     private void CloseAllPanels()
