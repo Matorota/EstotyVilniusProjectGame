@@ -1,17 +1,30 @@
 using System;
 using System.Collections.Generic;
+using Characters.Player.Inventory;
+using Configs;
 using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
+    [SerializeField] private List<CardConfig> cards;
+    
     private  Dictionary<string, int> cardCountsById = new Dictionary<string, int>();
     private  Dictionary<string, Texture> texturesByCardId = new Dictionary<string, Texture>(); // will delete later
 
     public IReadOnlyDictionary<string, int> CardCountsById => cardCountsById;
     public event Action OnInventoryChanged;
 
+    public CardConfig GetCardConfig(CardType type)// use to setup card widget
+    {
+        
+        return cards.Find(c => c.Type == type);
+    }
+
     public bool AddCard(string cardId)
     {
+        // example
+        CardConfig config = GetCardConfig(CardType.SpeedUp); // do this inside CardWiget
+        //
         return AddCard(cardId, null);
     }
 
