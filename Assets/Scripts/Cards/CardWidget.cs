@@ -3,8 +3,9 @@ using Configs;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class CardWidget : MonoBehaviour
+public class CardWidget : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private CardConfig config;
     private CardInventory inventory;
@@ -15,6 +16,7 @@ public class CardWidget : MonoBehaviour
 
     public CardConfig Config => config;
     public CardType CardType => cardType;
+    public bool CanEquip { get; set; } = true;
 
     private void Awake()
     {
@@ -25,6 +27,10 @@ public class CardWidget : MonoBehaviour
     public void SetConfig(CardConfig cardConfig)
     {
         config = cardConfig;
+        if (cardConfig != null)
+        {
+            cardType = cardConfig.Type;
+        }
         Refresh();
     }
 
@@ -85,6 +91,31 @@ public class CardWidget : MonoBehaviour
         if (inventory != null)   
         {
             config = inventory.GetCardConfig(cardType);
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (!CanEquip)
+        {
+            // ignore clicks when this widget is shown as a selected card
+            return;
+        }
+
+        Debug.Log($"CardWidget clicked: {cardType}. Trying to equip...");
+        SelectedCardsManager manager = FindObjectOfType<SelectedCardsManager>();
+        if (manager != null)
+        {
+            bool equipped = manager.TryEquip(cardType);
+            Debug.Log(equipped ? $"Equipped {cardType}" : $"Failed to equip {cardType}");
+            if (equipped)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No SelectedCardsManager found in scene.");
         }
     }
 }

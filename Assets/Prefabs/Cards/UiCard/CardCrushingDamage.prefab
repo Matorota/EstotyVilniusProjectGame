@@ -385,6 +385,7 @@ GameObject:
   - component: {fileID: 3000944318613670713}
   - component: {fileID: 4763879326299480549}
   - component: {fileID: 4316785964001907372}
+  - component: {fileID: 5967990154915720611}
   m_Layer: 5
   m_Name: CardCrushingDamage
   m_TagString: Untagged
@@ -473,6 +474,18 @@ MonoBehaviour:
   nameText: {fileID: 3128932861706986751}
   descriptionText: {fileID: 6124650367254186177}
   iconImage: {fileID: 5055406677055322806}
+--- !u!114 &5967990154915720611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635394718674100952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253ea83727cf4de4ca08d27d9f3c19f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedCardWidget
 --- !u!1 &8148641366889833473
 GameObject:
   m_ObjectHideFlags: 0

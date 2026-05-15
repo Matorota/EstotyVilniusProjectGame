@@ -68,4 +68,20 @@ public class CardInventory : MonoBehaviour
         texture = null;
         return texturesByType.TryGetValue(type, out texture);
     }
+
+    public bool RemoveCard(CardType type)
+    {
+        if (cardCountsByType.TryGetValue(type, out int current) && current > 0)
+        {
+            cardCountsByType[type] = current - 1;
+            if (cardCountsByType[type] <= 0)
+            {
+                cardCountsByType.Remove(type);
+                texturesByType.Remove(type);
+            }
+            OnInventoryChanged?.Invoke();
+            return true;
+        }
+        return false;
+    }
 }

@@ -10,13 +10,13 @@ namespace Configs
         [SerializeField] private string description;
         [SerializeField] private Sprite image;
         [SerializeField] private CardType type;
-        [SerializeField] private int amount;
+        [SerializeField] private int value;
         
         public string Id => type.ToString();
         public string Name => name;
         public string Description => description;
         public Sprite Image => image;
         public CardType Type => type;
-        public int Amount => amount;
+        public int Value => value;
     }
 }

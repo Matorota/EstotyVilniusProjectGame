@@ -42,5 +42,6 @@ public class Health : MonoBehaviour, IDamageable
             OnDeath?.Invoke();
         }
     }
-
+    
+    // public void Heal(float amount)
 }
