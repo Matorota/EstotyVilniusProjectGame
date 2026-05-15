@@ -7581,7 +7581,8 @@ GameObject:
   - component: {fileID: 357268835}
   - component: {fileID: 357268834}
   - component: {fileID: 357268833}
-  m_Layer: 5
+  - component: {fileID: 357268837}
+  m_Layer: 7
   m_Name: Ability 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7664,7 +7665,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 357268835}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7635394718674100952, guid: 5e6f7213bb856734795a73e75f67b8aa, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &357268835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7703,6 +7716,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357268831}
   m_CullTransparentMesh: 1
+--- !u!114 &357268837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357268831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc70d537986e9847abfcbc9b09453fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedCardUseButton
+  button: {fileID: 357268834}
+  activeIndicator: {fileID: 0}
+  manager: {fileID: 0}
+  type: 0
 --- !u!1 &364664875 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: bcc9aad2f0f94f04480e63f49300b688, type: 3}
@@ -11795,8 +11824,9 @@ GameObject:
   - component: {fileID: 519393902}
   - component: {fileID: 519393901}
   - component: {fileID: 519393900}
-  m_Layer: 5
-  m_Name: Defend
+  - component: {fileID: 519393904}
+  m_Layer: 7
+  m_Name: Ability 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11878,7 +11908,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 519393902}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &519393902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11917,6 +11959,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519393898}
   m_CullTransparentMesh: 1
+--- !u!114 &519393904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519393898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc70d537986e9847abfcbc9b09453fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedCardUseButton
+  button: {fileID: 519393901}
+  activeIndicator: {fileID: 0}
+  manager: {fileID: 0}
+  type: 0
 --- !u!1001 &523618505
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12342,7 +12400,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 563678111}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: ButtonAbility 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12501,6 +12559,23 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1684726708983176156, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
   m_PrefabInstance: {fileID: 2961847014790830871}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &566761869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 566761867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13568f9ebf675c84990ea5089e68d4d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedAbilitiesUi
+  manager: {fileID: 3273973556273018646}
+  abilityButtons:
+  - {fileID: 519393901}
+  - {fileID: 2077493153}
+  - {fileID: 357268834}
 --- !u!224 &569971234 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1871178272346622562, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
@@ -16659,7 +16734,7 @@ GameObject:
   - component: {fileID: 760000252}
   - component: {fileID: 760000254}
   - component: {fileID: 760000253}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21570,7 +21645,7 @@ GameObject:
   - component: {fileID: 988830197}
   - component: {fileID: 988830199}
   - component: {fileID: 988830198}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25784,7 +25859,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1162235614}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: ButtonAbility 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -32976,8 +33051,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1505110661}
-  m_Layer: 5
-  m_Name: ButtonAbility 1
+  m_Layer: 7
+  m_Name: ButtonAbility 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41625,6 +41700,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
   destroyIfAlreadyOwned: 1
   cardWidget: {fileID: 0}
+--- !u!114 &1938720478
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938720464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e851e7f60d9d14a4d9a96b4402aad996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
 --- !u!1 &1947214050 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f4eed50361df342419841cb5155ea0b9, type: 3}
@@ -42284,7 +42371,7 @@ GameObject:
   - component: {fileID: 1980388734}
   - component: {fileID: 1980388736}
   - component: {fileID: 1980388735}
-  m_Layer: 5
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44367,8 +44454,9 @@ GameObject:
   - component: {fileID: 2077493154}
   - component: {fileID: 2077493153}
   - component: {fileID: 2077493152}
-  m_Layer: 5
-  m_Name: Defend
+  - component: {fileID: 2077493156}
+  m_Layer: 7
+  m_Name: Ability 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44489,6 +44577,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2077493150}
   m_CullTransparentMesh: 1
+--- !u!114 &2077493156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2077493150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbc70d537986e9847abfcbc9b09453fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedCardUseButton
+  button: {fileID: 2077493153}
+  activeIndicator: {fileID: 0}
+  manager: {fileID: 0}
+  type: 0
 --- !u!4 &2080933924 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -45612,6 +45716,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1938720477}
+    - targetCorrespondingSourceObject: {fileID: 6708540197888594989, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1938720478}
   m_SourcePrefab: {fileID: 100100000, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
 --- !u!1001 &919318660950649903
 PrefabInstance:
@@ -46360,6 +46467,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -38
       objectReference: {fileID: 0}
+    - target: {fileID: 1393238266657941281, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1684726708983176156, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -46500,9 +46611,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 35
       objectReference: {fileID: 0}
+    - target: {fileID: 6704973265894532002, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6705035200927095878, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
       propertyPath: m_Name
       value: RightButtonsDefence
+      objectReference: {fileID: 0}
+    - target: {fileID: 6705035200927095878, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7374591431806426751, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
       propertyPath: inputReader
@@ -46524,7 +46643,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1684726708983176156, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
       insertIndex: 3
       addedObject: {fileID: 1505110661}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1763640762543068350, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 566761869}
   m_SourcePrefab: {fileID: 100100000, guid: 9b956364e413ac541a424dda3cf0ea23, type: 3}
 --- !u!1 &3273973556273018644 stripped
 GameObject:
