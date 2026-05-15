@@ -144,15 +144,28 @@ public class CardInventory : MonoBehaviour
 
     public bool RemoveCard(CardType type)
     {
+        return RemoveCardAtIndex(type, 0, out _, out _);
+    }
+
+    public bool RemoveCardAtIndex(CardType type, int index, out CardConfig removedConfig, out Texture removedTexture)
+    {
+        removedConfig = null;
+        removedTexture = null;
+
+        if (index < 0) return false;
+
         if (instanceConfigsByType.TryGetValue(type, out var cfgList) && cfgList != null && cfgList.Count > 0)
         {
-            int removeIndex = 0; // remove oldest
-            cfgList.RemoveAt(removeIndex);
+            if (index >= cfgList.Count) return false;
+
+            removedConfig = cfgList[index];
+            cfgList.RemoveAt(index);
             if (cfgList.Count == 0) instanceConfigsByType.Remove(type);
 
-            if (instanceTexturesByType.TryGetValue(type, out var texList) && texList != null && texList.Count > removeIndex)
+            if (instanceTexturesByType.TryGetValue(type, out var texList) && texList != null && texList.Count > index)
             {
-                texList.RemoveAt(removeIndex);
+                removedTexture = texList[index];
+                texList.RemoveAt(index);
                 if (texList.Count == 0) instanceTexturesByType.Remove(type);
             }
 

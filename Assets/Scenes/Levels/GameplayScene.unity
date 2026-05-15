@@ -45097,8 +45097,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5782693100804550085, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 900
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782693100804550085, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_SizeDelta.y
       value: 198.97
+      objectReference: {fileID: 0}
+    - target: {fileID: 5782693100804550085, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.0014343
       objectReference: {fileID: 0}
     - target: {fileID: 5782693100804550085, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -45131,6 +45139,12 @@ PrefabInstance:
     - target: {fileID: 7453304105944762805, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7679051006808432374, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
+      propertyPath: m_text
+      value: 'Equipped Cards
+
+'
       objectReference: {fileID: 0}
     - target: {fileID: 7688594493581549258, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_Name

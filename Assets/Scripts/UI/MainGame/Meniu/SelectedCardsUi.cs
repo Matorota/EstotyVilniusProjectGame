@@ -50,8 +50,12 @@ public class SelectedCardsUi : MonoBehaviour
         }
 
         if (manager == null) return;
-        foreach (var type in manager.Selected)
+
+        // Use detailed selected info so the displayed selected card matches the exact instance (config + texture)
+        var selectedDetails = manager.GetSelectedCards();
+        foreach (var entry in selectedDetails)
         {
+            CardType type = entry.Type;
             if (prefabByCardType.TryGetValue(type, out var prefab))
             {
                 GameObject root = Instantiate(prefab, cardsContainer);
@@ -62,6 +66,14 @@ public class SelectedCardsUi : MonoBehaviour
                 if (w != null)
                 {
                     w.CanEquip = false;
+                    if (entry.Config != null)
+                    {
+                        w.SetConfig(entry.Config);
+                    }
+                    if (entry.Texture != null)
+                    {
+                        w.SetTexture(entry.Texture);
+                    }
                 }
 
                 SelectedCardWidget scw = root.GetComponent<SelectedCardWidget>() ?? root.GetComponentInChildren<SelectedCardWidget>(true);

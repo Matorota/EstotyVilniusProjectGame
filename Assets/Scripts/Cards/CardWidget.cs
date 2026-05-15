@@ -19,6 +19,9 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
     public CardType CardType => cardType;
     public bool CanEquip { get; set; } = true;
 
+    private int instanceIndex = -1;
+    public int InstanceIndex => instanceIndex;
+
     private void Awake()
     {
         ResolveConfigFromInventory();
@@ -111,6 +114,11 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void SetInstanceIndex(int index)
+    {
+        instanceIndex = index;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (!CanEquip)
@@ -123,7 +131,16 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         SelectedCardsManager manager = FindObjectOfType<SelectedCardsManager>();
         if (manager != null)
         {
-            bool equipped = manager.TryEquip(cardType);
+            bool equipped;
+            if (instanceIndex >= 0)
+            {
+                equipped = manager.TryEquip(cardType, instanceIndex);
+            }
+            else
+            {
+                equipped = manager.TryEquip(cardType);
+            }
+
             Debug.Log(equipped ? $"Equipped {cardType}" : $"Failed to equip {cardType}");
             if (equipped)
             {
