@@ -5,10 +5,16 @@ using Configs;
 public class PlayerStats : MonoBehaviour
 {
     private float damageBonus = 0f; // flat add to melee damage
-    private float speedMultiplier = 1f; 
+    private float speedMultiplier = 1f;
+    private Health health;
 
     public float GetDamageBonus() => damageBonus;
     public float GetSpeedMultiplier() => speedMultiplier;
+
+    private void Awake()
+    {
+        health = GetComponent<Health>();
+    }
 
     public void ApplyCardEffect(CardConfig cfg)
     {
@@ -28,11 +34,10 @@ public class PlayerStats : MonoBehaviour
                 speedMultiplier += cfg.Value;
                 break;
             case Characters.Player.Inventory.CardType.Health:
-                Health h = GetComponent<Health>();
-                if (h != null)
+                if (health != null)
                 {
-                    h.AddMaxHealth(cfg.Value);
-                    h.Heal(cfg.Value);
+                    health.AddMaxHealth(cfg.Value);
+                    health.Heal(cfg.Value);
                 }
                 break;
         }
@@ -48,10 +53,9 @@ public class PlayerStats : MonoBehaviour
                 speedMultiplier = Mathf.Max(1f, speedMultiplier - cfg.Value);
                 break;
             case Characters.Player.Inventory.CardType.Health:
-                Health h2 = GetComponent<Health>();
-                if (h2 != null)
+                if (health != null)
                 {
-                    h2.RemoveMaxHealth(cfg.Value);
+                    health.RemoveMaxHealth(cfg.Value);
                 }
                 break;
         }

@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Characters.Player.Inventory;
-using Configs;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SelectedCardsUi : MonoBehaviour
 {
@@ -82,15 +80,6 @@ public class SelectedCardsUi : MonoBehaviour
                 if (scw == null)
                 {
                     root.AddComponent<SelectedCardWidget>();
-                }
-
-                // Wire up a Use button if present on the prefab
-                Button useButton = root.GetComponentInChildren<Button>(true);
-                if (useButton != null)
-                {
-                    // prefer a dedicated component to manage state and visuals
-                    SelectedCardUseButton useComp = useButton.GetComponent<SelectedCardUseButton>() ?? useButton.gameObject.AddComponent<SelectedCardUseButton>();
-                    useComp.Initialize(manager, type);
                 }
             }
         }

@@ -28,14 +28,14 @@ public class SelectedCardsManager : MonoBehaviour
         public bool IsActive;
     }
 
-    // expose selected types for backwards compatibility
-    public IReadOnlyList<CardType> Selected => selectedEntries.ConvertAll(e => e.Type);
     public event Action OnSelectedChanged;
     [SerializeField] private int maxSelected = 3;
+    private PlayerStats stats;
 
     private void Awake()
     {
         inventory ??= FindObjectOfType<CardInventory>();
+        stats ??= FindObjectOfType<PlayerStats>();
     }
 
     // Equip by type, default behaviour — removes oldest instance
@@ -59,38 +59,32 @@ public class SelectedCardsManager : MonoBehaviour
         // block if same type already selected
         if (selectedEntries.Any(e => e.Type == type))
         {
-            Debug.Log($"Already equipped card with type {type}");
             return false;
         }
 
         // block if same name already selected (name is the uniqueness key)
         if (previewConfig != null && selectedEntries.Any(e => e.Config != null && e.Config.Name == previewConfig.Name))
         {
-            Debug.Log($"Already equipped card with name '{previewConfig.Name}'");
             return false;
         }
 
         if (selectedEntries.Count >= maxSelected)
         {
-            Debug.Log($"Cannot equip {type}: max selected {maxSelected} reached");
             return false;
         }
 
         if (inventory.GetCardCount(type) <= 0)
         {
-            Debug.Log($"No card of type {type} in inventory to equip");
             return false;
         }
 
         if (!inventory.RemoveCardAtIndex(type, instanceIndex, out CardConfig cfg, out Texture tex))
         {
-            Debug.Log($"RemoveCardAtIndex failed for {type} index {instanceIndex}");
             return false;
         }
 
         selectedEntries.Add(new SelectedEntry { Type = type, Config = cfg, Texture = tex, IsActive = false });
         OnSelectedChanged?.Invoke();
-        Debug.Log($"Equipped card {type} ('{cfg?.Name}') — selected now: {selectedEntries.Count}");
         return true;
     }
 
@@ -120,15 +114,6 @@ public class SelectedCardsManager : MonoBehaviour
         }
     }
 
-    // Use the selected card's temporary effect (does not unequip). Returns false if not usable.
-    public bool TryUse(CardType type)
-    {
-        // prefer using the first matching entry index
-        int idx = selectedEntries.FindIndex(e => e.Type == type);
-        if (idx < 0) return false;
-        return TryUseByIndex(idx);
-    }
-
     // Use by slot index (0-based) — maps to Ability 1/2/3. Keeps ordering of selected entries.
     public bool TryUseByIndex(int index)
     {
@@ -137,16 +122,13 @@ public class SelectedCardsManager : MonoBehaviour
         if (entry == null) return false;
         if (entry.IsActive) return false; // already active
 
-        PlayerStats stats = FindObjectOfType<PlayerStats>();
         if (stats == null)
         {
-            Debug.LogWarning("No PlayerStats found to apply card effect.");
             return false;
         }
 
         if (entry.Config == null)
         {
-            Debug.LogWarning("Selected card has no config to apply.");
             return false;
         }
 

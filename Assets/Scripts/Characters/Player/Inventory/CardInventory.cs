@@ -7,10 +7,8 @@ using UnityEngine;
 public class CardInventory : MonoBehaviour
 {
     [SerializeField] private List<CardConfig> cards;
-
-    private  Dictionary<CardType, List<CardConfig>> instanceConfigsByType = new Dictionary<CardType, List<CardConfig>>();
-    private  Dictionary<CardType, List<Texture>> instanceTexturesByType = new Dictionary<CardType, List<Texture>>();
-
+    private Dictionary<CardType, List<CardConfig>> instanceConfigsByType = new Dictionary<CardType, List<CardConfig>>();
+    private Dictionary<CardType, List<Texture>> instanceTexturesByType = new Dictionary<CardType, List<Texture>>();
     private Dictionary<CardType, int> cardCountsByType = new Dictionary<CardType, int>();
 
     public IReadOnlyDictionary<CardType, int> CardCountsByType => cardCountsByType;
@@ -22,28 +20,7 @@ public class CardInventory : MonoBehaviour
         {
             return list[0];
         }
-        return cards != null ? cards.Find(c => c != null && c.Type == type) : null;
-    }
-
-    public CardConfig GetSpeedUpCardConfig()
-    {
-        return GetCardConfig(CardType.SpeedUp);
-    }
-
-    public CardConfig GetDamageCardConfig()
-    {
-        return GetCardConfig(CardType.Damage);
-    }
-
-    public CardConfig GetHealthCardConfig()
-    {
-        return GetCardConfig(CardType.Health);
-    }
-
-    public bool TryGetCardConfig(CardType type, out CardConfig config)
-    {
-        config = GetCardConfig(type);
-        return config != null;
+        return cards == null ? null : cards.Find(c => c != null && c.Type == type);
     }
 
     public bool AddCard(CardConfig config, Texture cardTexture)
@@ -126,17 +103,6 @@ public class CardInventory : MonoBehaviour
         if (instanceTexturesByType.TryGetValue(type, out var list) && list != null && index >= 0 && index < list.Count)
         {
             texture = list[index];
-            return texture != null;
-        }
-        return false;
-    }
-
-    public bool TryGetCardTexture(CardType type, out Texture texture)
-    {
-        texture = null;
-        if (instanceTexturesByType.TryGetValue(type, out var list) && list != null && list.Count > 0)
-        {
-            texture = list[0];
             return texture != null;
         }
         return false;

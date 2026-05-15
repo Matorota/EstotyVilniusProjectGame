@@ -43,6 +43,7 @@ public class Health : MonoBehaviour, IDamageable
         }
     }
     
+    
     public void Heal(float amount)
     {
         if (amount <= 0f) return;

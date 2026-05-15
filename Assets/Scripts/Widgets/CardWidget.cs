@@ -9,7 +9,6 @@ using UnityEngine.EventSystems;
 public class CardWidget : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private CardConfig config;
-    private CardInventory inventory;
     [SerializeField] private CardType cardType;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text descriptionText;
@@ -24,7 +23,6 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
 
     private void Awake()
     {
-        ResolveConfigFromInventory();
         Refresh();
     }
 
@@ -38,79 +36,26 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         Refresh();
     }
 
-    public void UseSpeedUpConfig()
-    {
-        cardType = CardType.SpeedUp;
-        config = null;
-        Refresh();
-    }
-
-    public void UseDamageConfig()
-    {
-        cardType = CardType.Damage;
-        config = null;
-        Refresh();
-    }
-
-    public void UseHealthConfig()
-    {
-        cardType = CardType.Health;
-        config = null;
-        Refresh();
-    }
-
     public void Refresh()
     {
-        ResolveConfigFromInventory();
+        config ??= GetComponentInParent<CardInventory>()?.GetCardConfig(cardType);
+        if (config == null) return;
 
-        if (config == null)
-        {
-            return;
-        }
-
-        if (nameText != null)
-        {
-            nameText.text = config.Name;
-        }
-
-        if (descriptionText != null)
-        {
-            descriptionText.text = config.Description;
-        }
-
-        if (iconImage != null)
-        {
-            iconImage.sprite = config.Image;
-        }
+        if (nameText != null) nameText.text = config.Name;
+        if (descriptionText != null) descriptionText.text = config.Description;
+        if (iconImage != null) iconImage.sprite = config.Image;
     }
 
-    private void ResolveConfigFromInventory()
+    public void SetTexture(Texture texture)
     {
-        if (config != null)
-        {
-            return;
-        }
+        if (iconImage == null || texture is not Texture2D tex2D) return;
 
-        inventory ??= GetComponentInParent<CardInventory>();
-        if (inventory != null)   
+        try
         {
-            config = inventory.GetCardConfig(cardType);
+            iconImage.sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f));
         }
-    }
-
-    public void SetTexture(Texture texture) // for now do not touch it works!! oki?!
-    {
-        if (texture == null || iconImage == null) return;
-        if (texture is Texture2D tex2D)
+        catch (Exception)
         {
-            try
-            {
-                Sprite s = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f));
-                iconImage.sprite = s;
-            }
-            catch (Exception) 
-            {
-            }
         }
     }
 
@@ -121,35 +66,12 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!CanEquip)
-        {
-            // ignore clicks when this widget is shown as a selected card
-            return;
-        }
+        if (!CanEquip) return;
 
-        Debug.Log($"CardWidget clicked: {cardType}. Trying to equip...");
         SelectedCardsManager manager = FindObjectOfType<SelectedCardsManager>();
-        if (manager != null)
-        {
-            bool equipped;
-            if (instanceIndex >= 0)
-            {
-                equipped = manager.TryEquip(cardType, instanceIndex);
-            }
-            else
-            {
-                equipped = manager.TryEquip(cardType);
-            }
+        if (manager == null) return;
 
-            Debug.Log(equipped ? $"Equipped {cardType}" : $"Failed to equip {cardType}");
-            if (equipped)
-            {
-                gameObject.SetActive(false);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("No SelectedCardsManager found in scene.");
-        }
+        bool equipped = instanceIndex >= 0 ? manager.TryEquip(cardType, instanceIndex) : manager.TryEquip(cardType);
+        if (equipped) gameObject.SetActive(false);
     }
 }
