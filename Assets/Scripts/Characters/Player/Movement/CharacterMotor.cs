@@ -18,6 +18,8 @@ public class CharacterMotor : MonoBehaviour
     private const float GroundStick = -1f;
     private const float MaxFallSpeed = 50f;
 
+    private PlayerStats stats;
+
     public Vector3 HorizontalVelocity => smoothedHorizontalVelocity;
     public float NormalizedHorizontalSpeed
     {
@@ -32,6 +34,7 @@ public class CharacterMotor : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        stats = GetComponent<PlayerStats>();
     }
 
     public void SetFacingTarget(Transform target)
@@ -42,7 +45,8 @@ public class CharacterMotor : MonoBehaviour
     public void Tick(Vector3 moveDirection)
     {
         float dt = Time.deltaTime;
-        Vector3 targetHorizontalVelocity = moveDirection * speed;
+        float multiplier = stats != null ? stats.GetSpeedMultiplier() : 1f;
+        Vector3 targetHorizontalVelocity = moveDirection * speed * multiplier;
         smoothedHorizontalVelocity = Vector3.SmoothDamp(
             smoothedHorizontalVelocity,
             targetHorizontalVelocity,

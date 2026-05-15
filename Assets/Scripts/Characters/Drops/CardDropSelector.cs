@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class CardDropSelector
 {
-    private static GameObject lastDroppedCardPrefab;
-
     public bool TrySelectPrefab(GameObject[] prefabs, out GameObject selectedPrefab)
     {
         selectedPrefab = null;
@@ -29,24 +27,24 @@ public class CardDropSelector
             return false;
         }
 
-        if (validPrefabs.Count > 1 && lastDroppedCardPrefab != null)
+        // Use a scene registry object to keep drop state 
+        CardDropRegistry registry = Object.FindObjectOfType<CardDropRegistry>();
+        if (registry == null)
         {
-            validPrefabs.RemoveAll(candidate => candidate == lastDroppedCardPrefab);
-            if (validPrefabs.Count == 0)
-            {
-                for (int i = 0; i < prefabs.Length; i++)
-                {
-                    GameObject prefab = prefabs[i];
-                    if (prefab != null)
-                    {
-                        validPrefabs.Add(prefab);
-                    }
-                }
-            }
+            GameObject go = new GameObject("CardDropRegistry");
+            registry = go.AddComponent<CardDropRegistry>();
+        }
+
+
+        validPrefabs.RemoveAll(candidate => registry.IsDropped(candidate));
+
+        if (validPrefabs.Count == 0)
+        {
+            return false;
         }
 
         selectedPrefab = validPrefabs[Random.Range(0, validPrefabs.Count)];
-        lastDroppedCardPrefab = selectedPrefab;
+        registry.MarkDropped(selectedPrefab);
         return true;
     }
 }

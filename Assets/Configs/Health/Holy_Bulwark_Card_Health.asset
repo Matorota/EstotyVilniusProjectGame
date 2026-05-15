@@ -15,6 +15,5 @@ MonoBehaviour:
   name: Card Holy Bulwark
   description: Gives +10 Health
   image: {fileID: 21300000, guid: b5c44f74d63e8ca4a98f155951272f94, type: 3}
-  cardId: 6
   type: 2
-  amount: 10
+  value: 10

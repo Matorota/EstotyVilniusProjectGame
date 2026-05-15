@@ -16,4 +16,4 @@ MonoBehaviour:
   description: Gives +20 Damage
   image: {fileID: 21300000, guid: c78e038d19833c74fb307b820ba71909, type: 3}
   type: 1
-  amount: 20
+  value: 20
