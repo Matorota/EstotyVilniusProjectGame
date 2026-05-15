@@ -15,6 +15,5 @@ MonoBehaviour:
   name: Card Primal Savagary
   description: Gives +30 Damage
   image: {fileID: 21300000, guid: 1e070b9e61fafdc4a86d23af363c043f, type: 3}
-  cardId: 4
   type: 1
-  amount: 30
+  value: 30

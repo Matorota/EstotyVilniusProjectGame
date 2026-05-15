@@ -89,7 +89,7 @@ public class CardInventoryUi : MonoBehaviour
 
             while (list.Count < count)
             {
-                CardEntry newEntry = CreateEntry(type);
+                CardEntry newEntry = CreateEntry(type, list.Count);
                 if (newEntry != null)
                 {
                     list.Add(newEntry);
@@ -137,7 +137,7 @@ public class CardInventoryUi : MonoBehaviour
         entry.Root.transform.SetSiblingIndex(visibleIndex);
     }
 
-    private CardEntry CreateEntry(CardType type)
+    private CardEntry CreateEntry(CardType type, int instanceIndex)
     {
         GameObject uiPrefab = ResolveUiPrefab(type);
         if (uiPrefab == null)
@@ -156,10 +156,15 @@ public class CardInventoryUi : MonoBehaviour
         CardWidget widget = root.GetComponent<CardWidget>() ?? root.GetComponentInChildren<CardWidget>(true);
         if (widget != null)
         {
-            CardConfig config = inventory.GetCardConfig(type);
+            CardConfig config = inventory.GetCardConfigAtIndex(type, instanceIndex);
             if (config != null)
             {
                 widget.SetConfig(config);
+            }
+
+            if (inventory.TryGetCardTextureAtIndex(type, instanceIndex, out Texture tex))
+            {
+                widget.SetTexture(tex);
             }
         }
 

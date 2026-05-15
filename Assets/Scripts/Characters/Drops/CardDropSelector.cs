@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class CardDropSelector
 {
-    private static GameObject lastDroppedCardPrefab;
+    private static readonly HashSet<GameObject> droppedPrefabs = new HashSet<GameObject>();
 
     public bool TrySelectPrefab(GameObject[] prefabs, out GameObject selectedPrefab)
     {
@@ -18,35 +18,26 @@ public class CardDropSelector
         for (int i = 0; i < prefabs.Length; i++)
         {
             GameObject prefab = prefabs[i];
-            if (prefab != null)
+            if (prefab != null && !droppedPrefabs.Contains(prefab))
             {
                 validPrefabs.Add(prefab);
             }
         }
 
+        // If no valid prefabs remain (all have been dropped before), do not select any
         if (validPrefabs.Count == 0)
         {
             return false;
         }
 
-        if (validPrefabs.Count > 1 && lastDroppedCardPrefab != null)
-        {
-            validPrefabs.RemoveAll(candidate => candidate == lastDroppedCardPrefab);
-            if (validPrefabs.Count == 0)
-            {
-                for (int i = 0; i < prefabs.Length; i++)
-                {
-                    GameObject prefab = prefabs[i];
-                    if (prefab != null)
-                    {
-                        validPrefabs.Add(prefab);
-                    }
-                }
-            }
-        }
-
         selectedPrefab = validPrefabs[Random.Range(0, validPrefabs.Count)];
-        lastDroppedCardPrefab = selectedPrefab;
+        droppedPrefabs.Add(selectedPrefab);
         return true;
+    }
+
+    // Optional helper to reset tracked drops between levels or sessions
+    public static void ResetDroppedPrefabs()
+    {
+        droppedPrefabs.Clear();
     }
 }

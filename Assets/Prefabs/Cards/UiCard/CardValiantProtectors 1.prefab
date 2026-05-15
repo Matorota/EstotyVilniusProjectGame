@@ -131,7 +131,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 337.6383, y: 109.7078}
+  m_SizeDelta: {x: 285.899, y: 109.7078}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7080514876527888198
 CanvasRenderer:
@@ -334,7 +334,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320, y: 320}
+  m_SizeDelta: {x: 277.7916, y: 320}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2876871878682875642
 CanvasRenderer:
@@ -469,7 +469,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardWidget
   config: {fileID: 11400000, guid: ecae070f72756124fb5017bb3aa71920, type: 2}
-  cardType: 0
+  cardType: 2
   nameText: {fileID: 3128932861706986751}
   descriptionText: {fileID: 6124650367254186177}
   iconImage: {fileID: 5055406677055322806}
@@ -508,7 +508,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 305.75, y: 75.8109}
+  m_SizeDelta: {x: 289.09, y: 75.8109}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6990675795720067860
 CanvasRenderer:

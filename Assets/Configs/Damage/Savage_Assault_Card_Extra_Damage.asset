@@ -15,6 +15,5 @@ MonoBehaviour:
   name: Card Savage Assault
   description: Gives +15 Damage
   image: {fileID: 21300000, guid: c78e038d19833c74fb307b820ba71909, type: 3}
-  cardId: 7
   type: 1
-  amount: 15
+  value: 15

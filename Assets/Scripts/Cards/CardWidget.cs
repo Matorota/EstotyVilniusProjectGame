@@ -1,3 +1,4 @@
+using System;
 using Characters.Player.Inventory;
 using Configs;
 using TMPro;
@@ -91,6 +92,22 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         if (inventory != null)   
         {
             config = inventory.GetCardConfig(cardType);
+        }
+    }
+
+    public void SetTexture(Texture texture) // for now do not touch it works!! oki?!
+    {
+        if (texture == null || iconImage == null) return;
+        if (texture is Texture2D tex2D)
+        {
+            try
+            {
+                Sprite s = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f));
+                iconImage.sprite = s;
+            }
+            catch (Exception) 
+            {
+            }
         }
     }
 

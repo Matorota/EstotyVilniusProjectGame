@@ -51,8 +51,7 @@ public class CardPickup : MonoBehaviour
             return;
         }
 
-        CardType type = prefabConfig.Type;
-        if (inventory.AddCard(type, cardTexture))
+        if (inventory.AddCard(prefabConfig, cardTexture))
         {
             Destroy(gameObject);
             return;
