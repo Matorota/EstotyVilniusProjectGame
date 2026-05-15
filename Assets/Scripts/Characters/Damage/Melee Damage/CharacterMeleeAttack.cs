@@ -14,6 +14,7 @@ public class CharacterMeleeAttack : MonoBehaviour
 
     private CharacterAttackAnimation attackAnimation;
     private ICombat combat;
+    private PlayerStats stats;
 
     private float nextAttackTime;
     private float hitTime;
@@ -30,6 +31,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
         combat = GetComponent<ICombat>();
+        stats = GetComponent<PlayerStats>();
         range = Mathf.Max(0f, range);
     }
 
@@ -122,7 +124,10 @@ public class CharacterMeleeAttack : MonoBehaviour
             return;
         }
 
-        target.TakeDamage(damage);
+        float bonus = stats != null ? stats.GetDamageBonus() : 0f;
+        float finalDamage = damage + bonus;
+
+        target.TakeDamage(finalDamage);
 
         if (target.CurrentHealth <= 0f)
         {

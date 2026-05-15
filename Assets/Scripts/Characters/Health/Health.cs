@@ -43,5 +43,26 @@ public class Health : MonoBehaviour, IDamageable
         }
     }
     
-    // public void Heal(float amount)
+    public void Heal(float amount)
+    {
+        if (amount <= 0f) return;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        OnHealthChanged?.Invoke(currentHealth);
+    }
+
+    public void AddMaxHealth(float amount)
+    {
+        if (amount <= 0f) return;
+        maxHealth += amount;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        OnHealthChanged?.Invoke(currentHealth);
+    }
+
+    public void RemoveMaxHealth(float amount)
+    {
+        if (amount <= 0f) return;
+        maxHealth = Mathf.Max(1f, maxHealth - amount);
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
+        OnHealthChanged?.Invoke(currentHealth);
+    }
 }

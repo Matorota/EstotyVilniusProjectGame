@@ -11,6 +11,7 @@ namespace Configs
         [SerializeField] private Sprite image;
         [SerializeField] private CardType type;
         [SerializeField] private int value;
+        [SerializeField] private float duration = 5f; // duration for temporary effects
         
         public string Id => type.ToString();
         public string Name => name;
@@ -18,5 +19,6 @@ namespace Configs
         public Sprite Image => image;
         public CardType Type => type;
         public int Value => value;
+        public float Duration => duration;
     }
 }

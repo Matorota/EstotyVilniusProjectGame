@@ -167,7 +167,6 @@ public class CardInventoryUi : MonoBehaviour
                 widget.SetTexture(tex);
             }
 
-            // inform the widget which instance index it represents so clicks can equip the exact instance
             widget.SetInstanceIndex(instanceIndex);
         }
 

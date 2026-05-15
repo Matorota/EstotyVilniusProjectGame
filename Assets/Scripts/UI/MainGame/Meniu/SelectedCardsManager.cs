@@ -14,6 +14,7 @@ public class SelectedCardsManager : MonoBehaviour
         public CardType Type;
         public CardConfig Config;
         public Texture Texture;
+        public bool IsActive;
     }
 
     private List<SelectedEntry> selectedEntries = new List<SelectedEntry>();
@@ -24,6 +25,7 @@ public class SelectedCardsManager : MonoBehaviour
         public CardType Type;
         public CardConfig Config;
         public Texture Texture;
+        public bool IsActive;
     }
 
     // expose selected types for backwards compatibility
@@ -86,7 +88,7 @@ public class SelectedCardsManager : MonoBehaviour
             return false;
         }
 
-        selectedEntries.Add(new SelectedEntry { Type = type, Config = cfg, Texture = tex });
+        selectedEntries.Add(new SelectedEntry { Type = type, Config = cfg, Texture = tex, IsActive = false });
         OnSelectedChanged?.Invoke();
         Debug.Log($"Equipped card {type} ('{cfg?.Name}') — selected now: {selectedEntries.Count}");
         return true;
@@ -118,9 +120,54 @@ public class SelectedCardsManager : MonoBehaviour
         }
     }
 
+    // Use the selected card's temporary effect (does not unequip). Returns false if not usable.
+    public bool TryUse(CardType type)
+    {
+        // prefer using the first matching entry index
+        int idx = selectedEntries.FindIndex(e => e.Type == type);
+        if (idx < 0) return false;
+        return TryUseByIndex(idx);
+    }
+
+    // Use by slot index (0-based) — maps to Ability 1/2/3. Keeps ordering of selected entries.
+    public bool TryUseByIndex(int index)
+    {
+        if (index < 0 || index >= selectedEntries.Count) return false;
+        var entry = selectedEntries[index];
+        if (entry == null) return false;
+        if (entry.IsActive) return false; // already active
+
+        PlayerStats stats = FindObjectOfType<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogWarning("No PlayerStats found to apply card effect.");
+            return false;
+        }
+
+        if (entry.Config == null)
+        {
+            Debug.LogWarning("Selected card has no config to apply.");
+            return false;
+        }
+
+        stats.ApplyCardEffect(entry.Config);
+        StartCoroutine(ActivateEntryForDuration(entry, entry.Config.Duration));
+        OnSelectedChanged?.Invoke();
+        return true;
+    }
+
+    private System.Collections.IEnumerator ActivateEntryForDuration(SelectedEntry entry, float duration)
+    {
+        entry.IsActive = true;
+        OnSelectedChanged?.Invoke();
+        yield return new WaitForSeconds(Mathf.Max(0f, duration));
+        entry.IsActive = false;
+        OnSelectedChanged?.Invoke();
+    }
+
     // Provide detailed selected info for UI
     public List<SelectedCardInfo> GetSelectedCards()
     {
-        return selectedEntries.Select(e => new SelectedCardInfo { Type = e.Type, Config = e.Config, Texture = e.Texture }).ToList();
+        return selectedEntries.Select(e => new SelectedCardInfo { Type = e.Type, Config = e.Config, Texture = e.Texture, IsActive = e.IsActive }).ToList();
     }
 }
