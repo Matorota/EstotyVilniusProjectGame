@@ -36,7 +36,7 @@ public class Health : MonoBehaviour, IDamageable
 
         currentHealth = Mathf.Max(0f, currentHealth - amount);
         OnHealthChanged?.Invoke(currentHealth);
-
+        
         if (currentHealth <= 0f)
         {
             OnDeath?.Invoke();
