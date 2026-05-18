@@ -113,7 +113,19 @@ public class SelectedCardsManager : MonoBehaviour
         }
 
         stats.ApplyCardEffect(model.config);
-        StartCoroutine(ActivateForDuration(model, model.config.Duration));
+        if (isActiveAndEnabled)
+        {
+            StartCoroutine(ActivateForDuration(model, model.config.Duration));
+        }
+        else if (stats.isActiveAndEnabled)
+        {
+            stats.StartCoroutine(ActivateForDuration(model, model.config.Duration));
+        }
+        else
+        {
+            return false;
+        }
+
         OnSelectedChanged?.Invoke();
         return true;
     }

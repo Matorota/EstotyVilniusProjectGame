@@ -59,6 +59,21 @@ public class PauseMenu : MonoBehaviour
         SetMenu(false);
     }
 
+    public void OpenMenu()
+    {
+        SetMenu(true);
+    }
+
+    public void CloseMenu()
+    {
+        SetMenu(false);
+    }
+
+    public void ToggleMenu()
+    {
+        SetMenu(!isOpen);
+    }
+
     public void OpenCardsPanel()
     {
         OpenPanel(cardsPanelRoot);
