@@ -1,30 +1,19 @@
 using System;
-using System.Collections.Generic;
 using Characters.Player.Inventory;
-using Configs;
 using UnityEngine;
 
 public class CardInventoryUi : MonoBehaviour
 {
     [SerializeField] private CardInventory inventory;
+    [SerializeField] private SelectedCardsManager selectedCardsManager;
     [SerializeField] private Transform cardsContainer;
-    [SerializeField] private GameObject[] cardPrefabs;
-
-    private Dictionary<CardType, GameObject> prefabByCardType = new Dictionary<CardType, GameObject>();
-    private Dictionary<CardType, List<CardEntry>> entriesByCardType = new Dictionary<CardType, List<CardEntry>>();
-    private HashSet<CardType> missingPrefabWarnings = new HashSet<CardType>();
-
-    private sealed class CardEntry
-    {
-        public GameObject Root;
-        public CardWidget Widget;
-    }
+    [SerializeField] private CardWidget cardPrefab;
 
     private void Awake()
     {
         inventory ??= FindObjectOfType<CardInventory>();
+        selectedCardsManager ??= FindObjectOfType<SelectedCardsManager>();
         cardsContainer ??= transform;
-        CacheCardPrefabs();
     }
 
     private void OnEnable()
@@ -46,145 +35,36 @@ public class CardInventoryUi : MonoBehaviour
 
     private void Refresh()
     {
-        if (inventory == null || cardsContainer == null) return;
-        RefreshEntries();
-    }
-
-    private void CacheCardPrefabs()
-    {
-        prefabByCardType.Clear();
-
-        if (cardPrefabs == null)
+        if (cardsContainer == null)
         {
             return;
         }
 
-        foreach (GameObject cardPrefab in cardPrefabs)
+        for (int i = cardsContainer.childCount - 1; i >= 0; i--)
         {
-            if (cardPrefab == null) continue;
+            Destroy(cardsContainer.GetChild(i).gameObject);
+        }
 
-            CardWidget widget = cardPrefab.GetComponent<CardWidget>() ?? cardPrefab.GetComponentInChildren<CardWidget>(true);
-            if (widget == null || widget.Config == null) continue;
+        if (inventory == null || cardPrefab == null)
+        {
+            return;
+        }
 
-            prefabByCardType[widget.Config.Type] = cardPrefab;
+        foreach (CardModel model in inventory.GetUnequippedCards())
+        {
+            CardWidget widget = Instantiate(cardPrefab, cardsContainer);
+            widget.gameObject.name = $"Card_{model.config.Type}_{Guid.NewGuid():N}";
+            widget.Bind(model, HandleCardClick);
         }
     }
 
-    private void RefreshEntries()
+    private void HandleCardClick(CardModel model)
     {
-        IReadOnlyDictionary<CardType, int> cardCounts = inventory.CardCountsByType;
-        int visibleIndex = 0;
-
-        foreach (var pair in cardCounts)
+        if (selectedCardsManager == null || model == null)
         {
-            CardType type = pair.Key;
-            int count = pair.Value;
-            if (count <= 0) continue;
-
-            if (!entriesByCardType.TryGetValue(type, out List<CardEntry> list))
-            {
-                list = new List<CardEntry>();
-                entriesByCardType[type] = list;
-            }
-
-            while (list.Count < count)
-            {
-                CardEntry newEntry = CreateEntry(type, list.Count);
-                if (newEntry != null)
-                {
-                    list.Add(newEntry);
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                CardEntry entry = list[i];
-                if (entry == null || entry.Root == null) continue;
-
-                if (i < count)
-                {
-                    ShowEntry(entry, visibleIndex);
-                    visibleIndex++;
-                }
-                else
-                {
-                    entry.Root.SetActive(false);
-                }
-            }
+            return;
         }
 
-        foreach (var kv in entriesByCardType)
-        {
-            CardType type = kv.Key;
-            if (!cardCounts.TryGetValue(type, out int cnt) || cnt <= 0)
-            {
-                foreach (var entry in kv.Value)
-                {
-                    if (entry != null && entry.Root != null)
-                        entry.Root.SetActive(false);
-                }
-            }
-        }
-    }
-
-    private void ShowEntry(CardEntry entry, int visibleIndex)
-    {
-        entry.Root.SetActive(true);
-        entry.Root.transform.SetSiblingIndex(visibleIndex);
-    }
-
-    private CardEntry CreateEntry(CardType type, int instanceIndex)
-    {
-        GameObject uiPrefab = ResolveUiPrefab(type);
-        if (uiPrefab == null)
-        {
-            if (missingPrefabWarnings.Add(type))
-            {
-                Debug.LogWarning($"{nameof(CardInventoryUi)}: No UI prefab found for card type '{type}'. Add matching prefab to Card Prefabs.");
-            }
-
-            return null;
-        }
-
-        GameObject root = Instantiate(uiPrefab, cardsContainer);
-        root.name = $"Card_{type}_{Guid.NewGuid():N}";
-
-        CardWidget widget = root.GetComponent<CardWidget>() ?? root.GetComponentInChildren<CardWidget>(true);
-        if (widget != null)
-        {
-            CardConfig config = inventory.GetCardConfigAtIndex(type, instanceIndex);
-            if (config != null)
-            {
-                widget.SetConfig(config);
-            }
-
-            if (inventory.TryGetCardTextureAtIndex(type, instanceIndex, out Texture tex))
-            {
-                widget.SetTexture(tex);
-            }
-
-            widget.SetInstanceIndex(instanceIndex);
-        }
-
-        return new CardEntry
-        {
-            Root = root,
-            Widget = widget
-        };
-    }
-
-    private GameObject ResolveUiPrefab(CardType type)
-    {
-        if (prefabByCardType.TryGetValue(type, out GameObject prefab))
-        {
-            return prefab;
-        }
-
-        return null;
+        selectedCardsManager.TryEquip(model);
     }
 }
-

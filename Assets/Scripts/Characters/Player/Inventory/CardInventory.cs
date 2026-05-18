@@ -1,165 +1,100 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Characters.Player.Inventory;
-using Configs;
 using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    [SerializeField] private List<CardConfig> cards;
-    private Dictionary<CardType, List<CardConfig>> instanceConfigsByType = new Dictionary<CardType, List<CardConfig>>();
-    private Dictionary<CardType, List<Texture>> instanceTexturesByType = new Dictionary<CardType, List<Texture>>();
-    private Dictionary<CardType, int> cardCountsByType = new Dictionary<CardType, int>();
+    private List<CardModel> collectedCards = new();
+    private List<CardModel> equippedCards = new();
+    private Dictionary<CardType, List<CardModel>> cardModelsByType = new();
 
-    public IReadOnlyDictionary<CardType, int> CardCountsByType => cardCountsByType;
     public event Action OnInventoryChanged;
+    //public Dictionary<CardType, List<CardModel>> CardModelsByType => cardModelsByType;
 
-    public CardConfig GetCardConfig(CardType type)
+    public bool Collect(CardModel model)
     {
-        if (instanceConfigsByType.TryGetValue(type, out var list) && list != null && list.Count > 0)
-        {
-            return list[0];
-        }
-        return cards == null ? null : cards.Find(c => c != null && c.Type == type);
-    }
-
-    public bool AddCard(CardConfig config, Texture cardTexture)
-    {
-        if (config == null)
+        if (model == null || model.config == null)
         {
             return false;
         }
 
-        CardType type = config.Type;
-        if (!instanceConfigsByType.TryGetValue(type, out var cfgList))
+        CardType type = model.config.Type;
+        if (!cardModelsByType.TryGetValue(type, out List<CardModel> models))
         {
-            cfgList = new List<CardConfig>();
-            instanceConfigsByType[type] = cfgList;
+            models = new List<CardModel>();
+            cardModelsByType[type] = models;
         }
-        cfgList.Add(config);
 
-        if (cardTexture != null)
-        {
-            if (!instanceTexturesByType.TryGetValue(type, out var texList))
-            {
-                texList = new List<Texture>();
-                instanceTexturesByType[type] = texList;
-            }
-            texList.Add(cardTexture);
-        }
-        cardCountsByType.TryGetValue(type, out int cur);
-        cardCountsByType[type] = cur + 1;
-
+        model.MarkCollected();
+        models.Add(model);
+        collectedCards.Add(model);
         OnInventoryChanged?.Invoke();
         return true;
     }
 
-    public bool AddCard(CardType type)
+    public bool Equip(CardModel model)
     {
-        return AddCard(type, null);
-    }
-
-    public bool AddCard(CardType type, Texture cardTexture)
-    {
-        CardConfig found = cards != null ? cards.Find(c => c != null && c.Type == type) : null;
-        if (found != null)
+        if (model == null || model.config == null || model.isEquipped || !Contains(model))
         {
-            return AddCard(found, cardTexture);
+            return false;
         }
 
-        cardCountsByType.TryGetValue(type, out int currentCount);
-        cardCountsByType[type] = currentCount + 1;
-        if (cardTexture != null)
+        model.MarkEquipped();
+        if (!equippedCards.Contains(model))
         {
-            if (!instanceTexturesByType.TryGetValue(type, out var texList))
-            {
-                texList = new List<Texture>();
-                instanceTexturesByType[type] = texList;
-            }
-            texList.Add(cardTexture);
+            equippedCards.Add(model);
         }
-
         OnInventoryChanged?.Invoke();
         return true;
     }
 
-    public int GetCardCount(CardType type)
+    public bool Unequip(CardModel model)
     {
-        return cardCountsByType.TryGetValue(type, out int count) ? count : 0;
-    }
-
-    public CardConfig GetCardConfigAtIndex(CardType type, int index)
-    {
-        if (instanceConfigsByType.TryGetValue(type, out var list) && list != null && index >= 0 && index < list.Count)
+        if (model == null || model.config == null || !model.isEquipped || !Contains(model))
         {
-            return list[index];
-        }
-        return cards != null ? cards.Find(c => c != null && c.Type == type) : null;
-    }
-
-    public bool TryGetCardTextureAtIndex(CardType type, int index, out Texture texture)
-    {
-        texture = null;
-        if (instanceTexturesByType.TryGetValue(type, out var list) && list != null && index >= 0 && index < list.Count)
-        {
-            texture = list[index];
-            return texture != null;
-        }
-        return false;
-    }
-
-    public bool RemoveCard(CardType type)
-    {
-        return RemoveCardAtIndex(type, 0, out _, out _);
-    }
-
-    public bool RemoveCardAtIndex(CardType type, int index, out CardConfig removedConfig, out Texture removedTexture)
-    {
-        removedConfig = null;
-        removedTexture = null;
-
-        if (index < 0) return false;
-
-        if (instanceConfigsByType.TryGetValue(type, out var cfgList) && cfgList != null && cfgList.Count > 0)
-        {
-            if (index >= cfgList.Count) return false;
-
-            removedConfig = cfgList[index];
-            cfgList.RemoveAt(index);
-            if (cfgList.Count == 0) instanceConfigsByType.Remove(type);
-
-            if (instanceTexturesByType.TryGetValue(type, out var texList) && texList != null && texList.Count > index)
-            {
-                removedTexture = texList[index];
-                texList.RemoveAt(index);
-                if (texList.Count == 0) instanceTexturesByType.Remove(type);
-            }
-
-            if (cardCountsByType.TryGetValue(type, out int cur) && cur > 0)
-            {
-                cardCountsByType[type] = cur - 1;
-                if (cardCountsByType[type] <= 0)
-                {
-                    cardCountsByType.Remove(type);
-                }
-            }
-
-            OnInventoryChanged?.Invoke();
-            return true;
+            return false;
         }
 
-        if (cardCountsByType.TryGetValue(type, out int current) && current > 0)
+        model.MarkUnequipped();
+        equippedCards.Remove(model);
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+
+    public List<CardModel> GetCardsByType(CardType type)
+    {
+        if (cardModelsByType.TryGetValue(type, out List<CardModel> models))
         {
-            cardCountsByType[type] = current - 1;
-            if (cardCountsByType[type] <= 0)
-            {
-                cardCountsByType.Remove(type);
-                instanceTexturesByType.Remove(type);
-            }
-            OnInventoryChanged?.Invoke();
-            return true;
+            return models;
         }
 
-        return false;
+        return new List<CardModel>();
+    }
+
+    public List<CardModel> GetCollectedCards()
+    {
+        return new List<CardModel>(collectedCards);
+    }
+
+    public List<CardModel> GetUnequippedCards()
+    {
+        return collectedCards.Where(model => !model.isEquipped).ToList();
+    }
+
+    public List<CardModel> GetEquippedCards()
+    {
+        return new List<CardModel>(equippedCards);
+    }
+
+    private bool Contains(CardModel model)
+    {
+        if (model == null || model.config == null)
+        {
+            return false;
+        }
+
+        return cardModelsByType.TryGetValue(model.config.Type, out List<CardModel> models) && models.Contains(model);
     }
 }
