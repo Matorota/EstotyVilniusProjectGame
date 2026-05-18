@@ -76,5 +76,5 @@ public class Combat : MonoBehaviour, ICombat
     }
 
     private Component GetTargetComponent() => target as Component;
-    private static bool IsDestroyed(Object unityObject) => !ReferenceEquals(unityObject, null) && unityObject == null;
+    private bool IsDestroyed(Object unityObject) => !ReferenceEquals(unityObject, null) && unityObject == null;
 }

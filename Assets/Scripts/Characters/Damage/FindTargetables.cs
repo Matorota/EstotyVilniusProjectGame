@@ -4,7 +4,7 @@ public class FindTargetables : MonoBehaviour
 {
     private const float FaceDotThreshold = 0.8f;
 
-    public static IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
+    public IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
     {
         IDamageable best = null;
         float bestDistance = float.MaxValue;
@@ -37,7 +37,7 @@ public class FindTargetables : MonoBehaviour
         return best;
     }
 
-    public static bool IsTargetValid(Transform origin, IDamageable selfDamageable, IDamageable target, float range)
+    public bool IsTargetValid(Transform origin, IDamageable selfDamageable, IDamageable target, float range)
     {
         if (target == null || target.CurrentHealth <= 0f || !IsHostile(selfDamageable, target))
         {
@@ -53,7 +53,7 @@ public class FindTargetables : MonoBehaviour
         return offset.sqrMagnitude <= range * range;
     }
 
-    public static bool IsFacingTarget(Transform origin, IDamageable target)
+    public bool IsFacingTarget(Transform origin, IDamageable target)
     {
         if (!TryGetTargetTransform(target, out Transform targetTransform))
         {
@@ -64,7 +64,7 @@ public class FindTargetables : MonoBehaviour
         return offset.sqrMagnitude <= 0.0001f || Vector3.Dot(origin.forward, offset.normalized) >= FaceDotThreshold;
     }
 
-    public static bool IsHostile(IDamageable selfDamageable, IDamageable target)
+    public bool IsHostile(IDamageable selfDamageable, IDamageable target)
     {
         if (target == null)
         {
@@ -78,7 +78,7 @@ public class FindTargetables : MonoBehaviour
         return selfDamageable == null || target.Team != selfDamageable.Team;
     }
 
-    private static bool TryGetTargetTransform(IDamageable target, out Transform targetTransform)
+    private bool TryGetTargetTransform(IDamageable target, out Transform targetTransform)
     {
         if (target is Component targetComponent)
         {

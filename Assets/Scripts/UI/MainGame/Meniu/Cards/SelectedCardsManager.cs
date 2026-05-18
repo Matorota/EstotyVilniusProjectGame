@@ -9,22 +9,11 @@ public class SelectedCardsManager : MonoBehaviour
 {
     [SerializeField] private CardInventory inventory;
 
-    private sealed class SelectedEntry
-    {
-        public CardType Type;
-        public CardConfig Config;
-        public Texture Texture;
-        public bool IsActive;
-    }
-
-    private List<SelectedEntry> selectedEntries = new List<SelectedEntry>();
-
-    // Public info struct for UI/other systems
     public struct SelectedCardInfo
     {
+        public CardModel Model;
         public CardType Type;
         public CardConfig Config;
-        public Texture Texture;
         public bool IsActive;
     }
 
@@ -38,118 +27,152 @@ public class SelectedCardsManager : MonoBehaviour
         stats ??= FindObjectOfType<PlayerStats>();
     }
 
-    // Equip by type, default behaviour — removes oldest instance
-    public bool TryEquip(CardType type)
+    private void OnEnable()
     {
-        return TryEquip(type, 0);
+        if (inventory != null)
+        {
+            inventory.OnInventoryChanged += HandleInventoryChanged;
+        }
     }
 
-    // Equip a specific instance (index) so UI-picked prefab stays consistent
-    public bool TryEquip(CardType type, int instanceIndex)
+    private void OnDisable()
     {
-        if (inventory == null)
+        if (inventory != null)
         {
-            Debug.LogWarning("No inventory reference in SelectedCardsManager");
-            return false;
+            inventory.OnInventoryChanged -= HandleInventoryChanged;
         }
+    }
 
-        // Preview the config at the requested index to perform uniqueness checks before removal
-        CardConfig previewConfig = inventory.GetCardConfigAtIndex(type, instanceIndex);
-
-        // block if same type already selected
-        if (selectedEntries.Any(e => e.Type == type))
+    public bool TryEquip(CardModel model)
+    {
+        if (inventory == null || model == null || model.config == null)
         {
             return false;
         }
 
-        // block if same name already selected (name is the uniqueness key)
-        if (previewConfig != null && selectedEntries.Any(e => e.Config != null && e.Config.Name == previewConfig.Name))
+        if (model.isEquipped)
         {
             return false;
         }
 
-        if (selectedEntries.Count >= maxSelected)
+        if (inventory.GetEquippedCards().Count >= maxSelected)
         {
             return false;
         }
 
-        if (inventory.GetCardCount(type) <= 0)
+        if (!inventory.Equip(model))
         {
             return false;
         }
 
-        if (!inventory.RemoveCardAtIndex(type, instanceIndex, out CardConfig cfg, out Texture tex))
-        {
-            return false;
-        }
-
-        selectedEntries.Add(new SelectedEntry { Type = type, Config = cfg, Texture = tex, IsActive = false });
         OnSelectedChanged?.Invoke();
         return true;
     }
 
-    public bool TryUnequip(CardType type)
+    public bool TryUnequip(CardModel model)
     {
-        var entry = selectedEntries.Find(e => e.Type == type);
-        if (entry == null) return false;
-        selectedEntries.Remove(entry);
-        // restore exact instance if we have config info, otherwise fallback to type-only add
-        if (entry.Config != null)
+        if (inventory == null || model == null || model.config == null)
         {
-            inventory.AddCard(entry.Config, entry.Texture);
+            return false;
         }
-        else
+
+        if (!inventory.Unequip(model))
         {
-            inventory.AddCard(type);
+            return false;
         }
+
+        model.MarkInactive();
         OnSelectedChanged?.Invoke();
         return true;
     }
 
     public void ClearSelected()
     {
-        foreach (var e in new List<SelectedEntry>(selectedEntries))
+        foreach (CardModel model in inventory.GetEquippedCards().ToList())
         {
-            TryUnequip(e.Type);
+            TryUnequip(model);
         }
     }
 
-    // Use by slot index (0-based) — maps to Ability 1/2/3. Keeps ordering of selected entries.
     public bool TryUseByIndex(int index)
     {
-        if (index < 0 || index >= selectedEntries.Count) return false;
-        var entry = selectedEntries[index];
-        if (entry == null) return false;
-        if (entry.IsActive) return false; // already active
+        if (inventory == null)
+        {
+            return false;
+        }
+
+        List<CardModel> equippedCards = inventory.GetEquippedCards();
+        if (index < 0 || index >= equippedCards.Count) return false;
+        CardModel model = equippedCards[index];
+        if (model == null || model.config == null) return false;
+        if (model.isActive) return false;
 
         if (stats == null)
         {
             return false;
         }
 
-        if (entry.Config == null)
+        stats.ApplyCardEffect(model.config);
+        if (isActiveAndEnabled)
+        {
+            StartCoroutine(ActivateForDuration(model, model.config.Duration));
+        }
+        else if (stats.isActiveAndEnabled)
+        {
+            stats.StartCoroutine(ActivateForDuration(model, model.config.Duration));
+        }
+        else
         {
             return false;
         }
 
-        stats.ApplyCardEffect(entry.Config);
-        StartCoroutine(ActivateEntryForDuration(entry, entry.Config.Duration));
         OnSelectedChanged?.Invoke();
         return true;
     }
 
-    private System.Collections.IEnumerator ActivateEntryForDuration(SelectedEntry entry, float duration)
+    private System.Collections.IEnumerator ActivateForDuration(CardModel model, float duration)
     {
-        entry.IsActive = true;
+        model.MarkActive();
         OnSelectedChanged?.Invoke();
         yield return new WaitForSeconds(Mathf.Max(0f, duration));
-        entry.IsActive = false;
+        model.MarkInactive();
         OnSelectedChanged?.Invoke();
     }
 
-    // Provide detailed selected info for UI
     public List<SelectedCardInfo> GetSelectedCards()
     {
-        return selectedEntries.Select(e => new SelectedCardInfo { Type = e.Type, Config = e.Config, Texture = e.Texture, IsActive = e.IsActive }).ToList();
+        if (inventory == null)
+        {
+            return new List<SelectedCardInfo>();
+        }
+
+        return inventory
+            .GetEquippedCards()
+            .Select(model => new SelectedCardInfo
+            {
+                Model = model,
+                Type = model.config.Type,
+                Config = model.config,
+                IsActive = model.isActive
+            })
+            .ToList();
+    }
+
+    private void HandleInventoryChanged()
+    {
+        if (inventory == null)
+        {
+            return;
+        }
+
+        foreach (CardModel model in inventory.GetCollectedCards())
+        {
+            if (model != null && !model.isEquipped && model.isActive)
+            {
+                model.MarkInactive();
+            }
+        }
+
+        OnSelectedChanged?.Invoke();
     }
 }

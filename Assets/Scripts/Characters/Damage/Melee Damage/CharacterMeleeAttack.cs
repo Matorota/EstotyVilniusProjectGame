@@ -2,6 +2,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterAttackAnimation))]
 [RequireComponent(typeof(Combat))]
+[RequireComponent(typeof(FindTargetables))]
 public class CharacterMeleeAttack : MonoBehaviour
 {
     [SerializeField] private float damage = 10f;
@@ -14,6 +15,7 @@ public class CharacterMeleeAttack : MonoBehaviour
 
     private CharacterAttackAnimation attackAnimation;
     private ICombat combat;
+    private FindTargetables targetables;
     private PlayerStats stats;
 
     private float nextAttackTime;
@@ -31,6 +33,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
         combat = GetComponent<ICombat>();
+        targetables = GetComponent<FindTargetables>();
         stats = GetComponent<PlayerStats>();
         range = Mathf.Max(0f, range);
     }
@@ -71,14 +74,15 @@ public class CharacterMeleeAttack : MonoBehaviour
             return;
         }
 
-        if (!FindTargetables.IsFacingTarget(transform, target)) // leaving for now
+        if (!targetables.IsFacingTarget(transform, target))
         {
             return;
         }
 
         StartAttack();
     }
-    private bool CanRunCombat() // added after refactoring kept on attacking friendlies (enemy to enemy ) 
+
+    private bool CanRunCombat()
     {
         return combat != null && combat.HasValidSelf;
     }
@@ -114,12 +118,12 @@ public class CharacterMeleeAttack : MonoBehaviour
             return;
         }
 
-        if (!FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
+        if (!targetables.IsTargetValid(transform, self, target, EffectiveRange))
         {
             return;
         }
 
-        if (!FindTargetables.IsFacingTarget(transform, target))
+        if (!targetables.IsFacingTarget(transform, target))
         {
             return;
         }
@@ -139,12 +143,12 @@ public class CharacterMeleeAttack : MonoBehaviour
     {
         IDamageable self = combat.Self;
         IDamageable target = combat.Target;
-        if (FindTargetables.IsTargetValid(transform, self, target, EffectiveRange))
+        if (targetables.IsTargetValid(transform, self, target, EffectiveRange))
         {
             return;
         }
 
-        target = FindTargetables.FindTarget(transform, self, EffectiveRange);
+        target = targetables.FindTarget(transform, self, EffectiveRange);
 
         if (target == null)
         {

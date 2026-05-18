@@ -8,7 +8,6 @@ public interface IDamageable
     float MaxHealth { get; }
     float CurrentHealth { get; }
     Team Team { get; }
-    // bool IsDefending { get; }
 
     void TakeDamage(float amount);
 }

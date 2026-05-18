@@ -1,4 +1,3 @@
-using System;
 using Characters.Player.Inventory;
 using Configs;
 using TMPro;
@@ -8,70 +7,125 @@ using UnityEngine.EventSystems;
 
 public class CardWidget : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] private CardConfig config;
-    [SerializeField] private CardType cardType;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private Image iconImage;
 
-    public CardConfig Config => config;
-    public CardType CardType => cardType;
-    public bool CanEquip { get; set; } = true;
+    private CardModel cardModel;
+    private CardConfig displayConfig;
+    private System.Action<CardModel> clickHandler;
 
-    private int instanceIndex = -1;
-    public int InstanceIndex => instanceIndex;
+    public CardModel Model => cardModel;
+    public CardConfig Config => cardModel?.config ?? displayConfig;
+    public CardType CardType => Config != null ? Config.Type : default;
 
     private void Awake()
     {
-        Refresh();
+        EnsureBindings();
     }
 
-    public void SetConfig(CardConfig cardConfig)
+    public void Setup(CardConfig config)
     {
-        config = cardConfig;
-        if (cardConfig != null)
+        if (config == null)
         {
-            cardType = cardConfig.Type;
+            return;
         }
-        Refresh();
-    }
 
-    public void Refresh()
-    {
-        config ??= GetComponentInParent<CardInventory>()?.GetCardConfig(cardType);
-        if (config == null) return;
-
+        EnsureBindings();
+        displayConfig = config;
         if (nameText != null) nameText.text = config.Name;
         if (descriptionText != null) descriptionText.text = config.Description;
         if (iconImage != null) iconImage.sprite = config.Image;
     }
 
-    public void SetTexture(Texture texture)
+    public void Bind(CardModel model, System.Action<CardModel> onClick)
     {
-        if (iconImage == null || texture is not Texture2D tex2D) return;
-
-        try
-        {
-            iconImage.sprite = Sprite.Create(tex2D, new Rect(0, 0, tex2D.width, tex2D.height), new Vector2(0.5f, 0.5f));
-        }
-        catch (Exception)
-        {
-        }
-    }
-
-    public void SetInstanceIndex(int index)
-    {
-        instanceIndex = index;
+        cardModel = model;
+        clickHandler = onClick;
+        displayConfig = model?.config;
+        Setup(model?.config);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!CanEquip) return;
+        if (cardModel == null || clickHandler == null)
+        {
+            return;
+        }
 
-        SelectedCardsManager manager = FindObjectOfType<SelectedCardsManager>();
-        if (manager == null) return;
+        clickHandler.Invoke(cardModel);
+    }
 
-        bool equipped = instanceIndex >= 0 ? manager.TryEquip(cardType, instanceIndex) : manager.TryEquip(cardType);
-        if (equipped) gameObject.SetActive(false);
+    private void EnsureBindings()
+    {
+        TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
+        if (nameText == null)
+        {
+            nameText = FindTextByName(texts, "name", "title") ?? (texts.Length > 0 ? texts[0] : null);
+        }
+
+        if (descriptionText == null)
+        {
+            descriptionText = FindTextByName(texts, "description", "desc") ?? (texts.Length > 1 ? texts[1] : null);
+        }
+
+        if (iconImage == null)
+        {
+            Image[] images = GetComponentsInChildren<Image>(true);
+            iconImage = FindImageByName(images, "icon");
+            if (iconImage == null)
+            {
+                for (int i = 0; i < images.Length; i++)
+                {
+                    if (images[i] != null)
+                    {
+                        iconImage = images[i];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] tokens)
+    {
+        for (int i = 0; i < texts.Length; i++)
+        {
+            TMP_Text text = texts[i];
+            if (text == null)
+            {
+                continue;
+            }
+
+            string lower = text.gameObject.name.ToLowerInvariant();
+            for (int j = 0; j < tokens.Length; j++)
+            {
+                if (lower.Contains(tokens[j]))
+                {
+                    return text;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private Image FindImageByName(Image[] images, string token)
+    {
+        for (int i = 0; i < images.Length; i++)
+        {
+            Image image = images[i];
+            if (image == null)
+            {
+                continue;
+            }
+
+            if (image.gameObject.name.ToLowerInvariant().Contains(token))
+            {
+                return image;
+            }
+        }
+
+        return null;
     }
 }

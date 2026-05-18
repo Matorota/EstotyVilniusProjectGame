@@ -75,6 +75,6 @@ public class SelectedAbilitiesUi : MonoBehaviour
             return $"Ability {slotIndex + 1}";
         }
 
-        return $"Ability {slotIndex + 1}: +{entry.Config.Value} {entry.Config.Type}";
+        return $"Ability {slotIndex + 1}: +{entry.Config.Value:0.##} {entry.Config.Type}";
     }
 }
