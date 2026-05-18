@@ -7,18 +7,23 @@ using System.Collections.Generic;
 public class CardDrop : MonoBehaviour
 {
     private const float CardDropWorldY = 1.5f;
-    private static HashSet<int> usedConfigIds = new();
-    private static int lastDroppedConfigId = -1;
 
     [SerializeField] private CardPickup cardDropPrefab;
     [SerializeField] private CardConfig[] dropConfigs;
 
     private IDamageable health;
     private bool hasDropped;
+    private CardDropCycleState dropCycleState;
 
     private void Awake()
     {
         health = GetComponent<IDamageable>();
+        dropCycleState = FindObjectOfType<CardDropCycleState>();
+        if (dropCycleState == null)
+        {
+            GameObject stateObject = new GameObject("CardDropCycleState");
+            dropCycleState = stateObject.AddComponent<CardDropCycleState>();
+        }
 
         if (health == null)
         {
@@ -97,16 +102,21 @@ public class CardDrop : MonoBehaviour
             return false;
         }
 
-        List<CardConfig> cycleCandidates = uniqueConfigs.FindAll(cfg => !usedConfigIds.Contains(cfg.GetInstanceID()));
+        if (dropCycleState == null)
+        {
+            return false;
+        }
+
+        List<CardConfig> cycleCandidates = uniqueConfigs.FindAll(cfg => !dropCycleState.UsedConfigIds.Contains(cfg.GetInstanceID()));
         if (cycleCandidates.Count == 0)
         {
-            usedConfigIds.Clear();
+            dropCycleState.UsedConfigIds.Clear();
             cycleCandidates = new List<CardConfig>(uniqueConfigs);
         }
 
-        if (cycleCandidates.Count > 1 && lastDroppedConfigId != -1)
+        if (cycleCandidates.Count > 1 && dropCycleState.LastDroppedConfigId != -1)
         {
-            cycleCandidates.RemoveAll(cfg => cfg.GetInstanceID() == lastDroppedConfigId);
+            cycleCandidates.RemoveAll(cfg => cfg.GetInstanceID() == dropCycleState.LastDroppedConfigId);
         }
 
         if (cycleCandidates.Count == 0)
@@ -116,8 +126,8 @@ public class CardDrop : MonoBehaviour
 
         selectedConfig = cycleCandidates[Random.Range(0, cycleCandidates.Count)];
         int selectedId = selectedConfig.GetInstanceID();
-        usedConfigIds.Add(selectedId);
-        lastDroppedConfigId = selectedId;
+        dropCycleState.UsedConfigIds.Add(selectedId);
+        dropCycleState.LastDroppedConfigId = selectedId;
         return true;
     }
 }

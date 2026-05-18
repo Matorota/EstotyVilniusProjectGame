@@ -4,12 +4,12 @@ using UnityEngine;
 public class CharacterAttackAnimation : MonoBehaviour
 {
     private const string AttackParameter = "Attack";
-    private static readonly int AttackHash = Animator.StringToHash(AttackParameter);
 
     [SerializeField] private Animator animator;
     [SerializeField] private CharacterDefense defense;
 
     private bool hasAttackParameter;
+    private int attackHash;
 
     public bool IsDefending => defense != null && defense.IsDefending;
 
@@ -17,6 +17,7 @@ public class CharacterAttackAnimation : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         defense = GetComponent<CharacterDefense>();
+        attackHash = Animator.StringToHash(AttackParameter);
 
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
@@ -46,8 +47,8 @@ public class CharacterAttackAnimation : MonoBehaviour
             return false;
         }
 
-        animator.ResetTrigger(AttackHash);
-        animator.SetTrigger(AttackHash);
+        animator.ResetTrigger(attackHash);
+        animator.SetTrigger(attackHash);
         return true;
     }
 
@@ -58,6 +59,6 @@ public class CharacterAttackAnimation : MonoBehaviour
             return;
         }
 
-        animator.ResetTrigger(AttackHash);
+        animator.ResetTrigger(attackHash);
     }
 }

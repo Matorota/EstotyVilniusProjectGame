@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private GameObject menuRoot;
+    [SerializeField] private GameObject quitPopupRoot;
     [SerializeField] private GameObject cardsPanelRoot;
     [SerializeField] private GameObject quildPanelRoot;
     [SerializeField] private GameObject quildBacktoquildPanelRoot;
@@ -15,6 +16,7 @@ public class PauseMenu : MonoBehaviour
     private void Start()
     {
         SetMenu(false);
+        SetPanelVisible(quitPopupRoot, false);
     }
 
     private void Update()
@@ -48,15 +50,19 @@ public class PauseMenu : MonoBehaviour
 
     public void Resume()
     {
-        if (winScreenRoot != null && winScreenRoot.activeInHierarchy)
-        {
-            SetActiveIfAssigned(winScreenRoot, false);
-            SetActiveIfAssigned(hudWindowRoot, true);
-            Time.timeScale = 1f;
-            return;
-        }
+        isOpen = false;
+        SetActiveIfAssigned(menuRoot, false);
+        SetPanelVisible(quitPopupRoot, false);
+        SetActiveIfAssigned(winScreenRoot, false);
+        SetActiveIfAssigned(deathScreenRoot, false);
+        SetActiveIfAssigned(hudWindowRoot, true);
+        CloseAllPanels();
+        Time.timeScale = 1f;
+    }
 
-        SetMenu(false);
+    public void ContinueAndOpenQuitPopup()
+    {
+        Resume();
     }
 
     public void OpenMenu()
@@ -72,6 +78,27 @@ public class PauseMenu : MonoBehaviour
     public void ToggleMenu()
     {
         SetMenu(!isOpen);
+    }
+
+    public void OpenQuitPopup()
+    {
+        if (!isOpen)
+        {
+            SetMenu(true);
+        }
+
+        SetPanelVisible(quitPopupRoot, true);
+    }
+
+    public void CloseQuitPopup()
+    {
+        SetPanelVisible(quitPopupRoot, false);
+    }
+
+    public void QuitGame()
+    {
+        Time.timeScale = 1f;
+        Application.Quit();
     }
 
     public void OpenCardsPanel()
@@ -123,6 +150,7 @@ public class PauseMenu : MonoBehaviour
         if (!open)
         {
             CloseAllPanels();
+            SetPanelVisible(quitPopupRoot, false);
         }
         Time.timeScale = open ? 0f : 1f; // pause
     }
@@ -142,6 +170,7 @@ public class PauseMenu : MonoBehaviour
         }
 
         CloseAllPanels();
+        SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetPanelVisible(panelRoot, true);

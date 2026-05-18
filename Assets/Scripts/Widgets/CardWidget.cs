@@ -87,7 +87,7 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    private static TMP_Text FindTextByName(TMP_Text[] texts, params string[] tokens)
+    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] tokens)
     {
         for (int i = 0; i < texts.Length; i++)
         {
@@ -110,7 +110,7 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
         return null;
     }
 
-    private static Image FindImageByName(Image[] images, string token)
+    private Image FindImageByName(Image[] images, string token)
     {
         for (int i = 0; i < images.Length; i++)
         {

@@ -11,7 +11,6 @@ public class CardInventory : MonoBehaviour
     private Dictionary<CardType, List<CardModel>> cardModelsByType = new();
 
     public event Action OnInventoryChanged;
-    //public Dictionary<CardType, List<CardModel>> CardModelsByType => cardModelsByType;
 
     public bool Collect(CardModel model)
     {
@@ -61,16 +60,6 @@ public class CardInventory : MonoBehaviour
         equippedCards.Remove(model);
         OnInventoryChanged?.Invoke();
         return true;
-    }
-
-    public List<CardModel> GetCardsByType(CardType type)
-    {
-        if (cardModelsByType.TryGetValue(type, out List<CardModel> models))
-        {
-            return models;
-        }
-
-        return new List<CardModel>();
     }
 
     public List<CardModel> GetCollectedCards()

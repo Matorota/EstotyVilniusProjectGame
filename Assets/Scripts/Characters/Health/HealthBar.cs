@@ -17,7 +17,7 @@ public class HealthBar : MonoBehaviour
             return;
         }
 
-        if (healthFillImage != null && healthFillImage.color == Color.white) // was having issues with health bar being white
+        if (healthFillImage.color == Color.white)
         {
             healthFillImage.color = Color.red;
         }

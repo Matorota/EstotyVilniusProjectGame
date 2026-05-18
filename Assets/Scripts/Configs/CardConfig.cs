@@ -10,15 +10,14 @@ namespace Configs
         [SerializeField] private string description;
         [SerializeField] private Sprite image;
         [SerializeField] private CardType type;
-        [SerializeField] private int value;
-        [SerializeField] private float duration = 5f; // duration for temporary effects
+        [SerializeField] private float value;
+        [SerializeField] private float duration = 5f;
         
-        public string Id => type.ToString();
         public string Name => name;
         public string Description => description;
         public Sprite Image => image;
         public CardType Type => type;
-        public int Value => value;
+        public float Value => value;
         public float Duration => duration;
     }
 }

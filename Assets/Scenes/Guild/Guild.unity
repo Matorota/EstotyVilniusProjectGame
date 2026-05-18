@@ -521,6 +521,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1359274635}
   - component: {fileID: 1359274634}
+  - component: {fileID: 1359274636}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -555,6 +556,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1359274636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359274633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99027f8e91af91349b8411a026235655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSelectButton
+  targetSceneName: GameplayScene
 --- !u!1 &1374911128 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6949565409830305880, guid: 87521ab656ac5f049b625c3d5eb1b22d, type: 3}
@@ -6358,7 +6372,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4532447950346340739}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1359274636}
+        m_TargetAssemblyTypeName: LevelSelectButton, Assembly-CSharp
+        m_MethodName: LoadTargetScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &5906228069428568867
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,7 +8,7 @@ public class CardPickup : MonoBehaviour
 {
     [SerializeField] private CardConfig cardConfig;
     [SerializeField] private CardWidget cardWidget;
-    [SerializeField] private RawImage worldIconRawImage; // Il change it later
+    [SerializeField] private RawImage worldIconRawImage;
 
     private CardWidget[] widgets;
 
