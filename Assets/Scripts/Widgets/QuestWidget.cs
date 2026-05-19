@@ -1,29 +1,26 @@
-using Characters.Player.Inventory;
-using Configs;
+﻿using Configs;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class CardWidget : UIWidgetBase, IPointerClickHandler
+public class QuestWidget : UIWidgetBase, IPointerClickHandler
 {
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private Image iconImage;
 
-    private CardModel cardModel;
-    private CardConfig displayConfig;
-    private System.Action<CardModel> clickHandler;
+    private QuestConfig questConfig;
+    private System.Action<QuestConfig> clickHandler;
 
-    public CardModel Model => cardModel;
-    public CardConfig Config => cardModel?.config ?? displayConfig;
+    public QuestConfig Config => questConfig;
 
     private void Awake()
     {
         EnsureBindings();
     }
 
-    public void Setup(CardConfig config)
+    public void Setup(QuestConfig config)
     {
         if (config == null)
         {
@@ -31,28 +28,27 @@ public class CardWidget : UIWidgetBase, IPointerClickHandler
         }
 
         EnsureBindings();
-        displayConfig = config;
+        questConfig = config;
         if (nameText != null) nameText.text = config.Name;
         if (descriptionText != null) descriptionText.text = config.Description;
         if (iconImage != null) iconImage.sprite = config.Image;
     }
 
-    public void Bind(CardModel model, System.Action<CardModel> onClick)
+    public void Bind(QuestConfig config, System.Action<QuestConfig> onClick)
     {
-        cardModel = model;
+        questConfig = config;
         clickHandler = onClick;
-        displayConfig = model?.config;
-        Setup(model?.config);
+        Setup(config);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (cardModel == null || clickHandler == null)
+        if (questConfig == null || clickHandler == null)
         {
             return;
         }
 
-        clickHandler.Invoke(cardModel);
+        clickHandler.Invoke(questConfig);
     }
 
     private void EnsureBindings()
