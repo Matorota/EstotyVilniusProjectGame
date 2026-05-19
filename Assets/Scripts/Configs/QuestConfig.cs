@@ -10,14 +10,14 @@ namespace Configs
         [SerializeField] private string name;
         [SerializeField] private string description;
         [SerializeField] private Sprite image;
-        [SerializeField] private int gameCompletion;
+       // [SerializeField] private int gameCompletion;
         [SerializeField] private string targetSceneName;
 
         
         public string Name => name;
         public string Description => description;
         public Sprite Image => image;
-        public int GameCompletion => gameCompletion;
+        //public int GameCompletion => gameCompletion;
         public string TargetSceneName => targetSceneName;
 
     }

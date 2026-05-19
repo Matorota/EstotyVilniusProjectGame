@@ -8,6 +8,7 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private GameObject cardsPanelRoot;
     [SerializeField] private GameObject quildPanelRoot;
     [SerializeField] private GameObject quildBacktoquildPanelRoot;
+    [SerializeField] private GameObject otherPanelRoot;
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject deathScreenRoot;
@@ -80,6 +81,8 @@ public class PauseMenu : MonoBehaviour
         SetMenu(!isOpen);
     }
 
+    public bool IsOpen => isOpen;
+
     public void OpenQuitPopup()
     {
         if (!isOpen)
@@ -129,6 +132,25 @@ public class PauseMenu : MonoBehaviour
     public void CloseBacktoquildPanel()
     {
         SetPanelVisible(quildBacktoquildPanelRoot, false);
+    }
+
+    // New extra UI option in the pause menu
+    public void OpenOtherPanel()
+    {
+        if (!isOpen)
+        {
+            SetMenu(true);
+        }
+
+        SetPanelVisible(quitPopupRoot, false);
+        SetActiveIfAssigned(winScreenRoot, false);
+        SetActiveIfAssigned(deathScreenRoot, false);
+        SetPanelVisible(otherPanelRoot, true);
+    }
+
+    public void CloseOtherPanel()
+    {
+        SetPanelVisible(otherPanelRoot, false);
     }
 
     private void SetMenu(bool open)
@@ -182,6 +204,7 @@ public class PauseMenu : MonoBehaviour
         SetPanelVisible(cardsPanelRoot, false);
         SetPanelVisible(quildPanelRoot, false);
         SetPanelVisible(quildBacktoquildPanelRoot, false);
+        SetPanelVisible(otherPanelRoot, false);
     }
 
     private void SetPanelVisible(GameObject panelRoot, bool visible)
@@ -209,4 +232,6 @@ public class PauseMenu : MonoBehaviour
             target.SetActive(isActive);
         }
     }
+    
+    
 }
