@@ -17,7 +17,8 @@ public class CardWidget : MonoBehaviour, IPointerClickHandler
 
     public CardModel Model => cardModel;
     public CardConfig Config => cardModel?.config ?? displayConfig;
-    public CardType CardType => Config != null ? Config.Type : default;
+    
+    //public CardType CardType => Config != null ? Config.Type : default;
 
     private void Awake()
     {
