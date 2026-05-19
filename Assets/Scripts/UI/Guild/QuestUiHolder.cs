@@ -31,7 +31,12 @@ public class QuestUiHolder : MonoBehaviour
             Destroy(questsContainer.GetChild(i).gameObject);
         }
 
-        if (questPrefab == null || availableQuests == null)
+        if (questPrefab == null)
+        {
+            return;
+        }
+
+        if (availableQuests.Count == 0)
         {
             return;
         }

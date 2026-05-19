@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StoryController : MonoBehaviour
 {
@@ -28,7 +29,7 @@ public class StoryController : MonoBehaviour
     public void ShowCurrent()
     {
         if (storyWidget == null) return;
-        if (storyPages == null || storyPages.Count == 0)
+        if (storyPages.Count == 0)
         {
             storyWidget.Setup(null);
             return;
@@ -40,27 +41,36 @@ public class StoryController : MonoBehaviour
 
     public void Next()
     {
-        if (storyPages == null || storyPages.Count == 0) return;
-        if (currentIndex >= storyPages.Count - 1) return;
+        if (storyPages.Count == 0 || !HasNext()) return;
         currentIndex++;
         ShowCurrent();
+
+        if (!HasNext())
+        {
+            LoadGameplay();
+        }
+    }
+
+    private void LoadGameplay()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("GameplayScene");
     }
 
     public void Previous()
     {
-        if (storyPages == null || storyPages.Count == 0) return;
-        if (currentIndex <= 0) return;
+        if (storyPages.Count == 0 || !HasPrevious()) return;
         currentIndex--;
         ShowCurrent();
     }
 
     public void GoToIndex(int index)
     {
-        if (storyPages == null || storyPages.Count == 0) return;
+        if (storyPages.Count == 0) return;
         currentIndex = Mathf.Clamp(index, 0, storyPages.Count - 1);
         ShowCurrent();
     }
 
-    public bool HasNext() => storyPages != null && currentIndex < storyPages.Count - 1;
-    public bool HasPrevious() => storyPages != null && currentIndex > 0;
+    public bool HasNext() => currentIndex < storyPages.Count - 1;
+    public bool HasPrevious() => currentIndex > 0;
 }

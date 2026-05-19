@@ -3,14 +3,12 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StoryWidget : MonoBehaviour
+public class StoryWidget : UIWidgetBase
 {
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text speakerText;
     [SerializeField] private TMP_Text bodyText;
     [SerializeField] private Image artworkImage;
-
-    private StoryConfig config;
 
     private void Awake()
     {
@@ -19,7 +17,6 @@ public class StoryWidget : MonoBehaviour
 
     public void Setup(StoryConfig story)
     {
-        config = story;
         EnsureBindings();
 
         if (titleText != null) titleText.text = story?.Title ?? string.Empty;
@@ -49,23 +46,7 @@ public class StoryWidget : MonoBehaviour
         if (artworkImage == null)
         {
             Image[] images = GetComponentsInChildren<Image>(true);
-            if (images.Length > 0) artworkImage = images[0];
+            artworkImage = (images.Length > 0) ? images[0] : null;
         }
-    }
-
-    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] tokens)
-    {
-        for (int i = 0; i < texts.Length; i++)
-        {
-            TMP_Text t = texts[i];
-            if (t == null) continue;
-            string lower = t.gameObject.name.ToLowerInvariant();
-            for (int j = 0; j < tokens.Length; j++)
-            {
-                if (lower.Contains(tokens[j])) return t;
-            }
-        }
-
-        return null;
     }
 }

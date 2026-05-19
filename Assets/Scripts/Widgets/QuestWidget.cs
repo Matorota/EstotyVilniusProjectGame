@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class QuestWidget : MonoBehaviour, IPointerClickHandler
+public class QuestWidget : UIWidgetBase, IPointerClickHandler
 {
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text descriptionText;
@@ -82,45 +82,4 @@ public class QuestWidget : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] tokens)
-    {
-        for (int i = 0; i < texts.Length; i++)
-        {
-            TMP_Text text = texts[i];
-            if (text == null)
-            {
-                continue;
-            }
-
-            string lower = text.gameObject.name.ToLowerInvariant();
-            for (int j = 0; j < tokens.Length; j++)
-            {
-                if (lower.Contains(tokens[j]))
-                {
-                    return text;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private Image FindImageByName(Image[] images, string token)
-    {
-        for (int i = 0; i < images.Length; i++)
-        {
-            Image image = images[i];
-            if (image == null)
-            {
-                continue;
-            }
-
-            if (image.gameObject.name.ToLowerInvariant().Contains(token))
-            {
-                return image;
-            }
-        }
-
-        return null;
-    }
 }
