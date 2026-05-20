@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 4670377083506886961}
   - component: {fileID: 2414331902495004248}
   - component: {fileID: 2168051241488986604}
+  - component: {fileID: -168999830056841283}
   m_Layer: 5
   m_Name: WorldSpaceCard
   m_TagString: Untagged
@@ -240,6 +241,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
   cardConfig: {fileID: 0}
   cardWidget: {fileID: 5358931868250051689, guid: ac41018812ff71241a480eee7c99ae4b, type: 3}
-  worldIconImage: {fileID: 0}
   worldIconRawImage: {fileID: 7185152671512413340}
-  worldSpriteRenderer: {fileID: 0}
+--- !u!114 &-168999830056841283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7635394718674100952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a76a67ec3f88f0c42aa4fbbb124b6860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlignToCamera

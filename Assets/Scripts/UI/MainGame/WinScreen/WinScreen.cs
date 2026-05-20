@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class WinScreen : MonoBehaviour
 {
@@ -11,23 +12,25 @@ public class WinScreen : MonoBehaviour
     [SerializeField] private EndQuestButtonManager endQuestButtonManager;
 
     private IDamageable playerHealth;
+    private CountEnemies countEnemies;
     private bool isShown;
     public bool HasWon;
     private bool changedTimeScale;
     private int initialEnemyCount;
-    private Health[] enemyHealthSources;
     private int aliveEnemyCount;
-    private bool enemiesInitialized;
+    private float refreshInterval = 0.5f;
+    private Coroutine refreshCoroutine;
 
     private void Awake()
     {
         playerHealth = mainCharacter != null ? mainCharacter.GetComponent<IDamageable>() : null;
+        countEnemies = GetComponent<CountEnemies>() ?? gameObject.AddComponent<CountEnemies>();
+        
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
 
         if (playerHealth == null)
         {
-            Debug.LogWarning($"{nameof(WinScreen)} on {name} is missing a valid player health source.");
             enabled = false;
         }
     }
@@ -40,39 +43,24 @@ public class WinScreen : MonoBehaviour
 
     private void OnEnable()
     {
-        if (playerHealth == null)
-        {
-            return;
-        }
+        if (playerHealth == null) return;
 
         playerHealth.OnDeath += HandlePlayerDeath;
-        if (enemiesInitialized)
-        {
-            SubscribeToEnemyDeaths();
-            aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
-            TryShowWinScreen();
-        }
+        InitializeEnemies();
+        refreshCoroutine = StartCoroutine(RefreshEnemiesPeriodically());
     }
 
-    private void Update()
-    {
-        // Refresh enemy list for dynamically spawned enemies
-        RefreshEnemyList();
-    }
 
     private void RefreshEnemyList()
     {
-        Health[] currentEnemies = FindEnemyHealthSources();
+        Health[] currentEnemies = countEnemies.FindAllEnemies();
         
-        if (currentEnemies.Length != enemyHealthSources.Length)
+        if (currentEnemies.Length != initialEnemyCount)
         {
-            Debug.Log($"WinScreen: Enemy count changed from {enemyHealthSources.Length} to {currentEnemies.Length}");
-            // Enemy count changed - update the list
-            UnsubscribeFromEnemyDeaths();
-            enemyHealthSources = currentEnemies;
-            initialEnemyCount = enemyHealthSources.Length;
-            aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
-            SubscribeToEnemyDeaths();
+            countEnemies.UnsubscribeFromDeaths(HandleEnemyDeath);
+            initialEnemyCount = currentEnemies.Length;
+            aliveEnemyCount = countEnemies.CountAliveEnemies();
+            countEnemies.SubscribeToDeaths(HandleEnemyDeath);
             TryShowWinScreen();
         }
     }
@@ -83,28 +71,27 @@ public class WinScreen : MonoBehaviour
         {
             playerHealth.OnDeath -= HandlePlayerDeath;
         }
-        if (enemiesInitialized)
+        if (refreshCoroutine != null)
         {
-            UnsubscribeFromEnemyDeaths();
+            StopCoroutine(refreshCoroutine);
+            refreshCoroutine = null;
         }
-
+        if (countEnemies != null)
+        {
+            countEnemies.UnsubscribeFromDeaths(HandleEnemyDeath);
+        }
         RestoreTimeScaleIfChanged();
     }
 
     public void ShowWinScreen()
     {
-        if (isShown)
-        {
-            return;
-        }
+        if (isShown) return;
 
         isShown = true;
         HasWon = true;
-        Debug.Log($"ShowWinScreen: Showing win screen root, hudWindowRoot active: {(hudWindowRoot != null && hudWindowRoot.activeInHierarchy)}");
         SetActiveIfAssigned(winScreenRoot, true);
         SetActiveIfAssigned(hudWindowRoot, false);
 
-        // Make sure all UI elements in the win screen are visible
         if (winScreenRoot != null)
         {
             CanvasGroup canvasGroup = winScreenRoot.GetComponent<CanvasGroup>();
@@ -113,16 +100,12 @@ public class WinScreen : MonoBehaviour
                 canvasGroup.alpha = 1f;
                 canvasGroup.interactable = true;
                 canvasGroup.blocksRaycasts = true;
-                Debug.Log("ShowWinScreen: CanvasGroup configured");
             }
 
-            // Make all child buttons visible
             Button[] buttons = winScreenRoot.GetComponentsInChildren<Button>(true);
-            Debug.Log($"ShowWinScreen: Found {buttons.Length} buttons in win screen");
             foreach (Button btn in buttons)
             {
                 btn.gameObject.SetActive(true);
-                Debug.Log($"ShowWinScreen: Enabled button: {btn.name}");
             }
         }
 
@@ -131,115 +114,41 @@ public class WinScreen : MonoBehaviour
             Time.timeScale = 0f;
             changedTimeScale = true;
         }
-        
-        Debug.Log("ShowWinScreen: Win screen fully configured!");
     }
 
     private void TryShowWinScreen()
     {
-        if (isShown || playerHealth == null || playerHealth.CurrentHealth <= 0f)
+        if (isShown || playerHealth == null || playerHealth.CurrentHealth <= 0f || initialEnemyCount <= 0 || aliveEnemyCount > 0)
         {
             return;
         }
 
-        Debug.Log($"WinScreen: Checking win condition - initialEnemyCount: {initialEnemyCount}, aliveEnemyCount: {aliveEnemyCount}");
-
-        if (initialEnemyCount <= 0 || aliveEnemyCount > 0)
-        {
-            return;
-        }
-
-        Debug.Log("WinScreen: All enemies dead! Showing win screen!");
         ShowWinScreen();
-    }
-
-    private void SubscribeToEnemyDeaths()
-    {
-        for (int i = 0; i < enemyHealthSources.Length; i++)
-        {
-            Health enemyHealth = enemyHealthSources[i];
-            if (enemyHealth != null)
-            {
-                enemyHealth.OnDeath += HandleEnemyDeath;
-            }
-        }
     }
 
     private void InitializeEnemies()
     {
-        enemyHealthSources = FindEnemyHealthSources();
-        initialEnemyCount = enemyHealthSources.Length;
-        aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
-        enemiesInitialized = true;
-
-        if (isActiveAndEnabled)
-        {
-            SubscribeToEnemyDeaths();
-        }
+        Health[] enemies = countEnemies.FindAllEnemies();
+        initialEnemyCount = enemies.Length;
+        aliveEnemyCount = countEnemies.CountAliveEnemies();
+        countEnemies.SubscribeToDeaths(HandleEnemyDeath);
     }
 
-    private void UnsubscribeFromEnemyDeaths()
+    private IEnumerator RefreshEnemiesPeriodically()
     {
-        for (int i = 0; i < enemyHealthSources.Length; i++)
+        while (true)
         {
-            Health enemyHealth = enemyHealthSources[i];
-            if (enemyHealth != null)
-            {
-                enemyHealth.OnDeath -= HandleEnemyDeath;
-            }
+            yield return new WaitForSeconds(refreshInterval);
+            RefreshEnemyList();
         }
     }
 
     private void HandleEnemyDeath()
     {
         aliveEnemyCount = Mathf.Max(0, aliveEnemyCount - 1);
-        Debug.Log($"WinScreen: Enemy died! Alive: {aliveEnemyCount}/{initialEnemyCount}");
         TryShowWinScreen();
     }
 
-    private Health[] FindEnemyHealthSources()
-    {
-        Health[] allHealth = FindObjectsOfType<Health>();
-        int enemyCount = 0;
-
-        for (int i = 0; i < allHealth.Length; i++)
-        {
-            if (allHealth[i].Team == Team.Enemy)
-            {
-                enemyCount++;
-            }
-        }
-
-        Health[] enemyHealth = new Health[enemyCount];
-        int enemyIndex = 0;
-        for (int i = 0; i < allHealth.Length; i++)
-        {
-            if (allHealth[i].Team == Team.Enemy)
-            {
-                enemyHealth[enemyIndex] = allHealth[i];
-                enemyIndex++;
-            }
-        }
-
-        return enemyHealth;
-    }
-
-    private int CountAliveEnemies(Health[] enemyHealthSources)
-    {
-        int aliveCount = 0;
-
-        for (int i = 0; i < enemyHealthSources.Length; i++)
-        {
-            Health enemyHealth = enemyHealthSources[i];
-            if (enemyHealth != null && enemyHealth.CurrentHealth > 0f)
-            {
-                aliveCount++;
-            }
-        }
-
-        return aliveCount;
-    }
-    
     private void HandlePlayerDeath()
     {
         enabled = false;
@@ -247,47 +156,26 @@ public class WinScreen : MonoBehaviour
 
     private void RestoreTimeScaleIfChanged()
     {
-        if (!changedTimeScale)
-        {
-            return;
-        }
-
+        if (!changedTimeScale) return;
         Time.timeScale = 1f;
         changedTimeScale = false;
     }
 
     private void SetActiveIfAssigned(GameObject target, bool isActive)
     {
-        if (target != null)
-        {
-            target.SetActive(isActive);
-        }
+        if (target != null) target.SetActive(isActive);
     }
 
     public void OnContinueButtonPressed()
     {
-        Debug.Log("WinScreen: Continue button pressed! Resuming game and showing End Quest button...");
-        
-        // Call PauseMenu.Resume() to unpause and show HUD
         if (pauseMenu != null)
         {
             pauseMenu.Resume();
-            Debug.Log("WinScreen: PauseMenu.Resume() called");
-        }
-        else
-        {
-            Debug.LogWarning("WinScreen: PauseMenu reference not assigned in inspector!");
         }
         
-        // Show the End Quest button via EndQuestButtonManager
         if (endQuestButtonManager != null)
         {
             endQuestButtonManager.ShowEndQuestButton();
-            Debug.Log("WinScreen: Called EndQuestButtonManager.ShowEndQuestButton()");
-        }
-        else
-        {
-            Debug.LogWarning("WinScreen: EndQuestButtonManager reference not assigned in inspector!");
         }
     }
 }

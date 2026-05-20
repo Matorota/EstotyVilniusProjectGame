@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class StoryController : MonoBehaviour
 {
@@ -20,7 +19,6 @@ public class StoryController : MonoBehaviour
         }
 
         buttonManager = GetComponentInChildren<StoryButtonManager>(true);
-
         currentIndex = Mathf.Clamp(startIndex, 0, Mathf.Max(0, storyPages.Count - 1));
     }
 
@@ -31,16 +29,26 @@ public class StoryController : MonoBehaviour
 
     public void ShowCurrent()
     {
-        if (storyWidget == null) return;
+        // Always ensure button states are refreshed even if storyWidget is not assigned.
         if (storyPages.Count == 0)
         {
-            storyWidget.Setup(null);
+            if (storyWidget != null) storyWidget.Setup(null);
+            if (buttonManager != null) buttonManager.UpdateButtonStates();
             return;
         }
 
         currentIndex = Mathf.Clamp(currentIndex, 0, storyPages.Count - 1);
-        storyWidget.Setup(storyPages[currentIndex]);
-        
+        if (storyWidget != null)
+        {
+            storyWidget.Setup(storyPages[currentIndex]);
+        }
+
+        // Ensure we have a reference to the button manager (prefab bindings may call controller methods directly).
+        if (buttonManager == null)
+        {
+            buttonManager = GetComponentInChildren<StoryButtonManager>(true);
+        }
+
         if (buttonManager != null)
         {
             buttonManager.UpdateButtonStates();
@@ -54,28 +62,6 @@ public class StoryController : MonoBehaviour
         ShowCurrent();
     }
 
-    private void LoadGameplay()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("GameplayScene");
-    }
-
-    public void PlayStory()
-    {
-
-        PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
-        if (pauseMenu != null)
-        {
-            pauseMenu.CloseStoryWindow();
-            pauseMenu.OpenAdditionalPanel(); 
-        }
-        else
-        {
-            GetComponent<CanvasGroup>().alpha = 0f;
-            gameObject.SetActive(false);
-        }
-    }
-
     public void Previous()
     {
         if (storyPages.Count == 0 || !HasPrevious()) return;
@@ -83,11 +69,18 @@ public class StoryController : MonoBehaviour
         ShowCurrent();
     }
 
-    public void GoToIndex(int index)
+    public void PlayStory()
     {
-        if (storyPages.Count == 0) return;
-        currentIndex = Mathf.Clamp(index, 0, storyPages.Count - 1);
-        ShowCurrent();
+        PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
+        if (pauseMenu != null)
+        {
+            pauseMenu.CloseStoryWindow();
+            pauseMenu.OpenAdditionalPanel();
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     public bool HasNext() => currentIndex < storyPages.Count - 1;

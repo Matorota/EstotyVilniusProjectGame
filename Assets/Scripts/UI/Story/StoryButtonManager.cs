@@ -22,34 +22,34 @@ public class StoryButtonManager : MonoBehaviour
 
     public void UpdateButtonStates()
     {
-        // Debug:
-        Debug.Log($"StoryButtonManager - storyController: {(storyController != null ? "✓" : "✗")}, nextButton: {(nextButton != null ? "✓" : "✗")}, playButton: {(playButton != null ? "✓" : "✗")}");
+        if (nextButton == null || playButton == null) return;
 
         if (storyController == null)
         {
-            Debug.LogWarning("StoryButtonManager: storyController is not assigned!");
-            return;
-        }
-        
-        if (nextButton == null)
-        {
-            Debug.LogWarning("StoryButtonManager: nextButton is not assigned!");
-            return;
-        }
-        
-        if (playButton == null)
-        {
-            Debug.LogWarning("StoryButtonManager: playButton is not assigned!");
-            return;
+            storyController = GetComponentInParent<StoryController>();
         }
 
-        bool hasNext = storyController.HasNext();
-        Debug.Log($"StoryButtonManager - Current index: {storyController}, HasNext: {hasNext}");
+        bool hasNext = storyController != null && storyController.HasNext();
 
-        nextButton.gameObject.SetActive(hasNext);
-        playButton.gameObject.SetActive(!hasNext);
-        
-        Debug.Log($"Next button active: {hasNext}, Play button active: {!hasNext}");
+        nextButton.gameObject.SetActive(true);
+        nextButton.interactable = true;
+
+        playButton.gameObject.SetActive(true);
+        bool playInteractable = !hasNext;
+        playButton.interactable = playInteractable;
+
+        Image playImage = playButton.GetComponent<Image>();
+        if (playImage != null)
+        {
+            Color c = playImage.color;
+            c.a = playInteractable ? 1f : 0.5f;
+            playImage.color = c;
+        }
+        else
+        {
+            CanvasGroup cg = playButton.GetComponent<CanvasGroup>();
+            if (cg != null) cg.alpha = playInteractable ? 1f : 0.5f;
+        }
     }
 
     public void OnNextButtonClicked()
@@ -61,11 +61,20 @@ public class StoryButtonManager : MonoBehaviour
         }
     }
 
+    public void OnPreviousButtonClicked()
+    {
+        if (storyController != null)
+        {
+            storyController.Previous();
+            UpdateButtonStates();
+        }
+    }
+
     public void OnPlayButtonClicked()
     {
         if (storyController != null)
         {
-            storyController.PlayStory(); 
+            storyController.PlayStory();
         }
     }
 }
