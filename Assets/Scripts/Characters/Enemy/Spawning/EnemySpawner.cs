@@ -13,8 +13,6 @@ public class EnemySpawner : MonoBehaviour
     private float spawnTimer = 0f;
     private int enemiesToSpawn = 0;
     private int enemiesSpawned = 0;
-    private bool isSpawning = false;
-    
 
     public void SpawnEnemies(int amount)
     {
@@ -76,9 +74,6 @@ public class EnemySpawner : MonoBehaviour
             {
                 targetField.SetValue(enemyMovement, playerTarget);
             }
-        }
-        else
-        {
         }
 
         Health health = newEnemy.GetComponent<Health>();
