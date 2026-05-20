@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class WinScreen : MonoBehaviour
 {
@@ -6,6 +7,8 @@ public class WinScreen : MonoBehaviour
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private bool pauseGameOnWin = true;
+    [SerializeField] private PauseMenu pauseMenu;
+    [SerializeField] private EndQuestButtonManager endQuestButtonManager;
 
     private IDamageable playerHealth;
     private bool isShown;
@@ -51,6 +54,29 @@ public class WinScreen : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Refresh enemy list for dynamically spawned enemies
+        RefreshEnemyList();
+    }
+
+    private void RefreshEnemyList()
+    {
+        Health[] currentEnemies = FindEnemyHealthSources();
+        
+        if (currentEnemies.Length != enemyHealthSources.Length)
+        {
+            Debug.Log($"WinScreen: Enemy count changed from {enemyHealthSources.Length} to {currentEnemies.Length}");
+            // Enemy count changed - update the list
+            UnsubscribeFromEnemyDeaths();
+            enemyHealthSources = currentEnemies;
+            initialEnemyCount = enemyHealthSources.Length;
+            aliveEnemyCount = CountAliveEnemies(enemyHealthSources);
+            SubscribeToEnemyDeaths();
+            TryShowWinScreen();
+        }
+    }
+
     private void OnDisable()
     {
         if (playerHealth != null)
@@ -74,14 +100,39 @@ public class WinScreen : MonoBehaviour
 
         isShown = true;
         HasWon = true;
+        Debug.Log($"ShowWinScreen: Showing win screen root, hudWindowRoot active: {(hudWindowRoot != null && hudWindowRoot.activeInHierarchy)}");
         SetActiveIfAssigned(winScreenRoot, true);
         SetActiveIfAssigned(hudWindowRoot, false);
+
+        // Make sure all UI elements in the win screen are visible
+        if (winScreenRoot != null)
+        {
+            CanvasGroup canvasGroup = winScreenRoot.GetComponent<CanvasGroup>();
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+                Debug.Log("ShowWinScreen: CanvasGroup configured");
+            }
+
+            // Make all child buttons visible
+            Button[] buttons = winScreenRoot.GetComponentsInChildren<Button>(true);
+            Debug.Log($"ShowWinScreen: Found {buttons.Length} buttons in win screen");
+            foreach (Button btn in buttons)
+            {
+                btn.gameObject.SetActive(true);
+                Debug.Log($"ShowWinScreen: Enabled button: {btn.name}");
+            }
+        }
 
         if (pauseGameOnWin)
         {
             Time.timeScale = 0f;
             changedTimeScale = true;
         }
+        
+        Debug.Log("ShowWinScreen: Win screen fully configured!");
     }
 
     private void TryShowWinScreen()
@@ -91,11 +142,14 @@ public class WinScreen : MonoBehaviour
             return;
         }
 
+        Debug.Log($"WinScreen: Checking win condition - initialEnemyCount: {initialEnemyCount}, aliveEnemyCount: {aliveEnemyCount}");
+
         if (initialEnemyCount <= 0 || aliveEnemyCount > 0)
         {
             return;
         }
 
+        Debug.Log("WinScreen: All enemies dead! Showing win screen!");
         ShowWinScreen();
     }
 
@@ -139,6 +193,7 @@ public class WinScreen : MonoBehaviour
     private void HandleEnemyDeath()
     {
         aliveEnemyCount = Mathf.Max(0, aliveEnemyCount - 1);
+        Debug.Log($"WinScreen: Enemy died! Alive: {aliveEnemyCount}/{initialEnemyCount}");
         TryShowWinScreen();
     }
 
@@ -206,6 +261,33 @@ public class WinScreen : MonoBehaviour
         if (target != null)
         {
             target.SetActive(isActive);
+        }
+    }
+
+    public void OnContinueButtonPressed()
+    {
+        Debug.Log("WinScreen: Continue button pressed! Resuming game and showing End Quest button...");
+        
+        // Call PauseMenu.Resume() to unpause and show HUD
+        if (pauseMenu != null)
+        {
+            pauseMenu.Resume();
+            Debug.Log("WinScreen: PauseMenu.Resume() called");
+        }
+        else
+        {
+            Debug.LogWarning("WinScreen: PauseMenu reference not assigned in inspector!");
+        }
+        
+        // Show the End Quest button via EndQuestButtonManager
+        if (endQuestButtonManager != null)
+        {
+            endQuestButtonManager.ShowEndQuestButton();
+            Debug.Log("WinScreen: Called EndQuestButtonManager.ShowEndQuestButton()");
+        }
+        else
+        {
+            Debug.LogWarning("WinScreen: EndQuestButtonManager reference not assigned in inspector!");
         }
     }
 }

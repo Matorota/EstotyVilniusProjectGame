@@ -69,6 +69,19 @@ public class PauseMenu : MonoBehaviour
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
+        
+        // Ensure HUD CanvasGroup is fully visible
+        if (hudWindowRoot != null)
+        {
+            CanvasGroup hudCanvasGroup = hudWindowRoot.GetComponent<CanvasGroup>();
+            if (hudCanvasGroup != null)
+            {
+                hudCanvasGroup.alpha = 1f;
+                hudCanvasGroup.interactable = true;
+                hudCanvasGroup.blocksRaycasts = true;
+            }
+        }
+        
         CloseAllPanels();
         Time.timeScale = 1f;
     }

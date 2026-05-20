@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class QuestUiHolder : MonoBehaviour
 {
@@ -57,12 +56,23 @@ public class QuestUiHolder : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        if (quest == null || string.IsNullOrWhiteSpace(quest.TargetSceneName))
+        if (quest == null)
         {
             return;
         }
 
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(quest.TargetSceneName);
+        // Close UI and start gameplay
+        PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
+        if (pauseMenu != null)
+        {
+            pauseMenu.Resume(); // This closes all panels and shows HUD
+        }
+
+        // Spawn enemies based on quest config
+        EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
+        if (spawner != null)
+        {
+            spawner.SpawnEnemies(quest.EnemiesAmount);
+        }
     }
 }

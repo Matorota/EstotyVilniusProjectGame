@@ -15,4 +15,4 @@ MonoBehaviour:
   name: Killing Goblins a lot
   description: 'Kill a few Goblins '
   image: {fileID: 21300000, guid: 9e955848950f9ac4d9ca0a77ec98aeac, type: 3}
-  targetSceneName: QuestKillAllGoblins
+  enemiesAmount: 5
