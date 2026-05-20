@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    public static Action<Health> OnEnemySpawned;
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private float spawnDelay = 0.5f;
     [SerializeField] private Transform playerTarget;
@@ -61,7 +63,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnOneEnemy()
     {
-        Transform randomSpawnPoint = spawnPoints[Random.Range(0, spawnPoints.Count)];
+        Transform randomSpawnPoint = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)];
 
         GameObject newEnemy = Instantiate(enemyPrefab, randomSpawnPoint.position, randomSpawnPoint.rotation);
         newEnemy.name = $"Enemy_{enemiesSpawned + 1}";
@@ -77,6 +79,12 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
+        }
+
+        Health health = newEnemy.GetComponent<Health>();
+        if (health != null)
+        {
+            OnEnemySpawned?.Invoke(health);
         }
     }
 }

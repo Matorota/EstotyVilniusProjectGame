@@ -1,8 +1,11 @@
 using UnityEngine;
 
+using System;
+
 public class CountEnemies : MonoBehaviour
 {
     private Health[] enemyHealthSources = new Health[0];
+    public Action OnEnemiesListUpdated;
 
     public Health[] FindAllEnemies()
     {
@@ -29,6 +32,7 @@ public class CountEnemies : MonoBehaviour
         }
 
         enemyHealthSources = enemyHealth;
+        OnEnemiesListUpdated?.Invoke();
         return enemyHealth;
     }
 

@@ -1,4 +1,4 @@
-﻿﻿using System.Collections;
+using System.Collections.Generic;
 using Configs;
 using TMPro;
 using UnityEngine;
@@ -11,11 +11,65 @@ namespace Widgets
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text descriptionText;
         [SerializeField] private Slider enemiesSlider;
-        [SerializeField] private CountEnemies countEnemies;
-        [SerializeField] private float refreshInterval = 0.5f;
+        [SerializeField] private GameObject background;
 
         private QuestConfig currentQuest;
-        private Coroutine refreshCoroutine;
+        private  HashSet<Health> trackedEnemies = new HashSet<Health>();
+
+        private void OnEnable()
+        {
+            EnemySpawner.OnEnemySpawned += OnEnemySpawned;
+
+            RegisterExistingEnemies();
+
+            UpdateEnemiesText();
+        }
+
+        private void OnDisable()
+        {
+            EnemySpawner.OnEnemySpawned -= OnEnemySpawned;
+            UnregisterAllEnemies();
+        }
+
+        private void RegisterExistingEnemies()
+        {
+            var all = FindObjectsOfType<Health>();
+            for (int i = 0; i < all.Length; i++)
+            {
+                var h = all[i];
+                if (h != null && h.Team == Team.Enemy)
+                {
+                    RegisterEnemy(h);
+                }
+            }
+        }
+
+        private void RegisterEnemy(Health h)
+        {
+            if (h == null || trackedEnemies.Contains(h)) return;
+            trackedEnemies.Add(h);
+            h.OnDeath += OnTrackedEnemyDeath;
+            UpdateEnemiesText();
+        }
+
+        private void UnregisterAllEnemies()
+        {
+            foreach (var h in trackedEnemies)
+            {
+                if (h != null) h.OnDeath -= OnTrackedEnemyDeath;
+            }
+            trackedEnemies.Clear();
+        }
+
+        private void OnEnemySpawned(Health h)
+        {
+            RegisterEnemy(h);
+        }
+
+        private void OnTrackedEnemyDeath()
+        {
+            UpdateEnemiesText();
+        }
 
         public void Setup(QuestConfig quest)
         {
@@ -26,56 +80,18 @@ namespace Widgets
             if (enemiesSlider != null)
             {
                 enemiesSlider.maxValue = quest != null && quest.EnemiesAmount > 0 ? quest.EnemiesAmount : 1;
+                enemiesSlider.value = 0f;
             }
 
             UpdateEnemiesText();
         }
 
-        private void OnEnable()
-        {
-            if (countEnemies == null)
-            {
-                countEnemies = FindObjectOfType<CountEnemies>();
-            }
-
-            if (refreshCoroutine == null)
-                refreshCoroutine = StartCoroutine(RefreshRoutine());
-        }
-
-        private void OnDisable()
-        {
-            if (refreshCoroutine != null)
-            {
-                StopCoroutine(refreshCoroutine);
-                refreshCoroutine = null;
-            }
-        }
-
-        private IEnumerator RefreshRoutine()
-        {
-            while (true)
-            {
-                UpdateEnemiesText();
-                yield return new WaitForSeconds(refreshInterval);
-            }
-        }
-
         private void UpdateEnemiesText()
         {
             int alive = 0;
-            if (countEnemies != null)
+            foreach (var h in trackedEnemies)
             {
-                alive = countEnemies.CountAliveEnemies();
-            }
-            else
-            {
-                // fallback: scan Health components
-                var all = FindObjectsOfType<Health>();
-                for (int i = 0; i < all.Length; i++)
-                {
-                    if (all[i] != null && all[i].Team == Team.Enemy && all[i].CurrentHealth > 0f)
-                        alive++;
-                }
+                if (h != null && h.CurrentHealth > 0f) alive++;
             }
 
             if (descriptionText != null)
@@ -88,7 +104,40 @@ namespace Widgets
 
             if (enemiesSlider != null)
             {
-                enemiesSlider.value = alive;
+                float val = Mathf.Clamp(alive, 0, (int)enemiesSlider.maxValue);
+                enemiesSlider.value = val;
+                GameObject sliderGO = enemiesSlider.gameObject;
+                bool shouldShow = alive > 0;
+                if (sliderGO != this.gameObject)
+                {
+                    sliderGO.SetActive(shouldShow);
+                }
+                else
+                {
+                    CanvasGroup cg = sliderGO.GetComponent<CanvasGroup>();
+                    if (cg == null) cg = sliderGO.AddComponent<CanvasGroup>();
+                    cg.alpha = shouldShow ? 1f : 0f;
+                    cg.interactable = shouldShow;
+                    cg.blocksRaycasts = shouldShow;
+                }
+            }
+
+            if (background != null)
+            {
+                GameObject bgGO = background.gameObject;
+                bool bgShow = alive > 0;
+                if (bgGO != this.gameObject)
+                {
+                    bgGO.SetActive(bgShow);
+                }
+                else
+                {
+                    CanvasGroup bgCg = bgGO.GetComponent<CanvasGroup>();
+                    if (bgCg == null) bgCg = bgGO.AddComponent<CanvasGroup>();
+                    bgCg.alpha = bgShow ? 1f : 0f;
+                    bgCg.interactable = bgShow;
+                    bgCg.blocksRaycasts = bgShow;
+                }
             }
         }
     }

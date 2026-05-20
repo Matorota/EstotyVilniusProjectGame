@@ -61,18 +61,22 @@ public class QuestUiHolder : MonoBehaviour
             return;
         }
 
-        // Close UI and start gameplay
         PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
         if (pauseMenu != null)
         {
-            pauseMenu.Resume(); // This closes all panels and shows HUD
+            pauseMenu.Resume(); 
         }
 
-        // Spawn enemies based on quest config
         EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
         if (spawner != null)
         {
             spawner.SpawnEnemies(quest.EnemiesAmount);
+        }
+
+        var progress = FindObjectOfType<Widgets.LevelProgressWidget>();
+        if (progress != null)
+        {
+            progress.Setup(quest);
         }
     }
 }
