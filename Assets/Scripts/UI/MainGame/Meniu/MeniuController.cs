@@ -4,11 +4,12 @@ using UnityEngine.InputSystem;
 public class PauseMenu : MonoBehaviour
 {
     [SerializeField] private GameObject menuRoot;
-    [SerializeField] private GameObject quitPopupRoot;
     [SerializeField] private GameObject cardsPanelRoot;
     [SerializeField] private GameObject quildPanelRoot;
     [SerializeField] private GameObject quildBacktoquildPanelRoot;
     [SerializeField] private GameObject otherPanelRoot;
+    [SerializeField] private GameObject startGameWindowRoot;
+    [SerializeField] private GameObject storyWindowRoot;
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject deathScreenRoot;
@@ -16,8 +17,19 @@ public class PauseMenu : MonoBehaviour
 
     private void Start()
     {
-        SetMenu(false);
-        SetPanelVisible(quitPopupRoot, false);
+        Time.timeScale = 0f; 
+        isOpen = true; 
+        
+        SetActiveIfAssigned(startGameWindowRoot, true);
+        SetActiveIfAssigned(hudWindowRoot, false);
+        SetActiveIfAssigned(menuRoot, false);
+        SetActiveIfAssigned(cardsPanelRoot, false);
+        SetActiveIfAssigned(quildPanelRoot, false);
+        SetActiveIfAssigned(quildBacktoquildPanelRoot, false);
+        SetActiveIfAssigned(otherPanelRoot, false);
+        SetActiveIfAssigned(storyWindowRoot, false);
+        SetActiveIfAssigned(winScreenRoot, false);
+        SetActiveIfAssigned(deathScreenRoot, false);
     }
 
     private void Update()
@@ -53,7 +65,7 @@ public class PauseMenu : MonoBehaviour
     {
         isOpen = false;
         SetActiveIfAssigned(menuRoot, false);
-        SetPanelVisible(quitPopupRoot, false);
+        //SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
@@ -90,13 +102,9 @@ public class PauseMenu : MonoBehaviour
             SetMenu(true);
         }
 
-        SetPanelVisible(quitPopupRoot, true);
+        //SetPanelVisible(quitPopupRoot, true);
     }
-
-    public void CloseQuitPopup()
-    {
-        SetPanelVisible(quitPopupRoot, false);
-    }
+    
 
     public void QuitGame()
     {
@@ -134,7 +142,6 @@ public class PauseMenu : MonoBehaviour
         SetPanelVisible(quildBacktoquildPanelRoot, false);
     }
 
-    // New extra UI option in the pause menu
     public void OpenOtherPanel()
     {
         if (!isOpen)
@@ -142,7 +149,7 @@ public class PauseMenu : MonoBehaviour
             SetMenu(true);
         }
 
-        SetPanelVisible(quitPopupRoot, false);
+       // SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetPanelVisible(otherPanelRoot, true);
@@ -151,6 +158,30 @@ public class PauseMenu : MonoBehaviour
     public void CloseOtherPanel()
     {
         SetPanelVisible(otherPanelRoot, false);
+    }
+
+    public void OpenStartGameWindow()
+    {
+        OpenPanel(startGameWindowRoot);
+    }
+
+    public void CloseStartGameWindow()
+    {
+        SetPanelVisible(startGameWindowRoot, false);
+        
+        isOpen = false;
+        SetActiveIfAssigned(hudWindowRoot, true);
+        Time.timeScale = 1f; 
+    }
+
+    public void OpenStoryWindow()
+    {
+        OpenPanel(storyWindowRoot);
+    }
+
+    public void CloseStoryWindow()
+    {
+        SetPanelVisible(storyWindowRoot, false);
     }
 
     private void SetMenu(bool open)
@@ -172,7 +203,7 @@ public class PauseMenu : MonoBehaviour
         if (!open)
         {
             CloseAllPanels();
-            SetPanelVisible(quitPopupRoot, false);
+            //SetPanelVisible(quitPopupRoot, false);
         }
         Time.timeScale = open ? 0f : 1f; // pause
     }
@@ -192,9 +223,10 @@ public class PauseMenu : MonoBehaviour
         }
 
         CloseAllPanels();
-        SetPanelVisible(quitPopupRoot, false);
+        //SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
+        SetActiveIfAssigned(hudWindowRoot, false); // Hide HUD when opening a panel
         SetPanelVisible(panelRoot, true);
         
     }
@@ -205,6 +237,21 @@ public class PauseMenu : MonoBehaviour
         SetPanelVisible(quildPanelRoot, false);
         SetPanelVisible(quildBacktoquildPanelRoot, false);
         SetPanelVisible(otherPanelRoot, false);
+        SetPanelVisible(storyWindowRoot, false);
+        
+        if (!isOpen && !IsAnyPanelOpen() && (startGameWindowRoot == null || !startGameWindowRoot.activeInHierarchy))
+        {
+            SetActiveIfAssigned(hudWindowRoot, true);
+        }
+    }
+
+    private bool IsAnyPanelOpen()
+    {
+        return (cardsPanelRoot != null && cardsPanelRoot.activeInHierarchy) ||
+               (quildPanelRoot != null && quildPanelRoot.activeInHierarchy) ||
+               (quildBacktoquildPanelRoot != null && quildBacktoquildPanelRoot.activeInHierarchy) ||
+               (otherPanelRoot != null && otherPanelRoot.activeInHierarchy) ||
+               (storyWindowRoot != null && storyWindowRoot.activeInHierarchy);
     }
 
     private void SetPanelVisible(GameObject panelRoot, bool visible)

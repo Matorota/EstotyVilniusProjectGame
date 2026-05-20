@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b670ce9004049afb0cd5211cf625b38, type: 3}
-  m_Name: Crushing_Momentum_Card_Extra_Damage
+  m_Name: Card_Relentless_Ferocity
   m_EditorClassIdentifier: Assembly-CSharp::Configs.CardConfig
-  name: Card Crushing Momentum
-  description: Gives +10 damage
-  image: {fileID: 21300000, guid: 15f3233685d484947a5e2da924eecbd3, type: 3}
+  name: Card Relentless Ferocity
+  description: Gives +20 Damage
+  image: {fileID: 21300000, guid: c78e038d19833c74fb307b820ba71909, type: 3}
   type: 1
-  value: 10
+  value: 20

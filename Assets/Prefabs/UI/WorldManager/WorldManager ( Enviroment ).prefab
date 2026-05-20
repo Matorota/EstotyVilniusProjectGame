@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6949565409830305880
+--- !u!1 &3558503410941463983
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,11 +8,13 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6658701382282933240}
-  - component: {fileID: 5942528394779006400}
-  - component: {fileID: 658413788695067317}
-  - component: {fileID: 2619255278957502482}
-  - component: {fileID: 7987633073451875401}
+  - component: {fileID: 7676064781361650232}
+  - component: {fileID: 7389545892923460189}
+  - component: {fileID: 6024998960604605363}
+  - component: {fileID: 280385879274289147}
+  - component: {fileID: 418465967174447469}
+  - component: {fileID: 6829973218322499193}
+  - component: {fileID: 9201149861778162958}
   m_Layer: 0
   m_Name: WorldManager ( Enviroment )
   m_TagString: Untagged
@@ -20,13 +22,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6658701382282933240
+--- !u!4 &7676064781361650232
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6949565409830305880}
+  m_GameObject: {fileID: 3558503410941463983}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1280, y: 720, z: 0}
@@ -35,25 +37,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5942528394779006400
+--- !u!114 &7389545892923460189
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6949565409830305880}
+  m_GameObject: {fileID: 3558503410941463983}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0a19554684e99654b8abb39fd1ef6211, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelDeathScreenButtonOptions
---- !u!114 &658413788695067317
+--- !u!114 &6024998960604605363
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6949565409830305880}
+  m_GameObject: {fileID: 3558503410941463983}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f2914ab83dcaccf4189b561fe1b2ba83, type: 3}
@@ -63,28 +65,34 @@ MonoBehaviour:
   deathScreenRoot: {fileID: 0}
   hudWindowRoot: {fileID: 0}
   pauseGameOnDeath: 1
---- !u!114 &2619255278957502482
+--- !u!114 &280385879274289147
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6949565409830305880}
+  m_GameObject: {fileID: 3558503410941463983}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6074df666a1d41cfa96dbf4c486814d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PauseMenu
   menuRoot: {fileID: 0}
+  quitPopupRoot: {fileID: 0}
   cardsPanelRoot: {fileID: 0}
+  quildPanelRoot: {fileID: 0}
+  quildBacktoquildPanelRoot: {fileID: 0}
+  otherPanelRoot: {fileID: 0}
   hudWindowRoot: {fileID: 0}
---- !u!114 &7987633073451875401
+  winScreenRoot: {fileID: 0}
+  deathScreenRoot: {fileID: 0}
+--- !u!114 &418465967174447469
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6949565409830305880}
+  m_GameObject: {fileID: 3558503410941463983}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f9079b7cf42e00947b1d2317e2bcde9d, type: 3}
@@ -94,3 +102,32 @@ MonoBehaviour:
   winScreenRoot: {fileID: 0}
   hudWindowRoot: {fileID: 0}
   pauseGameOnWin: 1
+  HasWon: 0
+--- !u!114 &6829973218322499193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3558503410941463983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99027f8e91af91349b8411a026235655, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelSelectButton
+  targetSceneName: Guild
+--- !u!114 &9201149861778162958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3558503410941463983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8ed7987199eac4ca9fbc885ef872b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShowUiWhenAllEnemiesDead
+  uiRoot: {fileID: 0}
+  hudRoot: {fileID: 0}
+  pauseGameOnShow: 0

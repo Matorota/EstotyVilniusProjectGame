@@ -10,6 +10,7 @@ public class StoryController : MonoBehaviour
     [SerializeField] private int startIndex = 0;
 
     private int currentIndex = 0;
+    private StoryButtonManager buttonManager;
 
     private void Awake()
     {
@@ -17,6 +18,8 @@ public class StoryController : MonoBehaviour
         {
             storyWidget = GetComponentInChildren<StoryWidget>(true);
         }
+
+        buttonManager = GetComponentInChildren<StoryButtonManager>(true);
 
         currentIndex = Mathf.Clamp(startIndex, 0, Mathf.Max(0, storyPages.Count - 1));
     }
@@ -37,6 +40,11 @@ public class StoryController : MonoBehaviour
 
         currentIndex = Mathf.Clamp(currentIndex, 0, storyPages.Count - 1);
         storyWidget.Setup(storyPages[currentIndex]);
+        
+        if (buttonManager != null)
+        {
+            buttonManager.UpdateButtonStates();
+        }
     }
 
     public void Next()
@@ -44,17 +52,28 @@ public class StoryController : MonoBehaviour
         if (storyPages.Count == 0 || !HasNext()) return;
         currentIndex++;
         ShowCurrent();
-
-        if (!HasNext())
-        {
-            LoadGameplay();
-        }
     }
 
     private void LoadGameplay()
     {
         Time.timeScale = 1f;
         SceneManager.LoadScene("GameplayScene");
+    }
+
+    public void PlayStory()
+    {
+
+        PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
+        if (pauseMenu != null)
+        {
+            pauseMenu.CloseStoryWindow();
+            pauseMenu.OpenAdditionalPanel(); 
+        }
+        else
+        {
+            GetComponent<CanvasGroup>().alpha = 0f;
+            gameObject.SetActive(false);
+        }
     }
 
     public void Previous()

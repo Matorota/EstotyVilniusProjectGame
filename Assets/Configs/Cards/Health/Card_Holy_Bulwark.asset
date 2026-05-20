@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b670ce9004049afb0cd5211cf625b38, type: 3}
-  m_Name: Savage_Assault_Card_Extra_Damage
+  m_Name: Card_Holy_Bulwark
   m_EditorClassIdentifier: Assembly-CSharp::Configs.CardConfig
-  name: Card Savage Assault
-  description: Gives +15 Damage
-  image: {fileID: 21300000, guid: c78e038d19833c74fb307b820ba71909, type: 3}
-  type: 1
-  value: 15
+  name: Card Holy Bulwark
+  description: Gives +10 Health
+  image: {fileID: 21300000, guid: b5c44f74d63e8ca4a98f155951272f94, type: 3}
+  type: 2
+  value: 5
+  duration: 5

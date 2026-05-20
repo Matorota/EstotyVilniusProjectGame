@@ -10,10 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3dd6f4788c04546b5ee449c4a4d3fb7, type: 3}
-  m_Name: QuestKillingGoblins
+  m_Name: Quest_Kill_Enemies_Hard
   m_EditorClassIdentifier: Assembly-CSharp::Configs.QuestConfig
-  name: Killing Goblins
-  description: Kill all the goblins
-  image: {fileID: 21300000, guid: 94195d35967b52047936bc6b59786ce9, type: 3}
-  gameCompletion: 5
-  targetSceneName: GameplayScene
+  name: Killing Goblins a lot
+  description: 'Kill a few Goblins '
+  image: {fileID: 21300000, guid: 9e955848950f9ac4d9ca0a77ec98aeac, type: 3}
+  targetSceneName: QuestKillAllGoblins
