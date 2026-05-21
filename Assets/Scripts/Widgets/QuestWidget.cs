@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class QuestWidget : UIWidgetBase, IPointerClickHandler
+public class QuestWidget : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text descriptionText;
@@ -67,19 +67,39 @@ public class QuestWidget : UIWidgetBase, IPointerClickHandler
         if (iconImage == null)
         {
             Image[] images = GetComponentsInChildren<Image>(true);
-            iconImage = FindImageByName(images, "icon");
-            if (iconImage == null)
+            iconImage = FindImageByName(images, "icon") ?? (images.Length > 0 ? images[0] : null);
+        }
+    }
+
+    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] names)
+    {
+        if (texts == null) return null;
+        foreach (TMP_Text text in texts)
+        {
+            if (text == null) continue;
+            foreach (string name in names)
             {
-                for (int i = 0; i < images.Length; i++)
+                if (!string.IsNullOrEmpty(name) && text.gameObject.name.IndexOf(name, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    if (images[i] != null)
-                    {
-                        iconImage = images[i];
-                        break;
-                    }
+                    return text;
                 }
             }
         }
+        return null;
+    }
+
+    private Image FindImageByName(Image[] images, string name)
+    {
+        if (images == null) return null;
+        foreach (Image img in images)
+        {
+            if (img == null) continue;
+            if (!string.IsNullOrEmpty(name) && img.gameObject.name.IndexOf(name, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return img;
+            }
+        }
+        return null;
     }
 
 }

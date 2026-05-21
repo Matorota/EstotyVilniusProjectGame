@@ -13,10 +13,10 @@ public class StoryWindow : MonoBehaviour
     [SerializeField] private GameUIController gameUIController;
     [SerializeField] private int startIndex;
 
-    private TMP_Text titleText;
-    private TMP_Text speakerText;
-    private TMP_Text bodyText;
-    private Image artworkImage;
+    [SerializeField] private TMP_Text titleText;
+    [SerializeField] private TMP_Text speakerText;
+    [SerializeField] private TMP_Text bodyText;
+    [SerializeField] private Image artworkImage;
     private int currentIndex = -1;
 
     private void OnEnable()

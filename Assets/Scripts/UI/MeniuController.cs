@@ -29,16 +29,13 @@ public class GameUIController : MonoBehaviour
     private bool isOpen;
     private IDamageable playerHealth;
     
-    // Death Screen State
     private bool deathScreenShown;
     private bool changedTimeScaleOnDeath;
     
-    // Win Screen State
     private bool winScreenShown;
     public bool HasWon { get; private set; }
     private bool changedTimeScaleOnWin;
     
-    // Enemy Tracking
     private Health[] enemyHealthSources = new Health[0];
     private int initialEnemyCount;
     private int aliveEnemyCount;
@@ -79,12 +76,7 @@ public class GameUIController : MonoBehaviour
         refreshEnemiesCoroutine = StartCoroutine(RefreshEnemiesPeriodically());
     }
 
-    private void OnEnable()
-    {
-        if (playerHealth == null) return;
-        playerHealth.OnHealthChanged += OnPlayerHealthChanged;
-        playerHealth.OnDeath += ShowDeathScreen;
-    }
+    private void OnEnable() { }
 
     private void OnDisable()
     {
@@ -449,14 +441,6 @@ public class GameUIController : MonoBehaviour
         TryShowWinScreen();
     }
 
-    private void CloseMenuPanel()
-    {
-        if (menuRoot != null)
-        {
-            menuRoot.SetActive(false);
-        }
-    }
-
     private void SetMenu(bool open)
     {
         if (open && IsEndScreenActive())
@@ -543,29 +527,6 @@ public class GameUIController : MonoBehaviour
             canvasGroup.alpha = visible ? 1f : 0f;
             canvasGroup.interactable = visible;
             canvasGroup.blocksRaycasts = visible;
-        }
-    }
-
-    private void SetCanvasGroupVisible(CanvasGroup canvasGroup, bool visible)
-    {
-        if (canvasGroup == null) return;
-        canvasGroup.alpha = visible ? 1f : 0f;
-        canvasGroup.interactable = visible;
-        canvasGroup.blocksRaycasts = visible;
-    }
-
-    private void SetParentCanvasGroupsVisible(Transform target, bool visible)
-    {
-        Transform current = target.parent;
-        while (current != null)
-        {
-            CanvasGroup canvasGroup = current.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                SetCanvasGroupVisible(canvasGroup, visible);
-            }
-            current.gameObject.SetActive(visible || current.gameObject.activeSelf);
-            current = current.parent;
         }
     }
 
