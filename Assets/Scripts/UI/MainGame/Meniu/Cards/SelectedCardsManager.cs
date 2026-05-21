@@ -79,6 +79,12 @@ public class SelectedCardsManager : MonoBehaviour
         CardModel model = equippedCards[index];
         if (model.isActive) return false;
 
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats not assigned to SelectedCardsManager!");
+            return false;
+        }
+
         stats.ApplyCardEffect(model.config);
         if (isActiveAndEnabled)
         {

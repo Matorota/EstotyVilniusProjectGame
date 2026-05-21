@@ -8,7 +8,7 @@ public class QuestUiHolder : MonoBehaviour
     [SerializeField] private Transform questsContainer;
     [SerializeField] private QuestWidget questPrefab;
     [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
-    [SerializeField] private MenuController menuController;
+    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
@@ -42,7 +42,7 @@ public class QuestUiHolder : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        menuController.Resume();
+        gameUIController.Resume();
         enemySpawner.SpawnEnemies(quest.EnemiesAmount);
         levelProgressWidget.Setup(quest);
     }
@@ -54,7 +54,7 @@ public class QuestUiHolder : MonoBehaviour
 
     private void HandleOpenQuestButtonClicked()
     {
-        menuController.OpenBacktoquildPanel();
+        gameUIController.OpenBacktoquildPanel();
         gameObject.SetActive(false);
     }
 }
