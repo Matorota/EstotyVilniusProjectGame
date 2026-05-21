@@ -10,15 +10,14 @@ public class CardDrop : MonoBehaviour
 
     [SerializeField] private CardPickup cardDropPrefab;
     [SerializeField] private CardConfig[] dropConfigs;
+    [SerializeField] private CardDropCycleState dropCycleState;
 
     private IDamageable health;
     private bool hasDropped;
-    private CardDropCycleState dropCycleState;
 
     private void Awake()
     {
         health = GetComponent<IDamageable>();
-        dropCycleState = FindObjectOfType<CardDropCycleState>();
         if (dropCycleState == null)
         {
             GameObject stateObject = new GameObject("CardDropCycleState");
@@ -34,28 +33,17 @@ public class CardDrop : MonoBehaviour
 
     private void OnEnable()
     {
-        if (health != null)
-        {
-            health.OnDeath += OnDeath;
-        }
+        health.OnDeath += OnDeath;
     }
 
     private void OnDisable()
     {
-        if (health != null)
-        {
-            health.OnDeath -= OnDeath;
-        }
+        health.OnDeath -= OnDeath;
     }
 
     private void OnDeath()
     {
         if (hasDropped)
-        {
-            return;
-        }
-
-        if (cardDropPrefab == null)
         {
             return;
         }
@@ -102,11 +90,6 @@ public class CardDrop : MonoBehaviour
             return false;
         }
 
-        if (dropCycleState == null)
-        {
-            return false;
-        }
-
         List<CardConfig> cycleCandidates = uniqueConfigs.FindAll(cfg => !dropCycleState.UsedConfigIds.Contains(cfg.GetInstanceID()));
         if (cycleCandidates.Count == 0)
         {
@@ -131,3 +114,4 @@ public class CardDrop : MonoBehaviour
         return true;
     }
 }
+

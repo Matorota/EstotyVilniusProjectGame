@@ -1,38 +1,29 @@
 ﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class QuestUiHolder : MonoBehaviour
 {
     [SerializeField] private Transform questsContainer;
     [SerializeField] private QuestWidget questPrefab;
     [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
-
-    private void Awake()
-    {
-        questsContainer ??= transform;
-    }
-
+    [SerializeField] private MenuController menuController;
+    [SerializeField] private EnemySpawner enemySpawner;
+    [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
+    [SerializeField] private Button openQuestButton;
+    
     private void OnEnable()
     {
+        openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
         Refresh();
     }
 
     public void Refresh()
     {
-        if (questsContainer == null)
-        {
-            return;
-        }
-
         for (int i = questsContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(questsContainer.GetChild(i).gameObject);
-        }
-
-        if (questPrefab == null)
-        {
-            return;
         }
 
         if (availableQuests.Count == 0)
@@ -43,11 +34,6 @@ public class QuestUiHolder : MonoBehaviour
         for (int i = 0; i < availableQuests.Count; i++)
         {
             QuestConfig quest = availableQuests[i];
-            if (quest == null)
-            {
-                continue;
-            }
-
             QuestWidget widget = Instantiate(questPrefab, questsContainer);
             widget.gameObject.name = $"Quest_{quest.Name}_{i}";
             widget.Bind(quest, HandleQuestClicked);
@@ -56,27 +42,20 @@ public class QuestUiHolder : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        if (quest == null)
-        {
-            return;
-        }
+        menuController.Resume();
+        enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+        levelProgressWidget.Setup(quest);
+    }
+    
+    private void OnDisable()
+    {
+        openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
+    }
 
-        PauseMenu pauseMenu = FindObjectOfType<PauseMenu>();
-        if (pauseMenu != null)
-        {
-            pauseMenu.Resume(); 
-        }
-
-        EnemySpawner spawner = FindObjectOfType<EnemySpawner>();
-        if (spawner != null)
-        {
-            spawner.SpawnEnemies(quest.EnemiesAmount);
-        }
-
-        var progress = FindObjectOfType<Widgets.LevelProgressWidget>();
-        if (progress != null)
-        {
-            progress.Setup(quest);
-        }
+    private void HandleOpenQuestButtonClicked()
+    {
+        menuController.OpenBacktoquildPanel();
+        gameObject.SetActive(false);
     }
 }
+

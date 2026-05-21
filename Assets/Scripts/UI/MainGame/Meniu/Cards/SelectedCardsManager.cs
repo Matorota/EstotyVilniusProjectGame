@@ -8,6 +8,7 @@ using UnityEngine;
 public class SelectedCardsManager : MonoBehaviour
 {
     [SerializeField] private CardInventory inventory;
+    [SerializeField] private PlayerStats stats;
 
     public struct SelectedCardInfo
     {
@@ -19,37 +20,19 @@ public class SelectedCardsManager : MonoBehaviour
 
     public event Action OnSelectedChanged;
     [SerializeField] private int maxSelected = 3;
-    private PlayerStats stats;
-
-    private void Awake()
-    {
-        inventory ??= FindObjectOfType<CardInventory>();
-        stats ??= FindObjectOfType<PlayerStats>();
-    }
 
     private void OnEnable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged += HandleInventoryChanged;
-        }
+        inventory.OnInventoryChanged += HandleInventoryChanged;
     }
 
     private void OnDisable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged -= HandleInventoryChanged;
-        }
+        inventory.OnInventoryChanged -= HandleInventoryChanged;
     }
 
     public bool TryEquip(CardModel model)
     {
-        if (inventory == null || model == null || model.config == null)
-        {
-            return false;
-        }
-
         if (model.isEquipped)
         {
             return false;
@@ -71,11 +54,6 @@ public class SelectedCardsManager : MonoBehaviour
 
     public bool TryUnequip(CardModel model)
     {
-        if (inventory == null || model == null || model.config == null)
-        {
-            return false;
-        }
-
         if (!inventory.Unequip(model))
         {
             return false;
@@ -96,21 +74,10 @@ public class SelectedCardsManager : MonoBehaviour
 
     public bool TryUseByIndex(int index)
     {
-        if (inventory == null)
-        {
-            return false;
-        }
-
         List<CardModel> equippedCards = inventory.GetEquippedCards();
         if (index < 0 || index >= equippedCards.Count) return false;
         CardModel model = equippedCards[index];
-        if (model == null || model.config == null) return false;
         if (model.isActive) return false;
-
-        if (stats == null)
-        {
-            return false;
-        }
 
         stats.ApplyCardEffect(model.config);
         if (isActiveAndEnabled)
@@ -141,11 +108,6 @@ public class SelectedCardsManager : MonoBehaviour
 
     public List<SelectedCardInfo> GetSelectedCards()
     {
-        if (inventory == null)
-        {
-            return new List<SelectedCardInfo>();
-        }
-
         return inventory
             .GetEquippedCards()
             .Select(model => new SelectedCardInfo
@@ -160,11 +122,6 @@ public class SelectedCardsManager : MonoBehaviour
 
     private void HandleInventoryChanged()
     {
-        if (inventory == null)
-        {
-            return;
-        }
-
         foreach (CardModel model in inventory.GetCollectedCards())
         {
             if (model != null && !model.isEquipped && model.isActive)
@@ -176,3 +133,4 @@ public class SelectedCardsManager : MonoBehaviour
         OnSelectedChanged?.Invoke();
     }
 }
+

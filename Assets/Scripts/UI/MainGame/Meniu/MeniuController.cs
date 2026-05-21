@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PauseMenu : MonoBehaviour
+public class MenuController : MonoBehaviour
 {
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject cardsPanelRoot;
@@ -13,11 +13,14 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject deathScreenRoot;
+    [SerializeField] private TimeScaleManager timeScaleManager;
+    [SerializeField] private WinScreen winScreen;
+    
     private bool isOpen;
 
     private void Start()
     {
-        Time.timeScale = 0f; 
+        timeScaleManager.Pause();
         isOpen = true; 
         
         SetActiveIfAssigned(startGameWindowRoot, true);
@@ -36,19 +39,9 @@ public class PauseMenu : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            WinScreen win = null;
-            if (winScreenRoot != null)
+            if (winScreen != null && winScreen.HasWon)
             {
-                win = winScreenRoot.GetComponent<WinScreen>();
-            }
-            if (win == null)
-            {
-                win = FindObjectOfType<WinScreen>();
-            }
-
-            if (win != null && win.HasWon)
-            {
-                win.ShowWinScreen();
+                winScreen.ShowWinScreen();
                 return;
             }
 
@@ -65,12 +58,10 @@ public class PauseMenu : MonoBehaviour
     {
         isOpen = false;
         SetActiveIfAssigned(menuRoot, false);
-        //SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
         
-        // Ensure HUD CanvasGroup is fully visible
         if (hudWindowRoot != null)
         {
             CanvasGroup hudCanvasGroup = hudWindowRoot.GetComponent<CanvasGroup>();
@@ -83,7 +74,7 @@ public class PauseMenu : MonoBehaviour
         }
         
         CloseAllPanels();
-        Time.timeScale = 1f;
+        timeScaleManager.Resume();
     }
 
     public void ContinueAndOpenQuitPopup()
@@ -114,14 +105,11 @@ public class PauseMenu : MonoBehaviour
         {
             SetMenu(true);
         }
-
-        //SetPanelVisible(quitPopupRoot, true);
     }
-    
 
     public void QuitGame()
     {
-        Time.timeScale = 1f;
+        timeScaleManager.Resume();
         Application.Quit();
     }
 
@@ -162,7 +150,6 @@ public class PauseMenu : MonoBehaviour
             SetMenu(true);
         }
 
-       // SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
         SetPanelVisible(otherPanelRoot, true);
@@ -184,7 +171,7 @@ public class PauseMenu : MonoBehaviour
         
         isOpen = false;
         SetActiveIfAssigned(hudWindowRoot, true);
-        Time.timeScale = 1f; 
+        timeScaleManager.Resume();
     }
 
     public void OpenStoryWindow()
@@ -216,9 +203,12 @@ public class PauseMenu : MonoBehaviour
         if (!open)
         {
             CloseAllPanels();
-            //SetPanelVisible(quitPopupRoot, false);
         }
-        Time.timeScale = open ? 0f : 1f; // pause
+        
+        if (open)
+            timeScaleManager.Pause();
+        else
+            timeScaleManager.Resume();
     }
 
     private bool IsEndScreenActive()
@@ -236,12 +226,10 @@ public class PauseMenu : MonoBehaviour
         }
 
         CloseAllPanels();
-        //SetPanelVisible(quitPopupRoot, false);
         SetActiveIfAssigned(winScreenRoot, false);
         SetActiveIfAssigned(deathScreenRoot, false);
-        SetActiveIfAssigned(hudWindowRoot, false); // Hide HUD when opening a panel
+        SetActiveIfAssigned(hudWindowRoot, false);
         SetPanelVisible(panelRoot, true);
-        
     }
 
     private void CloseAllPanels()
@@ -292,6 +280,5 @@ public class PauseMenu : MonoBehaviour
             target.SetActive(isActive);
         }
     }
-    
-    
 }
+

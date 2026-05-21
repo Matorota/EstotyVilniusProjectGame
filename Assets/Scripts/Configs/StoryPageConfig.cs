@@ -3,7 +3,7 @@
 namespace Configs
 {
     [CreateAssetMenu(fileName = "StoryConfig", menuName = "Configs/StoryConfig")]
-    public class StoryConfig : ScriptableObject
+    public class StoryPageConfig : ScriptableObject
     {
         [SerializeField] private string title;
         [TextArea(3,10)]

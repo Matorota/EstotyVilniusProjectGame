@@ -1,6 +1,7 @@
 using System;
 using Characters.Player.Inventory;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardInventoryUi : MonoBehaviour
 {
@@ -8,46 +9,27 @@ public class CardInventoryUi : MonoBehaviour
     [SerializeField] private SelectedCardsManager selectedCardsManager;
     [SerializeField] private Transform cardsContainer;
     [SerializeField] private CardWidget cardPrefab;
-
-    private void Awake()
-    {
-        inventory ??= FindObjectOfType<CardInventory>();
-        selectedCardsManager ??= FindObjectOfType<SelectedCardsManager>();
-        cardsContainer ??= transform;
-    }
+    [SerializeField] private Button openQuestButton;
+    [SerializeField] private MenuController menuController;
 
     private void OnEnable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged += Refresh;
-        }
+        openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
+        inventory.OnInventoryChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged -= Refresh;
-        }
+        openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
+        inventory.OnInventoryChanged -= Refresh;
     }
 
     private void Refresh()
     {
-        if (cardsContainer == null)
-        {
-            return;
-        }
-
         for (int i = cardsContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(cardsContainer.GetChild(i).gameObject);
-        }
-
-        if (inventory == null || cardPrefab == null)
-        {
-            return;
         }
 
         foreach (CardModel model in inventory.GetUnequippedCards())
@@ -60,11 +42,14 @@ public class CardInventoryUi : MonoBehaviour
 
     private void HandleCardClick(CardModel model)
     {
-        if (selectedCardsManager == null || model == null)
-        {
-            return;
-        }
-
         selectedCardsManager.TryEquip(model);
     }
+    
+
+    private void HandleOpenQuestButtonClicked()
+    {
+        menuController.OpenAdditionalPanel();
+        gameObject.SetActive(false);
+    }
 }
+

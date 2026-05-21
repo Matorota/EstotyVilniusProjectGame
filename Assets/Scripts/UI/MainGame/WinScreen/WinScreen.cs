@@ -8,7 +8,7 @@ public class WinScreen : MonoBehaviour
     [SerializeField] private GameObject winScreenRoot;
     [SerializeField] private GameObject hudWindowRoot;
     [SerializeField] private bool pauseGameOnWin = true;
-    [SerializeField] private PauseMenu pauseMenu;
+    [SerializeField] private MenuController menuController;
     [SerializeField] private EndQuestButtonManager endQuestButtonManager;
 
     private IDamageable playerHealth;
@@ -168,9 +168,9 @@ public class WinScreen : MonoBehaviour
 
     public void OnContinueButtonPressed()
     {
-        if (pauseMenu != null)
+        if (menuController != null)
         {
-            pauseMenu.Resume();
+            menuController.Resume();
         }
         
         if (endQuestButtonManager != null)

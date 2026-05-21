@@ -4,9 +4,9 @@ using UnityEngine.UI;
 public class EndQuestButtonManager : MonoBehaviour
 {
    [SerializeField] private Button endQuestButton;
-   [SerializeField] private GameObject winScreenRoot;
-   [SerializeField] private GameObject hudWindowRoot;
-   [SerializeField] private PauseMenu pauseMenu;
+    private GameObject winScreenRoot; 
+    private GameObject hudWindowRoot; 
+    private MenuController pauseMenu;
 
    private void Start()
    {
