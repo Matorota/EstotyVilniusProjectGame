@@ -6,46 +6,25 @@ public class SelectedAbilitiesUi : MonoBehaviour
     [SerializeField] private SelectedCardsManager manager;
     [SerializeField] private Button[] abilityButtons;
 
-    private void Awake()
-    {
-        manager ??= FindObjectOfType<SelectedCardsManager>();
-    }
-
     private void OnEnable()
     {
-        if (manager != null)
-        {
-            manager.OnSelectedChanged += Refresh;
-        }
-
+        manager.OnSelectedChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
-        if (manager != null)
-        {
-            manager.OnSelectedChanged -= Refresh;
-        }
+        manager.OnSelectedChanged -= Refresh;
     }
 
     public void Refresh()
     {
-        if (manager == null || abilityButtons == null)
-        {
-            return;
-        }
-
         var selected = manager.GetSelectedCards();
 
         for (int i = 0; i < abilityButtons.Length; i++)
         {
             Button button = abilityButtons[i];
-            if (button == null)
-            {
-                continue;
-            }
-
+            
             if (i >= selected.Count)
             {
                 button.gameObject.SetActive(false);

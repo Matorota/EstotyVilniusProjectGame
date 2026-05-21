@@ -1,6 +1,7 @@
 using System;
 using Characters.Player.Inventory;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardInventoryUi : MonoBehaviour
 {
@@ -8,46 +9,36 @@ public class CardInventoryUi : MonoBehaviour
     [SerializeField] private SelectedCardsManager selectedCardsManager;
     [SerializeField] private Transform cardsContainer;
     [SerializeField] private CardWidget cardPrefab;
-
-    private void Awake()
-    {
-        inventory ??= FindObjectOfType<CardInventory>();
-        selectedCardsManager ??= FindObjectOfType<SelectedCardsManager>();
-        cardsContainer ??= transform;
-    }
+    [SerializeField] private Button openQuestButton;
+    [SerializeField] private Button reOpenQuestButton;
+    [SerializeField] private GameUIController gameUIController;
+    [SerializeField] private GameObject hudWindowRoot;
+    [SerializeField] private GameObject objectToShowWhenWon;
 
     private void OnEnable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged += Refresh;
-        }
+        if (openQuestButton != null)
+            openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
+        if (reOpenQuestButton != null)
+            reOpenQuestButton.onClick.AddListener(HandleReOpenQuestButtonClicked);
+        inventory.OnInventoryChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
-        if (inventory != null)
-        {
-            inventory.OnInventoryChanged -= Refresh;
-        }
+        if (openQuestButton != null)
+            openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
+        if (reOpenQuestButton != null)
+            reOpenQuestButton.onClick.RemoveListener(HandleReOpenQuestButtonClicked);
+        inventory.OnInventoryChanged -= Refresh;
     }
 
     private void Refresh()
     {
-        if (cardsContainer == null)
-        {
-            return;
-        }
-
         for (int i = cardsContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(cardsContainer.GetChild(i).gameObject);
-        }
-
-        if (inventory == null || cardPrefab == null)
-        {
-            return;
         }
 
         foreach (CardModel model in inventory.GetUnequippedCards())
@@ -60,11 +51,26 @@ public class CardInventoryUi : MonoBehaviour
 
     private void HandleCardClick(CardModel model)
     {
-        if (selectedCardsManager == null || model == null)
-        {
-            return;
-        }
-
         selectedCardsManager.TryEquip(model);
     }
+    
+
+    private void HandleOpenQuestButtonClicked()
+    {
+        gameUIController.OpenAdditionalPanel();
+        gameObject.SetActive(false);
+    }
+    
+    private void HandleReOpenQuestButtonClicked()
+    {
+        gameUIController.Resume();
+        
+        if (gameUIController.HasWon && objectToShowWhenWon != null)
+        {
+            objectToShowWhenWon.SetActive(true);
+        }
+        
+        gameObject.SetActive(false);
+    }
 }
+

@@ -9,11 +9,11 @@ namespace Configs
         [SerializeField] private string name;
         [SerializeField] private string description;
         [SerializeField] private Sprite image;
-        [SerializeField] private string targetSceneName;
+        [SerializeField] private int enemiesAmount = 5;
 
         public string Name => name;
         public string Description => description;
         public Sprite Image => image;
-        public string TargetSceneName => targetSceneName;
+        public int EnemiesAmount => enemiesAmount;
     }
 }
