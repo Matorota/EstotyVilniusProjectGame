@@ -1,4 +1,4 @@
-﻿﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -33,7 +33,7 @@ public class GameUIController : MonoBehaviour
     private bool changedTimeScaleOnDeath;
     
     private bool winScreenShown;
-    public bool HasWon { get; private set; }
+    public bool HasWon { get; private set; } // il change
     private bool changedTimeScaleOnWin;
     
     private Health[] enemyHealthSources = new Health[0];
@@ -67,17 +67,13 @@ public class GameUIController : MonoBehaviour
 
     private void InitializeScreens()
     {
-        if (playerHealth == null) return;
-
         playerHealth.OnHealthChanged += OnPlayerHealthChanged;
         playerHealth.OnDeath += ShowDeathScreen;
         
         InitializeEnemies();
         refreshEnemiesCoroutine = StartCoroutine(RefreshEnemiesPeriodically());
     }
-
-    private void OnEnable() { }
-
+    
     private void OnDisable()
     {
         RestoreAllTimeScales();
@@ -87,11 +83,10 @@ public class GameUIController : MonoBehaviour
         }
         UnsubscribeFromDeaths();
         
-        if (playerHealth != null)
-        {
+
             playerHealth.OnHealthChanged -= OnPlayerHealthChanged;
             playerHealth.OnDeath -= ShowDeathScreen;
-        }
+        
     }
 
     private void Update()
@@ -121,8 +116,7 @@ public class GameUIController : MonoBehaviour
         SetActiveIfAssigned(deathScreenRoot, false);
         SetActiveIfAssigned(hudWindowRoot, true);
 
-        if (hudWindowRoot != null)
-        {
+
             CanvasGroup hudCanvasGroup = hudWindowRoot.GetComponent<CanvasGroup>();
             if (hudCanvasGroup != null)
             {
@@ -130,7 +124,7 @@ public class GameUIController : MonoBehaviour
                 hudCanvasGroup.interactable = true;
                 hudCanvasGroup.blocksRaycasts = true;
             }
-        }
+        
 
         CloseAllPanels();
         timeScaleManager.Resume();
