@@ -22390,7 +22390,7 @@ Transform:
   m_GameObject: {fileID: 1227685221}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 1, z: 10}
+  m_LocalPosition: {x: 10, y: 1.6, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39026,7 +39026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3043732931553685641, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: enemySpawner
@@ -40125,9 +40125,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 556049621}
     - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
+      propertyPath: respawnLocationCube
+      value: 
+      objectReference: {fileID: 1227685225}
+    - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
       propertyPath: startGameWindowRoot
       value: 
       objectReference: {fileID: 874278285}
+    - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
+      propertyPath: selectedCardsManager
+      value: 
+      objectReference: {fileID: 1938720480}
     - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
       propertyPath: inventoryFromQuildSide
       value: 

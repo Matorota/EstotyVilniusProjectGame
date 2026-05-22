@@ -1,11 +1,9 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Collections;
-using System.Collections.Generic;
 
-public class GameUIController : MonoBehaviour
+public class GameUIController : MonoBehaviour  // This part of the code need a lot of refactoring
 {
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject inventoryWindow;
@@ -19,13 +17,14 @@ public class GameUIController : MonoBehaviour
     [SerializeField] private GameObject deathWindow;
 
     [SerializeField] private CharacterMovements mainCharacter;
+    [SerializeField] private Transform respawnLocationCube;
+    [SerializeField] private RespawnPlayer respawnPlayer;
     [SerializeField] private TimeScaleManager timeScaleManager;
     [SerializeField] private QuestUiHolder questUiHolder;
 
     [SerializeField] private bool pauseGameOnDeath = true;
     [SerializeField] private bool pauseGameOnWin = true;
     [SerializeField] private float enemyRefreshInterval = 0.5f;
-    [SerializeField] private string endQuestSceneName = "MainMenu";
 
     private bool isOpen;
     private IDamageable playerHealth;
@@ -163,16 +162,31 @@ public class GameUIController : MonoBehaviour
     {
         Application.Quit();
     }
-
+    
     public void RestartCurrentLevel()
     {
+        if (respawnPlayer == null)
+        {
+            Debug.LogError("Respawn player is not assigned.");
+            return;
+        }
+
+        if (!respawnPlayer.RespawnMainCharacter(mainCharacter, respawnLocationCube))
+            return;
+
         Time.timeScale = 1f;
         deathScreenShown = false;
         winScreenShown = false;
         HasWon = false;
         changedTimeScaleOnDeath = false;
         changedTimeScaleOnWin = false;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        SetPanelVisible(deathWindow, false);
+        SetPanelVisible(winWindow, false);
+        SetPanelVisible(hudWindow, true);
+        isOpen = false;
+        CloseAllPanels();
+        timeScaleManager.Resume();
     }
 
     public void OpenCardsPanel() => OpenPanel(inventoryWindow);
@@ -281,19 +295,28 @@ public class GameUIController : MonoBehaviour
             }
         }
 
-        CardPickup[] cards = FindObjectsOfType<CardPickup>(); // need it for now for card destroy (cant think of another way)
-        for (int i = 0; i < cards.Length; i++)
+        // Destroy all CardPickup instances in the active scene except the main character
+        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype
+        var cardsList = new System.Collections.Generic.List<CardPickup>();
+        for (int r = 0; r < roots.Length; r++)
         {
-            if (cards[i] != null && cards[i].gameObject != mainCharacter.gameObject)
+            var found = roots[r].GetComponentsInChildren<CardPickup>(true);
+            for (int j = 0; j < found.Length; j++)
+                cardsList.Add(found[j]);
+        }
+
+        for (int i = 0; i < cardsList.Count; i++)
+        {
+            var cp = cardsList[i];
+            if (cp != null && cp.gameObject != mainCharacter?.gameObject)
             {
-                Destroy(cards[i].gameObject);
+                Destroy(cp.gameObject);
             }
         }
 
-        if (currentQuest != null && questUiHolder != null)
-        {
-            questUiHolder.RemoveQuest(currentQuest);
-        }
+        // Delegate quest removal to QuestFinnishState
+        var finishState = new UI.QuestRemoval(questUiHolder);
+        finishState.FinishQuest(currentQuest);
 
         OpenBuildUI();
     }
@@ -327,12 +350,17 @@ public class GameUIController : MonoBehaviour
 
     private Health[] FindAllEnemies()
     {
-        var allHealth = FindObjectsOfType<Health>();
-        var enemies = new List<Health>(allHealth.Length);
-        foreach (var h in allHealth)
+        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype 
+        var enemies = new System.Collections.Generic.List<Health>();
+        for (int r = 0; r < roots.Length; r++)
         {
-            if (h != null && h.Team == Team.Enemy)
-                enemies.Add(h);
+            var found = roots[r].GetComponentsInChildren<Health>(true);
+            for (int i = 0; i < found.Length; i++)
+            {
+                var h = found[i];
+                if (h != null && h.Team == Team.Enemy)
+                    enemies.Add(h);
+            }
         }
 
         return enemies.ToArray();
