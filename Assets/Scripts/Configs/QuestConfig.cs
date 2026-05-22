@@ -10,10 +10,13 @@ namespace Configs
         [SerializeField] private string description;
         [SerializeField] private Sprite image;
         [SerializeField] private int enemiesAmount = 5;
+        [SerializeField] private string isCompletedText = "Completed!";
+        
 
         public string Name => name;
         public string Description => description;
         public Sprite Image => image;
         public int EnemiesAmount => enemiesAmount;
+
     }
 }

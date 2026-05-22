@@ -42,6 +42,14 @@ public class CharacterMotor : MonoBehaviour
         facingTarget = target;
     }
 
+    public void ResetMotion()
+    {
+        smoothedHorizontalVelocity = Vector3.zero;
+        horizontalVelocitySmoothing = Vector3.zero;
+        verticalVelocity = 0f;
+        facingTarget = null;
+    }
+
     public void Tick(Vector3 moveDirection)
     {
         float dt = Time.deltaTime;

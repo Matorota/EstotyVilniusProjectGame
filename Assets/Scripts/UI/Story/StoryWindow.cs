@@ -7,169 +7,106 @@ using UnityEngine.UI;
 public class StoryWindow : MonoBehaviour
 {
     [SerializeField] private List<StoryPageConfig> storyPages = new();
+    
+    [SerializeField] private GameUIController gameUIController;
+    
     [SerializeField] private Button nextStoryButton;
     [SerializeField] private Button previousStoryButton;
-    [SerializeField] private Button playStoryButton;
-    [SerializeField] private GameUIController gameUIController;
-    [SerializeField] private int startIndex;
 
     [SerializeField] private TMP_Text titleText;
     [SerializeField] private TMP_Text speakerText;
     [SerializeField] private TMP_Text bodyText;
-    [SerializeField] private Image artworkImage;
-    private int currentIndex = -1;
+
+    [SerializeField] private TMP_Text nextButtonText;
+    
+    [SerializeField] private Image storyImage;
+    
+    private int currentIndex;
 
     private void OnEnable()
     {
-        AttachButtonHandlers();
-        storyPages.RemoveAll(page => page == null);
-        EnsureBindings();
-        
-        if (currentIndex == -1)
-        {
-            currentIndex = Mathf.Clamp(startIndex, 0, Mathf.Max(0, storyPages.Count - 1));
-        }
-        else
-        {
-            currentIndex = Mathf.Clamp(currentIndex, 0, Mathf.Max(0, storyPages.Count - 1));
-        }
-        
+        nextStoryButton.onClick.AddListener(HandleNextButtonClicked);
+        previousStoryButton.onClick.AddListener(HandlePreviousButtonClicked);
+
         ShowCurrentPage();
     }
 
     private void OnDisable()
     {
-        DetachButtonHandlers();
+        nextStoryButton.onClick.RemoveListener(HandleNextButtonClicked); 
+        previousStoryButton.onClick.RemoveListener(HandlePreviousButtonClicked); 
     }
-
-    private void EnsureBindings()
-    {
-        TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
-        
-        titleText = FindTextByName(texts, "title", "name") ?? (texts.Length > 0 ? texts[0] : null);
-        speakerText = FindTextByName(texts, "speaker", "who", "name");
-        bodyText = FindTextByName(texts, "body", "description", "desc") ?? (texts.Length > 1 ? texts[1] : null);
-        
-        Image[] images = GetComponentsInChildren<Image>(true);
-        artworkImage = (images.Length > 0) ? images[0] : null;
-    }
-
-    private TMP_Text FindTextByName(TMP_Text[] texts, params string[] names)
-    {
-        foreach (TMP_Text text in texts)
-        {
-            foreach (string name in names)
-            {
-                if (text.gameObject.name.Contains(name, System.StringComparison.OrdinalIgnoreCase))
-                {
-                    return text;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void SetupPage(StoryPageConfig storyPage)
-    {
-        EnsureBindings();
-
-        if (titleText != null) titleText.text = storyPage?.Title ?? string.Empty;
-        if (speakerText != null) speakerText.text = storyPage?.Speaker ?? string.Empty;
-        if (bodyText != null) bodyText.text = storyPage?.Body ?? string.Empty;
-        if (artworkImage != null) artworkImage.sprite = storyPage?.Image;
-    }
-
+    
     private void ShowCurrentPage()
     {
         currentIndex = Mathf.Clamp(currentIndex, 0, storyPages.Count - 1);
+        StoryPageConfig storyPage = storyPages[currentIndex];
         
-        if (storyPages.Count > 0)
-        {
-            SetupPage(storyPages[currentIndex]);
-        }
+        titleText.text = storyPage.Title;
+        speakerText.text = storyPage.Speaker;
+        bodyText.text = storyPage.Body;
+        storyImage.sprite = storyPage.Sprite;
         
-        UpdateButtonStates();
+        RefreshButtons();
     }
 
-    public void Next()
+    private void RefreshButtons()
     {
-        if (!HasNext()) 
+        previousStoryButton.gameObject.SetActive(IsFirstPage() == false);
+        nextStoryButton.gameObject.SetActive(HasNextPage() || IsLastPage());
+        
+        nextButtonText.text = IsLastPage() ? "Play" : "Next";
+    }
+
+    private void GoToNextPage()
+    {
+        if (!HasNextPage()) 
             return;
         
         currentIndex++;
         ShowCurrentPage();
     }
 
-    public void Previous()
+    private void GoToPreviousPage()
     {
-        if (storyPages.Count == 0)
-        {
-            UpdateButtonStates();
+        if (IsFirstPage())
             return;
-        }
 
-        currentIndex = Mathf.Max(0, currentIndex - 1);
+        currentIndex--;
         ShowCurrentPage();
     }
 
-    public void PlayStory()
+    private void HandleNextButtonClicked()
     {
-        gameUIController.OpenAdditionalPanel();
-        gameObject.SetActive(false);
+        if (IsLastPage())
+        {
+            gameUIController.OpenAdditionalPanel();
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            GoToNextPage();
+        }
     }
 
-    public void UpdateButtonStates()
+    private void HandlePreviousButtonClicked()
     {
-        bool hasNext = HasNext();
-
-        nextStoryButton.gameObject.SetActive(true);
-        nextStoryButton.interactable = hasNext;
-        
-        previousStoryButton.gameObject.SetActive(true);
-        previousStoryButton.interactable = HasPrevious();
-        
-        playStoryButton.gameObject.SetActive(true);
-        bool playInteractable = !hasNext;
-        playStoryButton.interactable = playInteractable;
+        GoToPreviousPage();
     }
 
-    public void OnNextButtonClicked()
+    private bool HasNextPage()
     {
-        Next();
-        UpdateButtonStates();
+        return currentIndex < storyPages.Count - 1;
+    }
+    
+    private bool IsFirstPage()
+    {
+        return currentIndex == 0;
     }
 
-    public void OnPreviousButtonClicked()
+    private bool IsLastPage()
     {
-        Previous();
-        UpdateButtonStates();
-    }
-
-    public void OnPlayButtonClicked()
-    {
-        PlayStory();
-    }
-
-    public bool HasNext() => currentIndex < storyPages.Count - 1;
-    public bool HasPrevious() => currentIndex > 0;
-
-    private void AttachButtonHandlers()
-    {
-        nextStoryButton.onClick.RemoveListener(OnNextButtonClicked);
-        nextStoryButton.onClick.AddListener(OnNextButtonClicked);
-        
-        previousStoryButton.onClick.RemoveListener(OnPreviousButtonClicked);
-        previousStoryButton.onClick.AddListener(OnPreviousButtonClicked);
-        
-        playStoryButton.onClick.RemoveListener(OnPlayButtonClicked);
-        playStoryButton.onClick.AddListener(OnPlayButtonClicked);
-    }
-
-    private void DetachButtonHandlers()
-    {
-        nextStoryButton.onClick.RemoveListener(OnNextButtonClicked); 
-        previousStoryButton.onClick.RemoveListener(OnPreviousButtonClicked); 
-        playStoryButton.onClick.RemoveListener(OnPlayButtonClicked);
+        return currentIndex == storyPages.Count - 1;
     }
 }
 

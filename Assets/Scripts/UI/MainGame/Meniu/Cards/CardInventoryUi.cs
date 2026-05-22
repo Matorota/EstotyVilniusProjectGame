@@ -63,13 +63,8 @@ public class CardInventoryUi : MonoBehaviour
     
     private void HandleReOpenQuestButtonClicked()
     {
+        gameUIController.CloseAdditionalPanel();
         gameUIController.Resume();
-        
-        if (gameUIController.HasWon && objectToShowWhenWon != null)
-        {
-            objectToShowWhenWon.SetActive(true);
-        }
-        
         gameObject.SetActive(false);
     }
 }

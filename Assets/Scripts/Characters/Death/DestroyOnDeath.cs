@@ -4,10 +4,12 @@ using UnityEngine;
 public class DestroyOnDeath : MonoBehaviour
 {
     private IDamageable health;
+    private Health healthComponent;
 
     private void Awake()
     {
         health = GetComponent<IDamageable>();
+        healthComponent = GetComponent<Health>();
         if (health == null)
         {
             enabled = false;
@@ -32,6 +34,11 @@ public class DestroyOnDeath : MonoBehaviour
 
     private void HandleDeath()
     {
+        if (healthComponent != null && healthComponent.Team == Team.Player)
+        {
+            return;
+        }
+
         Destroy(gameObject);
     }
 }

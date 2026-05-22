@@ -33,13 +33,15 @@ namespace Widgets
 
         private void RegisterExistingEnemies()
         {
-            var all = FindObjectsOfType<Health>();
-            for (int i = 0; i < all.Length; i++)
+            var roots = gameObject.scene.GetRootGameObjects();  // cannot think of another way how to do it without findobjectbytype
+            for (int r = 0; r < roots.Length; r++)
             {
-                var h = all[i];
-                if (h != null && h.Team == Team.Enemy)
+                var found = roots[r].GetComponentsInChildren<Health>(true);
+                for (int i = 0; i < found.Length; i++)
                 {
-                    RegisterEnemy(h);
+                    var h = found[i];
+                    if (h != null && h.Team == Team.Enemy)
+                        RegisterEnemy(h);
                 }
             }
         }
@@ -114,11 +116,11 @@ namespace Widgets
                 }
                 else
                 {
-                    CanvasGroup cg = sliderGO.GetComponent<CanvasGroup>();
-                    if (cg == null) cg = sliderGO.AddComponent<CanvasGroup>();
-                    cg.alpha = shouldShow ? 1f : 0f;
-                    cg.interactable = shouldShow;
-                    cg.blocksRaycasts = shouldShow;
+                    CanvasGroup component = sliderGO.GetComponent<CanvasGroup>();
+                    if (component == null) component = sliderGO.AddComponent<CanvasGroup>();
+                    component.alpha = shouldShow ? 1f : 0f;
+                    component.interactable = shouldShow;
+                    component.blocksRaycasts = shouldShow;
                 }
             }
 

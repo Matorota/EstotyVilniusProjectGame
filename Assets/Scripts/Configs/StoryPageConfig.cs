@@ -8,12 +8,12 @@ namespace Configs
         [SerializeField] private string title;
         [TextArea(3,10)]
         [SerializeField] private string body;
-        [SerializeField] private Sprite image;
+        [SerializeField] private Sprite sprite;
         [SerializeField] private string speaker;
 
         public string Title => title;
         public string Body => body;
-        public Sprite Image => image;
+        public Sprite Sprite => sprite;
         public string Speaker => speaker;
     }
 }
