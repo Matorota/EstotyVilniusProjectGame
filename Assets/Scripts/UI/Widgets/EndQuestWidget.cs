@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace UI.Windows
 {
-    public class EndQuestOption : MonoBehaviour
+    public class EndQuestWidget : MonoBehaviour
     {
         [SerializeField] private GameUIController gameUIController;
         [SerializeField] private Button endGameButton;

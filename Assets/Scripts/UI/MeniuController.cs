@@ -248,6 +248,20 @@ public class GameUIController : MonoBehaviour
 
     public void OnEndQuestButtonPressed()
     {
+        // Reset main character health to max if possible
+        Health healthComp = playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
+        if (healthComp != null)
+        {
+            float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
+            if (missing > 0f)
+            {
+                healthComp.Heal(missing);
+            }
+        }
+
+        // Remove all spawned card pickups from the world
+        CardDropManager.ClearAll();
+
         if (!string.IsNullOrEmpty(endQuestSceneName))
             SceneManager.LoadScene(endQuestSceneName);
     }

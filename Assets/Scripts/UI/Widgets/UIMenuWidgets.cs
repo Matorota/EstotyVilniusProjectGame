@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIMenuWindow : MonoBehaviour
+public class UIMenuWidgets : MonoBehaviour
 {
     [SerializeField] private GameUIController gameUIController;
     [SerializeField] private Button backButton;
