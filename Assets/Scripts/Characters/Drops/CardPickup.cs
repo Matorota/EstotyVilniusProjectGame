@@ -24,13 +24,6 @@ public class CardPickup : MonoBehaviour
         worldIconRawImage ??= GetComponentInChildren<RawImage>(true);
         widgets = GetComponentsInChildren<CardWidget>(true);
         ApplyConfigToVisuals();
-
-        CardDropManager.Register(this);
-    }
-
-    private void OnDestroy()
-    {
-        CardDropManager.Unregister(this);
     }
 
     private void OnTriggerEnter(Collider other)

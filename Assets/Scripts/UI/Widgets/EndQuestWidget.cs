@@ -31,7 +31,7 @@ namespace UI.Windows
 
             if (gameUIController != null)
             {
-                gameUIController.OpenAdditionalPanel();
+                gameUIController.OnEndQuestButtonPressed();
             }
         }
     

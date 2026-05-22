@@ -40,8 +40,18 @@ public class QuestUiHolder : MonoBehaviour
         }
     }
 
+    public void RemoveQuest(QuestConfig quest)
+    {
+        if (availableQuests.Contains(quest))
+        {
+            availableQuests.Remove(quest);
+            Refresh();
+        }
+    }
+
     private void HandleQuestClicked(QuestConfig quest)
     {
+        gameUIController.OnQuestStarted(quest);
         gameUIController.Resume();
         enemySpawner.SpawnEnemies(quest.EnemiesAmount);
         levelProgressWidget.Setup(quest);

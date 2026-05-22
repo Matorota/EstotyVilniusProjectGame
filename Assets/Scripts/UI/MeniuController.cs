@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -20,6 +20,7 @@ public class GameUIController : MonoBehaviour
 
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private TimeScaleManager timeScaleManager;
+    [SerializeField] private QuestUiHolder questUiHolder;
 
     [SerializeField] private bool pauseGameOnDeath = true;
     [SerializeField] private bool pauseGameOnWin = true;
@@ -28,6 +29,7 @@ public class GameUIController : MonoBehaviour
 
     private bool isOpen;
     private IDamageable playerHealth;
+    private Configs.QuestConfig currentQuest;
 
     private bool deathScreenShown;
     private bool changedTimeScaleOnDeath;
@@ -41,11 +43,13 @@ public class GameUIController : MonoBehaviour
     private int aliveEnemyCount;
     private Coroutine refreshEnemiesCoroutine;
 
+    private bool isFirstLoad = true;
+
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
 
-        SetActiveIfAssigned(startGameWindow, true);
+        SetActiveIfAssigned(startGameWindow, isFirstLoad);
         SetActiveIfAssigned(hudWindow, false);
         SetActiveIfAssigned(menuRoot, false);
         SetActiveIfAssigned(inventoryWindow, false);
@@ -60,8 +64,20 @@ public class GameUIController : MonoBehaviour
     private void Start()
     {
         InitializeScreens();
-        timeScaleManager.Pause();
-        isOpen = true;
+        
+        if (isFirstLoad)
+        {
+            timeScaleManager.Pause();
+            isOpen = true;
+            isFirstLoad = false;
+        }
+        else
+        {
+            SetActiveIfAssigned(startGameWindow, false);
+            SetActiveIfAssigned(hudWindow, true);
+            timeScaleManager.Resume();
+            isOpen = false;
+        }
     }
 
     private void InitializeScreens()
@@ -151,6 +167,11 @@ public class GameUIController : MonoBehaviour
     public void RestartCurrentLevel()
     {
         Time.timeScale = 1f;
+        deathScreenShown = false;
+        winScreenShown = false;
+        HasWon = false;
+        changedTimeScaleOnDeath = false;
+        changedTimeScaleOnWin = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
@@ -161,6 +182,8 @@ public class GameUIController : MonoBehaviour
     public void OpenAdditionalPanel() => OpenPanel(quildWindow);
 
     public void CloseAdditionalPanel() => SetPanelVisible(quildWindow, false);
+
+    public void OpenBuildUI() => OpenPanel(quildWindow);
 
     public void OpenBacktoquildPanel() => OpenPanel(inventoryFromQuildSide);
 
@@ -248,7 +271,6 @@ public class GameUIController : MonoBehaviour
 
     public void OnEndQuestButtonPressed()
     {
-        // Reset main character health to max if possible
         Health healthComp = playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
         if (healthComp != null)
         {
@@ -259,11 +281,21 @@ public class GameUIController : MonoBehaviour
             }
         }
 
-        // Remove all spawned card pickups from the world
-        CardDropManager.ClearAll();
+        CardPickup[] cards = FindObjectsOfType<CardPickup>(); // need it for now for card destroy (cant think of another way)
+        for (int i = 0; i < cards.Length; i++)
+        {
+            if (cards[i] != null && cards[i].gameObject != mainCharacter.gameObject)
+            {
+                Destroy(cards[i].gameObject);
+            }
+        }
 
-        if (!string.IsNullOrEmpty(endQuestSceneName))
-            SceneManager.LoadScene(endQuestSceneName);
+        if (currentQuest != null && questUiHolder != null)
+        {
+            questUiHolder.RemoveQuest(currentQuest);
+        }
+
+        OpenBuildUI();
     }
 
     private void TryShowWinScreen()
@@ -273,6 +305,15 @@ public class GameUIController : MonoBehaviour
             return;
 
         ShowWinScreen();
+    }
+
+    public void OnQuestStarted(Configs.QuestConfig quest)
+    {
+        currentQuest = quest;
+        winScreenShown = false;
+        HasWon = false;
+        UnsubscribeFromDeaths();
+        InitializeEnemies();
     }
 
     private void InitializeEnemies()
@@ -451,4 +492,3 @@ public class GameUIController : MonoBehaviour
         }
     }
 }
-
