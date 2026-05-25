@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InventoryUIMenuWindow : MonoBehaviour
+public class InventoryWindow : MonoBehaviour
 {
     [SerializeField] private GameUIController gameUIController;
     [SerializeField] private Button menuButton;

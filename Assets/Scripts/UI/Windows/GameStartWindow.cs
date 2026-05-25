@@ -5,9 +5,9 @@ namespace UI.Windows
 {
     public class GameStartWindow : MonoBehaviour
     {
-        [SerializeField] private GameUIController gameUIController;
         [SerializeField] private Button startGameButton;
-
+        [SerializeField] private GameObject storyWindow;
+        
         private void OnEnable()
         {
             startGameButton.onClick.AddListener(HandleStartButtonClicked);
@@ -20,7 +20,7 @@ namespace UI.Windows
         
         private void HandleStartButtonClicked()
         {
-            gameUIController.OpenStoryWindow();
+            storyWindow.SetActive(true);
             gameObject.SetActive(false);
         }
     }

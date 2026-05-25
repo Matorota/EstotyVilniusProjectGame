@@ -4,20 +4,20 @@ namespace UI
 {
     public class QuestRemoval
     {
-        private QuestUiHolder questUiHolder;
+        private GuildWindow _guildWindow;
 
-        public QuestRemoval(QuestUiHolder questUiHolder)
+        public QuestRemoval(GuildWindow guildWindow)
         {
-            this.questUiHolder = questUiHolder;
+            this._guildWindow = guildWindow;
         }
 
         public void FinishQuest(QuestConfig quest)
         {
             if (quest == null) return;
 
-            if (questUiHolder != null)
+            if (_guildWindow != null)
             {
-                questUiHolder.RemoveQuest(quest);
+                _guildWindow.RemoveQuest(quest);
             }
         }
     }

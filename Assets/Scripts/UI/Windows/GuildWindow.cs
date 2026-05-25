@@ -1,22 +1,27 @@
 ﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class QuestUiHolder : MonoBehaviour
+public class GuildWindow : MonoBehaviour
 {
     [SerializeField] private Transform questsContainer;
     [SerializeField] private QuestWidget questPrefab;
     [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
+    [FormerlySerializedAs("menuController")]
+    [SerializeField] private GameUIController gameUIController;
+    
+    [SerializeField] private TimeScale timeScale;
     
     private void OnEnable()
     {
         openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
         Refresh();
+
     }
 
     public void Refresh()
@@ -53,6 +58,7 @@ public class QuestUiHolder : MonoBehaviour
     {
         gameUIController.OnQuestStarted(quest);
         gameUIController.Resume();
+        
         enemySpawner.SpawnEnemies(quest.EnemiesAmount);
         levelProgressWidget.Setup(quest);
     }
@@ -68,4 +74,3 @@ public class QuestUiHolder : MonoBehaviour
         gameObject.SetActive(false);
     }
 }
-

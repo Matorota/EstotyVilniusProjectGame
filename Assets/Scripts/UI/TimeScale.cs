@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TimeScaleManager : MonoBehaviour
+public class TimeScale : MonoBehaviour
 {
     public void SetTimeScale(float timeScale)
     {

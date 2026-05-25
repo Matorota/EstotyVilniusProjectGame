@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 336586589113287538}
   - component: {fileID: 3703078745422704340}
   m_Layer: 5
-  m_Name: QuildWindow
+  m_Name: GuildWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -389,6 +389,10 @@ MonoBehaviour:
   availableQuests:
   - {fileID: 11400000, guid: aeaf36a5d1ae493478b7097b95c0bad0, type: 2}
   - {fileID: 11400000, guid: 07d912d07ce6e27428423345834f81b3, type: 2}
+  gameUIController: {fileID: 0}
+  enemySpawner: {fileID: 0}
+  levelProgressWidget: {fileID: 0}
+  openQuestButton: {fileID: 0}
 --- !u!1 &3164271649711072554
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,7 +521,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3978089933335300830
 RectTransform:
   m_ObjectHideFlags: 0

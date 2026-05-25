@@ -88,11 +88,11 @@ public class SelectedCardsManager : MonoBehaviour
         stats.ApplyCardEffect(model.config);
         if (isActiveAndEnabled)
         {
-            StartCoroutine(ActivateForDuration(model, model.config.Duration));
+            StartCoroutine(ActivateForDuration(model));
         }
         else if (stats.isActiveAndEnabled)
         {
-            stats.StartCoroutine(ActivateForDuration(model, model.config.Duration));
+            stats.StartCoroutine(ActivateForDuration(model));
         }
         else
         {
@@ -103,11 +103,13 @@ public class SelectedCardsManager : MonoBehaviour
         return true;
     }
 
-    private System.Collections.IEnumerator ActivateForDuration(CardModel model, float duration)
+    private System.Collections.IEnumerator ActivateForDuration(CardModel model)
     {
         model.MarkActive();
         OnSelectedChanged?.Invoke();
-        yield return new WaitForSeconds(Mathf.Max(0f, duration));
+        
+        yield return new WaitForSeconds(model.config.Duration);
+        
         model.MarkInactive();
         OnSelectedChanged?.Invoke();
     }

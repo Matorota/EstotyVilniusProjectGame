@@ -1,16 +1,24 @@
-using UnityEngine;
-using Configs;
+using System.Collections.Generic;
 using Characters.Player.Inventory;
+using Configs;
+using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Collider))]
 public class CardPickup : MonoBehaviour
 {
-    [SerializeField] private CardConfig cardConfig;
-    [SerializeField] private CardWidget cardWidget;
-    [SerializeField] private RawImage worldIconRawImage;
+    private static  HashSet<CardPickup> ActivePickups = new(); // I need to do static without it i need to use FindObjectsOfType so one or the other i do not know witch is the better option
+
+     private CardConfig cardConfig;
+     private CardWidget cardWidget;
+     private RawImage worldIconRawImage;
 
     private CardWidget[] widgets;
+
+    public static List<CardPickup> GetActivePickups()
+    {
+        return new List<CardPickup>(ActivePickups);
+    }
 
     private void Reset()
     {
@@ -24,6 +32,16 @@ public class CardPickup : MonoBehaviour
         worldIconRawImage ??= GetComponentInChildren<RawImage>(true);
         widgets = GetComponentsInChildren<CardWidget>(true);
         ApplyConfigToVisuals();
+    }
+
+    private void OnEnable()
+    {
+        ActivePickups.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        ActivePickups.Remove(this);
     }
 
     private void OnTriggerEnter(Collider other)

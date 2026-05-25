@@ -6,9 +6,7 @@ using UnityEngine.UI;
 
 public class StoryWindow : MonoBehaviour
 {
-    [SerializeField] private List<StoryPageConfig> storyPages = new();
-    
-    [SerializeField] private GameUIController gameUIController;
+    [SerializeField] private GameObject guildWindow;
     
     [SerializeField] private Button nextStoryButton;
     [SerializeField] private Button previousStoryButton;
@@ -20,6 +18,8 @@ public class StoryWindow : MonoBehaviour
     [SerializeField] private TMP_Text nextButtonText;
     
     [SerializeField] private Image storyImage;
+    
+    [SerializeField] private List<StoryPageConfig> storyPages = new();
     
     private int currentIndex;
 
@@ -80,7 +80,7 @@ public class StoryWindow : MonoBehaviour
     {
         if (IsLastPage())
         {
-            gameUIController.OpenAdditionalPanel();
+            guildWindow.SetActive(true);
             gameObject.SetActive(false);
         }
         else

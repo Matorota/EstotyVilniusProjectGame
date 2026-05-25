@@ -4359,6 +4359,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 5131098183465429785, guid: 8c8c4de56dbff554583d5fe004627df5, type: 3}
+      propertyPath: storyWindow
+      value: 
+      objectReference: {fileID: 7879134062459610600}
+    - target: {fileID: 5131098183465429785, guid: 8c8c4de56dbff554583d5fe004627df5, type: 3}
       propertyPath: menuController
       value: 
       objectReference: {fileID: 1890011324555023794}
@@ -33918,9 +33922,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee03c8cea79e1c740b054f06a61c1841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardPickup
-  cardConfig: {fileID: 0}
-  cardWidget: {fileID: 0}
-  worldIconRawImage: {fileID: 0}
 --- !u!114 &1938720478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39022,7 +39023,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3043732931553685641, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: m_Name
-      value: QuildWindow
+      value: GuildWindow
       objectReference: {fileID: 0}
     - target: {fileID: 3043732931553685641, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: m_IsActive
@@ -39983,6 +39984,10 @@ PrefabInstance:
       propertyPath: playButton
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 7178128845914744035, guid: ac27feff08fc757468ecb283b8dccbad, type: 3}
+      propertyPath: guildWindow
+      value: 
+      objectReference: {fileID: 488929854}
     - target: {fileID: 7178128845914744035, guid: ac27feff08fc757468ecb283b8dccbad, type: 3}
       propertyPath: menuController
       value: 
