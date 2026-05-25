@@ -12,7 +12,6 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
-    [FormerlySerializedAs("menuController")]
     [SerializeField] private GameUIController gameUIController;
     
     [SerializeField] private TimeScale timeScale;

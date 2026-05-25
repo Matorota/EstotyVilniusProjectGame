@@ -19,8 +19,8 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private RespawnPlayer respawnPlayer;
-    [SerializeField] private TimeScaleManager timeScaleManager;
-    [SerializeField] private QuestUiHolder questUiHolder;
+    [SerializeField] private TimeScale timeScaleManager;
+    [SerializeField] private GuildWindow guildWindow;
 
     [SerializeField] private bool pauseGameOnDeath = true;
     [SerializeField] private bool pauseGameOnWin = true;
@@ -315,7 +315,7 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         }
 
         // Delegate quest removal to QuestFinnishState
-        var finishState = new UI.QuestRemoval(questUiHolder);
+        var finishState = new UI.QuestRemoval(guildWindow);
         finishState.FinishQuest(currentQuest);
 
         OpenBuildUI();
