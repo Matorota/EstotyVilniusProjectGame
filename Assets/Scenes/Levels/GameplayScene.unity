@@ -37992,7 +37992,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3837959989525903741, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3837959989525903741, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: m_AnchorMin.x
@@ -38084,7 +38084,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5879206653530149894, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8335696912033974338, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: background
@@ -39024,6 +39024,8 @@ MonoBehaviour:
   gameGubMenuWindowButton: {fileID: 2453834915924229019}
   hudWindow: {fileID: 6792995631686690106}
   mainCharacter: {fileID: 412086697}
+  winQuestWindow: {fileID: 158442571}
+  deathWindow: {fileID: 1976000}
 --- !u!1001 &4518272968763509902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -39920,7 +39922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &6792995631686690107
 MonoBehaviour:
   m_ObjectHideFlags: 0

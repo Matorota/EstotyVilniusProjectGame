@@ -9,7 +9,8 @@ public class MenuWindow : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject inventoryWindowGameObject;
     [SerializeField] private TimeScale timeScaleManager;
-
+    [SerializeField] private UI.Windows.GameHubWindow hub;
+    
     private void OnEnable()
     {
         inventoryButton.onClick.AddListener(HandleInventoryButtonClick);
@@ -28,38 +29,31 @@ public class MenuWindow : MonoBehaviour
 
     private void HandleInventoryButtonClick()
     {
-        if (inventoryWindowGameObject != null)
-            inventoryWindowGameObject.SetActive(true);
-        
+        inventoryWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }
-    
+
     private void HandleResumeButtonClick()
     {
-        if (timeScaleManager != null)
-            timeScaleManager.Resume();
-        
-        gameObject.SetActive(false);
+        Close();
+        hub.Open(true);
     }
-    
+
     private void HandleQuitButtonClick()
     {
         Application.Quit();
     }
 
-    // Window control API used by GameUIController
     public void Open()
     {
         gameObject.SetActive(true);
-        if (timeScaleManager != null)
-            timeScaleManager.Pause();
+        timeScaleManager.Pause();
     }
 
     public void Close()
     {
         gameObject.SetActive(false);
-        if (timeScaleManager != null)
-            timeScaleManager.Resume();
+        timeScaleManager.Resume();
     }
 
     public bool IsOpen => gameObject.activeSelf;

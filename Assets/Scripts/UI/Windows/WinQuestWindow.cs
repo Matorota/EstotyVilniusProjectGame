@@ -10,8 +10,9 @@ public class WinQuestWindow : MonoBehaviour
     [SerializeField] private Button buttonContinue;
     [SerializeField] private GameObject hudWindowGameObject;
     [SerializeField] private Button endQuestButton;
+    [SerializeField] private GuildWindow guildWindowRef;
     [SerializeField] private GameObject guildWindowGameObject;
-    [SerializeField] private GameObject menuUIGameObject;
+    private GameObject menuUIGameObject;
 
     private CanvasGroup canvasGroup;
     private Health playerHealth;
@@ -33,11 +34,8 @@ public class WinQuestWindow : MonoBehaviour
         if (!isInitialized)
             return;
 
-        if (buttonContinue != null)
-            buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
-
-        if (endQuestButton != null)
-            endQuestButton.onClick.RemoveListener(HandleEndQuestButtonClick);
+        buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
+        endQuestButton.onClick.RemoveListener(HandleEndQuestButtonClick);
 
         EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
         ClearTrackedEnemies();
@@ -45,7 +43,7 @@ public class WinQuestWindow : MonoBehaviour
 
     private void Update()
     {
-        if (isVisible && gameUIController != null && gameUIController.IsOpen)
+        if (isVisible && gameUIController.IsOpen)
             gameUIController.CloseMenu();
 
         RefreshPlayerHealth();
@@ -60,7 +58,7 @@ public class WinQuestWindow : MonoBehaviour
     {
         EnsureInitialized();
 
-        if (gameUIController != null && gameUIController.IsOpen)
+        if (gameUIController.IsOpen)
             gameUIController.CloseMenu();
 
         GameObject screenRoot = GetScreenRoot();
@@ -78,9 +76,6 @@ public class WinQuestWindow : MonoBehaviour
             timeScaleManager.Pause();
         else
             Time.timeScale = 0f;
-
-        if (hudWindowGameObject != null)
-            hudWindowGameObject.SetActive(false);
 
         if (menuUIGameObject != null)
             menuUIGameObject.SetActive(false);
@@ -118,7 +113,7 @@ public class WinQuestWindow : MonoBehaviour
 
     private void RefreshPlayerHealth()
     {
-        if (playerHealth == null && gameUIController != null)
+        if (playerHealth == null)
             playerHealth = gameUIController.GetPlayerHealth();
     }
 
@@ -139,7 +134,7 @@ public class WinQuestWindow : MonoBehaviour
 
     private void RegisterExistingEnemies()
     {
-        GameObject[] roots = gameUIController != null ? gameUIController.GetSceneRoots() : gameObject.scene.GetRootGameObjects();
+        GameObject[] roots = gameUIController.GetSceneRoots();
         for (int r = 0; r < roots.Length; r++)
         {
             Health[] found = roots[r].GetComponentsInChildren<Health>(true);
@@ -204,9 +199,6 @@ public class WinQuestWindow : MonoBehaviour
         else
             Time.timeScale = 1f;
 
-        if (hudWindowGameObject != null)
-            hudWindowGameObject.SetActive(true);
-
         if (menuUIGameObject != null)
             menuUIGameObject.SetActive(true);
 
@@ -220,7 +212,7 @@ public class WinQuestWindow : MonoBehaviour
     {
         ResetState();
 
-        Health healthComp = gameUIController != null ? gameUIController.GetPlayerHealth() : null;
+        Health healthComp = gameUIController.GetPlayerHealth();
         if (healthComp != null)
         {
             float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
@@ -228,36 +220,28 @@ public class WinQuestWindow : MonoBehaviour
                 healthComp.Heal(missing);
         }
 
-        GameObject[] roots = gameUIController != null ? gameUIController.GetSceneRoots() : null;
-        if (roots != null)
+        GameObject[] roots = gameUIController.GetSceneRoots();
+        var cardsList = new System.Collections.Generic.List<CardPickup>();
+        for (int r = 0; r < roots.Length; r++)
         {
-            var cardsList = new System.Collections.Generic.List<CardPickup>();
-            for (int r = 0; r < roots.Length; r++)
-            {
-                CardPickup[] found = roots[r].GetComponentsInChildren<CardPickup>(true);
-                for (int j = 0; j < found.Length; j++)
-                    cardsList.Add(found[j]);
-            }
-
-            CharacterMovements mainCharacter = gameUIController != null ? gameUIController.GetMainCharacter() : null;
-            for (int i = 0; i < cardsList.Count; i++)
-            {
-                CardPickup cp = cardsList[i];
-                if (cp != null && cp.gameObject != mainCharacter?.gameObject)
-                    Destroy(cp.gameObject);
-            }
+            CardPickup[] found = roots[r].GetComponentsInChildren<CardPickup>(true);
+            for (int j = 0; j < found.Length; j++)
+                cardsList.Add(found[j]);
         }
 
-        // Remove finished quest from guild window
-        var guild = FindObjectOfType<GuildWindow>(true);
-        if (guild != null)
-            guild.RemoveQuest(ActiveQuestRegistry.CurrentQuest);
+        CharacterMovements mainCharacter = gameUIController.GetMainCharacter();
+        for (int i = 0; i < cardsList.Count; i++)
+        {
+            CardPickup cp = cardsList[i];
+            if (cp != null && cp.gameObject != mainCharacter?.gameObject)
+                Destroy(cp.gameObject);
+        }
 
-        // clear active quest
-        ActiveQuestRegistry.CurrentQuest = null;
+        guildWindowRef.RemoveQuest(guildWindowRef.CurrentQuest);
 
-        if (guildWindowGameObject != null)
-            guildWindowGameObject.SetActive(true);
+        guildWindowRef.EndQuest();
+
+        guildWindowGameObject.SetActive(true);
 
         HideWindow();
     }
@@ -275,11 +259,8 @@ public class WinQuestWindow : MonoBehaviour
 
         RefreshPlayerHealth();
 
-        if (buttonContinue != null)
-            buttonContinue.onClick.AddListener(HandleContinueButtonClick);
-
-        if (endQuestButton != null)
-            endQuestButton.onClick.AddListener(HandleEndQuestButtonClick);
+        buttonContinue.onClick.AddListener(HandleContinueButtonClick);
+        endQuestButton.onClick.AddListener(HandleEndQuestButtonClick);
 
         EnemySpawner.OnEnemySpawned += HandleEnemySpawned;
         isInitialized = true;

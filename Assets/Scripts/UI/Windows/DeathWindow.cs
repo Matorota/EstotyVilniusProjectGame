@@ -30,7 +30,7 @@ public class DeathWindow : MonoBehaviour
         if (playerHealth == null)
             return;
 
-        if (isVisible && gameUIController != null && gameUIController.IsOpen)
+        if (isVisible && gameUIController.IsOpen)
             gameUIController.CloseMenu();
 
         bool isDead = playerHealth.CurrentHealth <= 0f;
@@ -51,21 +51,16 @@ public class DeathWindow : MonoBehaviour
         if (!isInitialized)
             return;
 
-        if (restartButton != null)
-            restartButton.onClick.RemoveListener(HandleRestartButtonClick);
-
-        if (guildButton != null)
-            guildButton.onClick.RemoveListener(HandleGuildButtonClick);
-
-        if (quitButton != null)
-            quitButton.onClick.RemoveListener(HandleQuitButtonClick);
+        restartButton.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton.onClick.RemoveListener(HandleQuitButtonClick);
     }
 
     public void ShowWindow()
     {
         EnsureInitialized();
 
-        if (gameUIController != null && gameUIController.IsOpen)
+        if (gameUIController.IsOpen)
             gameUIController.CloseMenu();
 
         GameObject screenRoot = GetScreenRoot();
@@ -99,8 +94,7 @@ public class DeathWindow : MonoBehaviour
     {
         isDismissed = true;
 
-        if (guildWindowGameObject != null)
-            guildWindowGameObject.SetActive(true);
+        guildWindowGameObject.SetActive(true);
 
         HideWindow();
     }
@@ -109,8 +103,7 @@ public class DeathWindow : MonoBehaviour
     {
         isDismissed = true;
 
-        if (gameUIController != null)
-            gameUIController.RestartCurrentLevel();
+        gameUIController.RestartCurrentLevel();
 
         HideWindow();
     }
@@ -119,8 +112,7 @@ public class DeathWindow : MonoBehaviour
     {
         isDismissed = true;
 
-        if (gameUIController != null)
-            gameUIController.ContinueAndOpenQuitPopup();
+        gameUIController.ContinueAndOpenQuitPopup();
 
         HideWindow();
     }
@@ -136,18 +128,11 @@ public class DeathWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
-        playerHealth = mainCharacter != null ? mainCharacter.GetComponent<Health>() : null;
-        if (playerHealth == null && gameUIController != null)
-            playerHealth = gameUIController.GetPlayerHealth();
+        playerHealth = gameUIController.GetPlayerHealth();
 
-        if (restartButton != null)
-            restartButton.onClick.AddListener(HandleRestartButtonClick);
-
-        if (guildButton != null)
-            guildButton.onClick.AddListener(HandleGuildButtonClick);
-
-        if (quitButton != null)
-            quitButton.onClick.AddListener(HandleQuitButtonClick);
+        restartButton.onClick.AddListener(HandleRestartButtonClick);
+        guildButton.onClick.AddListener(HandleGuildButtonClick);
+        quitButton.onClick.AddListener(HandleQuitButtonClick);
 
         isInitialized = true;
     }

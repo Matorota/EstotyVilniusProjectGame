@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -16,10 +16,27 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private GameObject hudWindowGameObject;
     
     [SerializeField] private TimeScale timeScale;
+    [SerializeField] private UI.Windows.GameHubWindow hub;
 
     private Configs.QuestConfig currentQuest;
-    
+
     public Configs.QuestConfig CurrentQuest => currentQuest;
+
+    public QuestStatus Status { get; private set; } = QuestStatus.None;
+
+    public bool IsActive => Status == QuestStatus.Active;
+
+    public void StartQuest(Configs.QuestConfig quest)
+    {
+        currentQuest = quest;
+        Status = QuestStatus.Active;
+    }
+
+    public void EndQuest()
+    {
+        currentQuest = null;
+        Status = QuestStatus.None;
+    }
 
     private void OnEnable()
     {
@@ -60,21 +77,22 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        // Start quest locally: set active quest, resume time, show HUD, spawn enemies, setup UI.
-        currentQuest = quest;
-        ActiveQuestRegistry.CurrentQuest = quest;
+        StartQuestInternal(quest);
+    }
 
-        if (timeScale != null)
-            timeScale.Resume();
+    private void StartQuestInternal(QuestConfig quest)
+    {
+        StartQuest(quest);
 
-        if (hudWindowGameObject != null)
-            hudWindowGameObject.SetActive(true);
+        timeScale.Resume();
 
-        if (enemySpawner != null)
-            enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+        hudWindowGameObject.SetActive(true);
 
-        if (levelProgressWidget != null)
-            levelProgressWidget.Setup(quest);
+        hub.Open();
+
+        enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+
+        levelProgressWidget.Setup(quest);
 
         gameObject.SetActive(false);
     }
@@ -86,9 +104,7 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleOpenQuestButtonClicked()
     {
-        if (inventoryGuildSideWindowGameObject != null)
-            inventoryGuildSideWindowGameObject.SetActive(true);
-        
+        inventoryGuildSideWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 }

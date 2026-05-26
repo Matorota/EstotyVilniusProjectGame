@@ -8,21 +8,17 @@ public class InventoryMenuWindow : MonoBehaviour
 
     private void OnEnable()
     {
-        if (backButton != null)
-            backButton.onClick.AddListener(HandleBackButtonClick);
+        backButton.onClick.AddListener(HandleBackButtonClick);
     }
 
     private void OnDisable()
     {
-        if (backButton != null)
-            backButton.onClick.RemoveListener(HandleBackButtonClick);
+        backButton.onClick.RemoveListener(HandleBackButtonClick);
     }
 
     private void HandleBackButtonClick()
     {
-        if (inventoryWindowGameObject != null)
-            inventoryWindowGameObject.SetActive(true);
-        
+        inventoryWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 }

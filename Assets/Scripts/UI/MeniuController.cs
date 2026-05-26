@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// There still the issue of FindWindow it is still there because of few windows being active and unactive when there not suppost to so this was for 
+// a time being a short solution.
+
 public class GameUIController : MonoBehaviour
 {
     [SerializeField] private CharacterMovements mainCharacter;
@@ -62,8 +65,9 @@ public class GameUIController : MonoBehaviour
 
     public bool IsOpen => isOpen;
 
-    // Indicates whether a quest is currently active (not null)
-    public bool IsQuestActive => ActiveQuestRegistry.HasActiveQuest;
+    private GuildWindow guildWindow;
+
+    public bool IsQuestActive => guildWindow != null && guildWindow.IsActive;
 
     public void OpenQuitPopup()
     {
@@ -84,11 +88,6 @@ public class GameUIController : MonoBehaviour
 
     public void RestartCurrentLevel()
     {
-        if (respawnPlayer == null)
-        {
-            Debug.LogError("Respawn player is not assigned.");
-            return;
-        }
 
         if (!respawnPlayer.RespawnMainCharacter(mainCharacter, respawnLocationCube))
             return;
@@ -118,7 +117,7 @@ public class GameUIController : MonoBehaviour
 
     public void OnContinueButtonPressed() => Resume();
 
-    public void OnEndQuestButtonPressed()
+    public void OnEndQuestButtonPressed() // Like a reset of quests 
     {
         Health healthComp = GetPlayerHealth();
         if (healthComp != null)
@@ -144,14 +143,13 @@ public class GameUIController : MonoBehaviour
                 Destroy(cp.gameObject);
         }
 
-        var guild = FindWindow<GuildWindow>();
+        var guild = guildWindow ?? FindWindow<GuildWindow>();
         if (guild != null)
         {
             var finishState = new UI.QuestRemoval(guild);
-            finishState.FinishQuest(ActiveQuestRegistry.CurrentQuest);
+            finishState.FinishQuest(guild.CurrentQuest);
+            guild.EndQuest();
         }
-
-        ActiveQuestRegistry.CurrentQuest = null;
 
         OpenBuildUI();
     }
@@ -184,6 +182,9 @@ public class GameUIController : MonoBehaviour
 
         if (menuWindow == null)
             menuWindow = FindWindow<MenuWindow>();
+
+        if (guildWindow == null)
+            guildWindow = FindWindow<GuildWindow>();
     }
 
     private void RefreshPlayerHealthReference()
@@ -256,7 +257,7 @@ public class GameUIController : MonoBehaviour
             winQuestWindow.ResetState();
     }
 
-    private T FindWindow<T>() where T : Component // was used for testing
+    private T FindWindow<T>() where T : Component // was used for testing for now permanant (ask how to replace to what) I am for now thinking a registry or something similar
     {
         GameObject[] roots = gameObject.scene.GetRootGameObjects();
         for (int r = 0; r < roots.Length; r++)
@@ -306,5 +307,3 @@ public class GameUIController : MonoBehaviour
     public CharacterMovements GetMainCharacter() => mainCharacter;
 
 }
-
-public class MeniuController : GameUIController { }
