@@ -3,11 +3,17 @@ using UnityEngine.UI;
 
 namespace UI.Windows
 {
-    public class GameStartWindow : MonoBehaviour
+    public class StartWindow : MonoBehaviour
     {
         [SerializeField] private Button startGameButton;
-        [SerializeField] private GameObject storyWindow;
-        
+        [SerializeField] private StoryWindow storyWindow;
+
+        private void Awake()
+        {
+            storyWindow.gameObject.SetActive(false);
+            gameObject.SetActive(true);
+        }
+
         private void OnEnable()
         {
             startGameButton.onClick.AddListener(HandleStartButtonClicked);
@@ -17,10 +23,10 @@ namespace UI.Windows
         {
             startGameButton.onClick.RemoveListener(HandleStartButtonClicked);
         }
-        
+
         private void HandleStartButtonClicked()
         {
-            storyWindow.SetActive(true);
+            storyWindow.gameObject.SetActive(true);
             gameObject.SetActive(false);
         }
     }

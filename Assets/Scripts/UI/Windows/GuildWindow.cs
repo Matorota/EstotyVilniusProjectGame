@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using Configs;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,10 +12,32 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
-    [SerializeField] private GameUIController gameUIController;
+    [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
+    [SerializeField] private GameObject hudWindowGameObject;
     
     [SerializeField] private TimeScale timeScale;
-    
+    [SerializeField] private UI.Windows.GameHubWindow hub;
+
+    private Configs.QuestConfig currentQuest;
+
+    public Configs.QuestConfig CurrentQuest => currentQuest;
+
+    public QuestStatus Status { get; private set; } = QuestStatus.None;
+
+    public bool IsActive => Status == QuestStatus.Active;
+
+    public void StartQuest(Configs.QuestConfig quest)
+    {
+        currentQuest = quest;
+        Status = QuestStatus.Active;
+    }
+
+    public void EndQuest()
+    {
+        currentQuest = null;
+        Status = QuestStatus.None;
+    }
+
     private void OnEnable()
     {
         openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
@@ -55,11 +77,24 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        gameUIController.OnQuestStarted(quest);
-        gameUIController.Resume();
-        
+        StartQuestInternal(quest);
+    }
+
+    private void StartQuestInternal(QuestConfig quest)
+    {
+        StartQuest(quest);
+
+        timeScale.Resume();
+
+        hudWindowGameObject.SetActive(true);
+
+        hub.Open();
+
         enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+
         levelProgressWidget.Setup(quest);
+
+        gameObject.SetActive(false);
     }
     
     private void OnDisable()
@@ -69,7 +104,8 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleOpenQuestButtonClicked()
     {
-        gameUIController.OpenBacktoquildPanel();
+        inventoryGuildSideWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 }
+

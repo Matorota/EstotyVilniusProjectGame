@@ -1,139 +1,58 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
-using System.Collections;
 
-public class GameUIController : MonoBehaviour  // This part of the code need a lot of refactoring
+// There still the issue of FindWindow it is still there because of few windows being active and unactive when there not suppost to so this was for 
+// a time being a short solution.
+
+public class GameUIController : MonoBehaviour
 {
-    [SerializeField] private GameObject menuRoot;
-    [SerializeField] private GameObject inventoryWindow;
-    [SerializeField] private GameObject quildWindow;
-    [SerializeField] private GameObject inventoryFromQuildSide;
-    [SerializeField] private GameObject inventoryMenuWindow;
-    [SerializeField] private GameObject startGameWindow;
-    [SerializeField] private GameObject storyWindow;
-    [SerializeField] private GameObject hudWindow;
-    [SerializeField] private GameObject winWindow;
-    [SerializeField] private GameObject deathWindow;
-
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private RespawnPlayer respawnPlayer;
     [SerializeField] private TimeScale timeScaleManager;
-    [SerializeField] private GuildWindow guildWindow;
 
-    [SerializeField] private bool pauseGameOnDeath = true;
-    [SerializeField] private bool pauseGameOnWin = true;
-    [SerializeField] private float enemyRefreshInterval = 0.5f;
-
-    private bool isOpen;
+    private WinQuestWindow winQuestWindow;
+    private DeathWindow deathWindowComponent;
+    private MenuWindow menuWindow;
     private IDamageable playerHealth;
-    private Configs.QuestConfig currentQuest;
-
-    private bool deathScreenShown;
-    private bool changedTimeScaleOnDeath;
-
-    private bool winScreenShown;
-    public bool HasWon { get; private set; }
-    private bool changedTimeScaleOnWin;
-
-    private Health[] enemyHealthSources = new Health[0];
-    private int initialEnemyCount;
-    private int aliveEnemyCount;
-    private Coroutine refreshEnemiesCoroutine;
-
-    private bool isFirstLoad = true;
+    private bool isDeathHandled;
+    private bool isOpen;
 
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
-
-        SetActiveIfAssigned(startGameWindow, isFirstLoad);
-        SetActiveIfAssigned(hudWindow, false);
-        SetActiveIfAssigned(menuRoot, false);
-        SetActiveIfAssigned(inventoryWindow, false);
-        SetActiveIfAssigned(quildWindow, false);
-        SetActiveIfAssigned(inventoryFromQuildSide, false);
-        SetActiveIfAssigned(inventoryMenuWindow, false);
-        SetActiveIfAssigned(storyWindow, false);
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
     }
 
     private void Start()
     {
-        InitializeScreens();
-        
-        if (isFirstLoad)
-        {
-            timeScaleManager.Pause();
-            isOpen = true;
-            isFirstLoad = false;
-        }
-        else
-        {
-            SetActiveIfAssigned(startGameWindow, false);
-            SetActiveIfAssigned(hudWindow, true);
-            timeScaleManager.Resume();
-            isOpen = false;
-        }
-    }
-
-    private void InitializeScreens()
-    {
-        if (playerHealth != null)
-        {
-            playerHealth.OnHealthChanged += OnPlayerHealthChanged;
-            playerHealth.OnDeath += ShowDeathScreen;
-        }
-
-        InitializeEnemies();
-        refreshEnemiesCoroutine = StartCoroutine(RefreshEnemiesPeriodically());
-    }
-
-    private void OnDisable()
-    {
-        RestoreAllTimeScales();
-
-        if (refreshEnemiesCoroutine != null)
-            StopCoroutine(refreshEnemiesCoroutine);
-
-        UnsubscribeFromDeaths();
-
-        if (playerHealth != null)
-        {
-            playerHealth.OnHealthChanged -= OnPlayerHealthChanged;
-            playerHealth.OnDeath -= ShowDeathScreen;
-        }
+        ResolveWindowReferences();
+        HideDeathScreen();
+        ResetWinWindow();
+        SetPlayerDeathState(false);
+        timeScaleManager.Pause();
     }
 
     private void Update()
     {
+        ResolveWindowReferences();
+        RefreshPlayerHealthReference();
+        HandleEndStates();
+
+        if (IsEndScreenVisible())
+            return;
+
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (HasWon)
-            {
-                ShowWinScreen();
-                return;
-            }
-
-            if (IsEndScreenActive())
-                return;
-
             SetMenu(!isOpen);
-        }
     }
 
     public void Resume()
     {
         isOpen = false;
-        SetActiveIfAssigned(menuRoot, false);
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
-        SetPanelVisible(hudWindow, true);
-
-        CloseAllPanels();
-        timeScaleManager.Resume();
+        MenuWindow mw = menuWindow ?? FindWindow<MenuWindow>();
+        if (mw != null)
+            mw.Close();
+        else if (timeScaleManager != null)
+            timeScaleManager.Resume();
     }
 
     public void ContinueAndOpenQuitPopup() => Resume();
@@ -145,6 +64,10 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     public void ToggleMenu() => SetMenu(!isOpen);
 
     public bool IsOpen => isOpen;
+
+    private GuildWindow guildWindow;
+
+    public bool IsQuestActive => guildWindow != null && guildWindow.IsActive;
 
     public void OpenQuitPopup()
     {
@@ -162,141 +85,49 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     {
         Application.Quit();
     }
-    
+
     public void RestartCurrentLevel()
     {
-        if (respawnPlayer == null)
-        {
-            Debug.LogError("Respawn player is not assigned.");
-            return;
-        }
 
         if (!respawnPlayer.RespawnMainCharacter(mainCharacter, respawnLocationCube))
             return;
 
+        isDeathHandled = false;
+        HideDeathScreen();
+        ResetWinWindow();
+        SetPlayerDeathState(false);
         Time.timeScale = 1f;
-        deathScreenShown = false;
-        winScreenShown = false;
-        HasWon = false;
-        changedTimeScaleOnDeath = false;
-        changedTimeScaleOnWin = false;
-
-        SetPanelVisible(deathWindow, false);
-        SetPanelVisible(winWindow, false);
-        SetPanelVisible(hudWindow, true);
         isOpen = false;
-        CloseAllPanels();
         timeScaleManager.Resume();
     }
 
-    public void OpenCardsPanel() => OpenPanel(inventoryWindow);
+    public void OpenCardsPanel() => SetMenu(true);
 
-    public void CloseCardsPanel() => SetPanelVisible(inventoryWindow, false);
+    public void CloseCardsPanel() => SetMenu(false);
 
-    public void OpenAdditionalPanel() => OpenPanel(quildWindow);
+    public void OpenAdditionalPanel() => SetMenu(true);
 
-    public void CloseAdditionalPanel() => SetPanelVisible(quildWindow, false);
+    public void CloseAdditionalPanel() => SetMenu(false);
 
-    public void OpenBuildUI() => OpenPanel(quildWindow);
+    public void OpenBuildUI() => SetMenu(true);
 
-    public void OpenBacktoquildPanel() => OpenPanel(inventoryFromQuildSide);
+    public void OpenOtherPanel() => SetMenu(true);
 
-    public void CloseBacktoquildPanel() => SetPanelVisible(inventoryFromQuildSide, false);
-
-    public void OpenOtherPanel()
-    {
-        if (!isOpen)
-            SetMenu(true);
-
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
-        SetPanelVisible(inventoryMenuWindow, true);
-    }
-
-    public void CloseOtherPanel() => SetPanelVisible(inventoryMenuWindow, false);
-
-    public void OpenStartGameWindow() => OpenPanel(startGameWindow);
-
-    public void CloseStartGameWindow()
-    {
-        SetPanelVisible(startGameWindow, false);
-        isOpen = false;
-        SetPanelVisible(hudWindow, true);
-        timeScaleManager.Resume();
-    }
-
-    public void OpenStoryWindow() => OpenPanel(storyWindow);
-
-    public void CloseStoryWindow() => SetPanelVisible(storyWindow, false);
-
-    public void ShowDeathScreen()
-    {
-        if (deathScreenShown) return;
-
-        deathScreenShown = true;
-        SetPanelVisible(deathWindow, true);
-        SetActiveIfAssigned(hudWindow, false);
-
-        if (pauseGameOnDeath)
-        {
-            Time.timeScale = 0f;
-            changedTimeScaleOnDeath = true;
-        }
-    }
-
-    private void OnPlayerHealthChanged(float currentHealth)
-    {
-        if (currentHealth <= 0f)
-            ShowDeathScreen();
-    }
-
-    public void ShowWinScreen()
-    {
-        if (winScreenShown) return;
-
-        winScreenShown = true;
-        HasWon = true;
-        SetPanelVisible(winWindow, true);
-        SetActiveIfAssigned(hudWindow, false);
-
-        if (winWindow != null)
-        {
-            var canvasGroup = winWindow.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 1f;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-
-            var buttons = winWindow.GetComponentsInChildren<Button>(true);
-            foreach (var btn in buttons)
-                btn.gameObject.SetActive(true);
-        }
-
-        if (pauseGameOnWin)
-        {
-            Time.timeScale = 0f;
-            changedTimeScaleOnWin = true;
-        }
-    }
+    public void CloseOtherPanel() => SetMenu(false);
 
     public void OnContinueButtonPressed() => Resume();
 
-    public void OnEndQuestButtonPressed()
+    public void OnEndQuestButtonPressed() // Like a reset of quests 
     {
-        Health healthComp = playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
+        Health healthComp = GetPlayerHealth();
         if (healthComp != null)
         {
             float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
             if (missing > 0f)
-            {
                 healthComp.Heal(missing);
-            }
         }
 
-        // Destroy all CardPickup instances in the active scene except the main character
-        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype
+        var roots = gameObject.scene.GetRootGameObjects();
         var cardsList = new System.Collections.Generic.List<CardPickup>();
         for (int r = 0; r < roots.Length; r++)
         {
@@ -309,214 +140,170 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         {
             var cp = cardsList[i];
             if (cp != null && cp.gameObject != mainCharacter?.gameObject)
-            {
                 Destroy(cp.gameObject);
-            }
         }
 
-        // Delegate quest removal to QuestFinnishState
-        var finishState = new UI.QuestRemoval(guildWindow);
-        finishState.FinishQuest(currentQuest);
+        var guild = guildWindow ?? FindWindow<GuildWindow>();
+        if (guild != null)
+        {
+            var finishState = new UI.QuestRemoval(guild);
+            finishState.FinishQuest(guild.CurrentQuest);
+            guild.EndQuest();
+        }
 
         OpenBuildUI();
     }
 
-    private void TryShowWinScreen()
-    {
-        if (winScreenShown || playerHealth == null || playerHealth.CurrentHealth <= 0f ||
-            initialEnemyCount <= 0 || aliveEnemyCount > 0)
-            return;
-
-        ShowWinScreen();
-    }
-
-    public void OnQuestStarted(Configs.QuestConfig quest)
-    {
-        currentQuest = quest;
-        winScreenShown = false;
-        HasWon = false;
-        UnsubscribeFromDeaths();
-        InitializeEnemies();
-    }
-
-    private void InitializeEnemies()
-    {
-        var enemies = FindAllEnemies();
-        enemyHealthSources = enemies;
-        initialEnemyCount = enemies.Length;
-        aliveEnemyCount = CountAliveEnemies(enemies);
-        SubscribeToDeaths(HandleEnemyDeath, enemies);
-    }
-
-    private Health[] FindAllEnemies()
-    {
-        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype 
-        var enemies = new System.Collections.Generic.List<Health>();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            var found = roots[r].GetComponentsInChildren<Health>(true);
-            for (int i = 0; i < found.Length; i++)
-            {
-                var h = found[i];
-                if (h != null && h.Team == Team.Enemy)
-                    enemies.Add(h);
-            }
-        }
-
-        return enemies.ToArray();
-    }
-
-    private int CountAliveEnemies(Health[] enemies = null)
-    {
-        var checkEnemies = enemies ?? enemyHealthSources;
-        var aliveCount = 0;
-        foreach (var e in checkEnemies)
-        {
-            if (e != null && e.CurrentHealth > 0f)
-                aliveCount++;
-        }
-
-        return aliveCount;
-    }
-
-    private void SubscribeToDeaths(System.Action onEnemyDeath, Health[] enemies = null)
-    {
-        var subscribeEnemies = enemies ?? enemyHealthSources;
-        foreach (var e in subscribeEnemies)
-        {
-            if (e != null)
-                e.OnDeath += onEnemyDeath;
-        }
-    }
-
-    private void UnsubscribeFromDeaths()
-    {
-        foreach (var e in enemyHealthSources)
-        {
-            if (e != null)
-                e.OnDeath -= HandleEnemyDeath;
-        }
-    }
-
-    private void RefreshEnemyList()
-    {
-        var currentEnemies = FindAllEnemies();
-        if (currentEnemies.Length != initialEnemyCount)
-        {
-            UnsubscribeFromDeaths();
-            enemyHealthSources = currentEnemies;
-            initialEnemyCount = currentEnemies.Length;
-            aliveEnemyCount = CountAliveEnemies(currentEnemies);
-            SubscribeToDeaths(HandleEnemyDeath, currentEnemies);
-            TryShowWinScreen();
-        }
-    }
-
-    private IEnumerator RefreshEnemiesPeriodically()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(enemyRefreshInterval);
-            RefreshEnemyList();
-        }
-    }
-
-    private void HandleEnemyDeath()
-    {
-        aliveEnemyCount = Mathf.Max(0, aliveEnemyCount - 1);
-        TryShowWinScreen();
-    }
-
     private void SetMenu(bool open)
     {
-        if (open && IsEndScreenActive())
+        menuWindow = menuWindow ?? FindWindow<MenuWindow>();
+        if (menuWindow != null)
+        {
+            if (open) menuWindow.Open(); else menuWindow.Close();
+            isOpen = menuWindow.IsOpen;
             return;
+        }
 
+        // fallback when MenuWindow isn't present: manage timescale directly
         isOpen = open;
-        SetActiveIfAssigned(menuRoot, open);
-        SetActiveIfAssigned(hudWindow, !open);
-
-        if (!open)
-            CloseAllPanels();
-
         if (open)
             timeScaleManager.Pause();
         else
             timeScaleManager.Resume();
     }
 
-    private bool IsEndScreenActive()
+    private void ResolveWindowReferences()
     {
-        return (winWindow != null && winWindow.activeInHierarchy) ||
-               (deathWindow != null && deathWindow.activeInHierarchy);
+        if (winQuestWindow == null)
+            winQuestWindow = FindWindow<WinQuestWindow>();
+
+        if (deathWindowComponent == null)
+            deathWindowComponent = FindWindow<DeathWindow>();
+
+        if (menuWindow == null)
+            menuWindow = FindWindow<MenuWindow>();
+
+        if (guildWindow == null)
+            guildWindow = FindWindow<GuildWindow>();
     }
 
-    private void OpenPanel(GameObject panelRoot)
+    private void RefreshPlayerHealthReference()
     {
-        if (!isOpen)
-            SetMenu(true);
-
-        CloseAllPanels();
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
-        SetActiveIfAssigned(hudWindow, false);
-        SetPanelVisible(panelRoot, true);
+        if (playerHealth == null)
+            playerHealth = mainCharacter?.GetComponent<IDamageable>();
     }
 
-    private void CloseAllPanels()
+    private void HandleEndStates()
     {
-        SetPanelVisible(inventoryWindow, false);
-        SetPanelVisible(quildWindow, false);
-        SetPanelVisible(inventoryFromQuildSide, false);
-        SetPanelVisible(inventoryMenuWindow, false);
-        SetPanelVisible(storyWindow, false);
+        Health healthComp = GetPlayerHealth();
+        if (healthComp == null)
+            return;
 
-        if (!isOpen && !IsAnyPanelOpen() && (startGameWindow == null || !startGameWindow.activeInHierarchy))
-            SetActiveIfAssigned(hudWindow, true);
-    }
-
-    private bool IsAnyPanelOpen()
-    {
-        return (inventoryWindow != null && inventoryWindow.activeInHierarchy) ||
-               (quildWindow != null && quildWindow.activeInHierarchy) ||
-               (inventoryFromQuildSide != null && inventoryFromQuildSide.activeInHierarchy) ||
-               (inventoryMenuWindow != null && inventoryMenuWindow.activeInHierarchy) ||
-               (storyWindow != null && storyWindow.activeInHierarchy);
-    }
-
-    private void SetPanelVisible(GameObject panelRoot, bool visible)
-    {
-        if (panelRoot == null) return;
-
-        panelRoot.SetActive(visible);
-
-        var canvasGroup = panelRoot.GetComponent<CanvasGroup>();
-        if (canvasGroup != null)
+        if (healthComp.CurrentHealth <= 0f)
         {
-            canvasGroup.alpha = visible ? 1f : 0f;
-            canvasGroup.interactable = visible;
-            canvasGroup.blocksRaycasts = visible;
+            if (!isDeathHandled)
+            {
+                isDeathHandled = true;
+                SetPlayerDeathState(true);
+                ShowDeathScreen();
+            }
+
+            return;
+        }
+
+        if (isDeathHandled)
+        {
+            isDeathHandled = false;
+            HideDeathScreen();
+            SetPlayerDeathState(false);
         }
     }
 
-    private void SetActiveIfAssigned(GameObject target, bool isActive)
+    private void ShowDeathScreen()
     {
-        if (target != null)
-            target.SetActive(isActive);
-    }
+        CloseMenu();
 
-    private void RestoreAllTimeScales()
-    {
-        if (changedTimeScaleOnDeath)
+        if (deathWindowComponent != null)
         {
-            Time.timeScale = 1f;
-            changedTimeScaleOnDeath = false;
+            deathWindowComponent.ShowWindow();
+            return;
         }
 
-        if (changedTimeScaleOnWin)
+        timeScaleManager.Pause();
+    }
+
+    private void HideDeathScreen()
+    {
+        if (deathWindowComponent != null)
         {
-            Time.timeScale = 1f;
-            changedTimeScaleOnWin = false;
+            deathWindowComponent.HideWindow();
         }
     }
+
+    private bool IsEndScreenVisible()
+    {
+        if (winQuestWindow != null && winQuestWindow.IsVisible)
+            return true;
+
+        if (deathWindowComponent != null && deathWindowComponent.IsVisible)
+            return true;
+
+        return false;
+    }
+
+    private void ResetWinWindow()
+    {
+        if (winQuestWindow != null)
+            winQuestWindow.ResetState();
+    }
+
+    private T FindWindow<T>() where T : Component // was used for testing for now permanant (ask how to replace to what) I am for now thinking a registry or something similar
+    {
+        GameObject[] roots = gameObject.scene.GetRootGameObjects();
+        for (int r = 0; r < roots.Length; r++)
+        {
+            T found = roots[r].GetComponentInChildren<T>(true);
+            if (found != null)
+                return found;
+        }
+
+        return null;
+    }
+
+    private void SetPlayerDeathState(bool isDead)
+    {
+        if (mainCharacter == null)
+            return;
+
+        CharacterMovements movements = mainCharacter.GetComponent<CharacterMovements>();
+        if (movements != null)
+            movements.enabled = !isDead;
+
+        CharacterInputReader inputReader = mainCharacter.GetComponent<CharacterInputReader>();
+        if (inputReader != null)
+            inputReader.enabled = !isDead;
+
+        CharacterMeleeAttack meleeAttack = mainCharacter.GetComponent<CharacterMeleeAttack>();
+        if (meleeAttack != null)
+            meleeAttack.enabled = !isDead;
+
+        Combat combat = mainCharacter.GetComponent<Combat>();
+        if (combat != null)
+            combat.ClearTarget();
+
+        CharacterMotor motor = mainCharacter.GetComponent<CharacterMotor>();
+        if (motor != null)
+            motor.ResetMotion();
+
+        CharacterMovementAnimation movementAnimation = mainCharacter.GetComponent<CharacterMovementAnimation>();
+        if (movementAnimation != null)
+            movementAnimation.Tick(Vector2.zero, Vector3.zero, 0f, Vector3.zero);
+    }
+
+    public Health GetPlayerHealth() => playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
+
+    public GameObject[] GetSceneRoots() => gameObject.scene.GetRootGameObjects();
+
+    public CharacterMovements GetMainCharacter() => mainCharacter;
+
 }

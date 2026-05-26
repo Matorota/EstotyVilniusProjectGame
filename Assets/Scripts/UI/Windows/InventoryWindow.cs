@@ -3,23 +3,24 @@ using UnityEngine.UI;
 
 public class InventoryWindow : MonoBehaviour
 {
-    [SerializeField] private GameUIController gameUIController;
-    [SerializeField] private Button menuButton;
+    [SerializeField] private GameObject hudWindowGameObject;
+    [SerializeField] private Button closeInventoryButton;
+    [SerializeField] private UI.Windows.GameHubWindow hub;
 
     private void OnEnable()
     {
-        if (menuButton != null)
-            menuButton.onClick.AddListener(HandleInventoryButtonClick);
+        hub.Close();
+        closeInventoryButton.onClick.AddListener(HandleCloseButtonClick);
     }
 
     private void OnDisable()
     {
-        if (menuButton != null)
-            menuButton.onClick.RemoveListener(HandleInventoryButtonClick);
+        closeInventoryButton.onClick.RemoveListener(HandleCloseButtonClick);
     }
 
-    private void HandleInventoryButtonClick()
+    private void HandleCloseButtonClick()
     {
-        gameUIController.OpenOtherPanel();
+        hub.Open();
+        gameObject.SetActive(false);
     }
 }

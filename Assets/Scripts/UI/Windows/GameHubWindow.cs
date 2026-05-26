@@ -7,6 +7,12 @@ namespace UI.Windows
     {
         [SerializeField] private GameUIController gameUIController;
         [SerializeField] private Button gameGubMenuWindowButton;
+        [SerializeField] private GameObject hudWindow; 
+        [SerializeField] private CharacterMovements mainCharacter; 
+
+        [SerializeField] private WinQuestWindow winQuestWindow;
+        [SerializeField] private DeathWindow deathWindow;
+
 
         private void OnEnable()
         {
@@ -23,5 +29,18 @@ namespace UI.Windows
             gameUIController.OpenQuitPopup();
             gameObject.SetActive(false);
         }
+
+        public void Open(bool forceShowHud = false)
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Close()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public bool IsOpen => gameObject.activeSelf;
+
     }
 }
