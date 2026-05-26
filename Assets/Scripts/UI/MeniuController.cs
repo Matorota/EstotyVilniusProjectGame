@@ -1,7 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI;
-using System.Collections;
 
 public class GameUIController : MonoBehaviour
 {
@@ -10,96 +8,47 @@ public class GameUIController : MonoBehaviour
     [SerializeField] private RespawnPlayer respawnPlayer;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private GuildWindow guildWindow;
-    [SerializeField] private GameObject winWindow;
-    [SerializeField] private GameObject deathWindow;
     [SerializeField] private GameObject menuRoot;
-
-    [SerializeField] private bool pauseGameOnDeath = true;
-    [SerializeField] private bool pauseGameOnWin = true;
-    [SerializeField] private float enemyRefreshInterval = 0.5f;
 
     private bool isOpen;
     private IDamageable playerHealth;
     private Configs.QuestConfig currentQuest;
+    private WinQuestWindow winQuestWindow;
+    private DeathWindow deathWindowComponent;
+    private bool isDeathHandled;
 
-    private bool deathScreenShown;
-    private bool changedTimeScaleOnDeath;
-
-    private bool winScreenShown;
-    public bool HasWon { get; private set; }
-    private bool changedTimeScaleOnWin;
-
-    private Health[] enemyHealthSources = new Health[0];
-    private int initialEnemyCount;
-    private int aliveEnemyCount;
-    private Coroutine refreshEnemiesCoroutine;
-    
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
-
         SetActiveIfAssigned(menuRoot, false);
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
     }
 
     private void Start()
     {
-        InitializeScreens();
+        ResolveWindowReferences();
+        HideDeathScreen();
+        ResetWinWindow();
+        SetPlayerDeathState(false);
         timeScaleManager.Pause();
-    }
-
-    private void InitializeScreens()
-    {
-        if (playerHealth != null)
-        {
-            playerHealth.OnHealthChanged += OnPlayerHealthChanged;
-            playerHealth.OnDeath += ShowDeathScreen;
-        }
-
-        InitializeEnemies();
-        refreshEnemiesCoroutine = StartCoroutine(RefreshEnemiesPeriodically());
-    }
-
-    private void OnDisable()
-    {
-        RestoreAllTimeScales();
-
-        if (refreshEnemiesCoroutine != null)
-            StopCoroutine(refreshEnemiesCoroutine);
-
-        UnsubscribeFromDeaths();
-
-        if (playerHealth != null)
-        {
-            playerHealth.OnHealthChanged -= OnPlayerHealthChanged;
-            playerHealth.OnDeath -= ShowDeathScreen;
-        }
     }
 
     private void Update()
     {
+        ResolveWindowReferences();
+        RefreshPlayerHealthReference();
+        HandleEndStates();
+
+        if (IsEndScreenVisible())
+            return;
+
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (HasWon)
-            {
-                ShowWinScreen();
-                return;
-            }
-
-            if (IsEndScreenActive())
-                return;
-
             SetMenu(!isOpen);
-        }
     }
 
     public void Resume()
     {
         isOpen = false;
         SetActiveIfAssigned(menuRoot, false);
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
         timeScaleManager.Resume();
     }
 
@@ -129,7 +78,7 @@ public class GameUIController : MonoBehaviour
     {
         Application.Quit();
     }
-    
+
     public void RestartCurrentLevel()
     {
         if (respawnPlayer == null)
@@ -141,15 +90,11 @@ public class GameUIController : MonoBehaviour
         if (!respawnPlayer.RespawnMainCharacter(mainCharacter, respawnLocationCube))
             return;
 
+        isDeathHandled = false;
+        HideDeathScreen();
+        ResetWinWindow();
+        SetPlayerDeathState(false);
         Time.timeScale = 1f;
-        deathScreenShown = false;
-        winScreenShown = false;
-        HasWon = false;
-        changedTimeScaleOnDeath = false;
-        changedTimeScaleOnWin = false;
-
-        SetPanelVisible(deathWindow, false);
-        SetPanelVisible(winWindow, false);
         isOpen = false;
         timeScaleManager.Resume();
     }
@@ -168,57 +113,6 @@ public class GameUIController : MonoBehaviour
 
     public void CloseOtherPanel() => SetMenu(false);
 
-    public void ShowDeathScreen()
-    {
-        if (deathScreenShown) return;
-
-        deathScreenShown = true;
-        SetPanelVisible(deathWindow, true);
-
-        if (pauseGameOnDeath)
-        {
-            Time.timeScale = 0f;
-            changedTimeScaleOnDeath = true;
-        }
-    }
-
-    private void OnPlayerHealthChanged(float currentHealth)
-    {
-        if (currentHealth <= 0f)
-            ShowDeathScreen();
-    }
-
-    public void ShowWinScreen()
-    {
-        if (winScreenShown) return;
-
-        winScreenShown = true;
-        HasWon = true;
-        
-        SetPanelVisible(winWindow, true);
-
-        if (winWindow != null)
-        {
-            var canvasGroup = winWindow.GetComponent<CanvasGroup>();
-            if (canvasGroup != null)
-            {
-                canvasGroup.alpha = 1f;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-
-            var buttons = winWindow.GetComponentsInChildren<Button>(true);
-            foreach (var btn in buttons)
-                btn.gameObject.SetActive(true);
-        }
-
-        if (pauseGameOnWin)
-        {
-            Time.timeScale = 0f;
-            changedTimeScaleOnWin = true;
-        }
-    }
-
     public void OnContinueButtonPressed() => Resume();
 
     public void OnEndQuestButtonPressed()
@@ -228,13 +122,10 @@ public class GameUIController : MonoBehaviour
         {
             float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
             if (missing > 0f)
-            {
                 healthComp.Heal(missing);
-            }
         }
 
-        // Destroy all CardPickup instances in the active scene except the main character
-        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype
+        var roots = gameObject.scene.GetRootGameObjects();
         var cardsList = new System.Collections.Generic.List<CardPickup>();
         for (int r = 0; r < roots.Length; r++)
         {
@@ -247,9 +138,7 @@ public class GameUIController : MonoBehaviour
         {
             var cp = cardsList[i];
             if (cp != null && cp.gameObject != mainCharacter?.gameObject)
-            {
                 Destroy(cp.gameObject);
-            }
         }
 
         var finishState = new UI.QuestRemoval(guildWindow);
@@ -258,117 +147,17 @@ public class GameUIController : MonoBehaviour
         OpenBuildUI();
     }
 
-    private void TryShowWinScreen()
-    {
-        if (winScreenShown || playerHealth == null || playerHealth.CurrentHealth <= 0f ||
-            initialEnemyCount <= 0 || aliveEnemyCount > 0)
-            return;
-
-        ShowWinScreen();
-    }
-
     public void OnQuestStarted(Configs.QuestConfig quest)
     {
         currentQuest = quest;
-        winScreenShown = false;
-        HasWon = false;
-        UnsubscribeFromDeaths();
-        InitializeEnemies();
-    }
-
-    private void InitializeEnemies()
-    {
-        var enemies = FindAllEnemies();
-        enemyHealthSources = enemies;
-        initialEnemyCount = enemies.Length;
-        aliveEnemyCount = CountAliveEnemies(enemies);
-        SubscribeToDeaths(HandleEnemyDeath, enemies);
-    }
-
-    private Health[] FindAllEnemies()
-    {
-        var roots = gameObject.scene.GetRootGameObjects(); // cannot think of another way how to do it without findobjectbytype 
-        var enemies = new System.Collections.Generic.List<Health>();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            var found = roots[r].GetComponentsInChildren<Health>(true);
-            for (int i = 0; i < found.Length; i++)
-            {
-                var h = found[i];
-                if (h != null && h.Team == Team.Enemy)
-                    enemies.Add(h);
-            }
-        }
-
-        return enemies.ToArray();
-    }
-
-    private int CountAliveEnemies(Health[] enemies = null)
-    {
-        var checkEnemies = enemies ?? enemyHealthSources;
-        var aliveCount = 0;
-        foreach (var e in checkEnemies)
-        {
-            if (e != null && e.CurrentHealth > 0f)
-                aliveCount++;
-        }
-
-        return aliveCount;
-    }
-
-    private void SubscribeToDeaths(System.Action onEnemyDeath, Health[] enemies = null)
-    {
-        var subscribeEnemies = enemies ?? enemyHealthSources;
-        foreach (var e in subscribeEnemies)
-        {
-            if (e != null)
-                e.OnDeath += onEnemyDeath;
-        }
-    }
-
-    private void UnsubscribeFromDeaths()
-    {
-        foreach (var e in enemyHealthSources)
-        {
-            if (e != null)
-                e.OnDeath -= HandleEnemyDeath;
-        }
-    }
-
-    private void RefreshEnemyList()
-    {
-        var currentEnemies = FindAllEnemies();
-        if (currentEnemies.Length != initialEnemyCount)
-        {
-            UnsubscribeFromDeaths();
-            enemyHealthSources = currentEnemies;
-            initialEnemyCount = currentEnemies.Length;
-            aliveEnemyCount = CountAliveEnemies(currentEnemies);
-            SubscribeToDeaths(HandleEnemyDeath, currentEnemies);
-            TryShowWinScreen();
-        }
-    }
-
-    private IEnumerator RefreshEnemiesPeriodically()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(enemyRefreshInterval);
-            RefreshEnemyList();
-        }
-    }
-
-    private void HandleEnemyDeath()
-    {
-        aliveEnemyCount = Mathf.Max(0, aliveEnemyCount - 1);
-        TryShowWinScreen();
+        isDeathHandled = false;
+        HideDeathScreen();
+        ResetWinWindow();
+        SetPlayerDeathState(false);
     }
 
     private void SetMenu(bool open)
     {
-        if (open && IsEndScreenActive())
-            return;
-
         isOpen = open;
         SetActiveIfAssigned(menuRoot, open);
 
@@ -378,46 +167,144 @@ public class GameUIController : MonoBehaviour
             timeScaleManager.Resume();
     }
 
-    private bool IsEndScreenActive()
-    {
-        return (winWindow != null && winWindow.activeInHierarchy) ||
-               (deathWindow != null && deathWindow.activeInHierarchy);
-    }
-
-    private void SetPanelVisible(GameObject panelRoot, bool visible)
-    {
-        if (panelRoot == null) return;
-
-        panelRoot.SetActive(visible);
-
-        var canvasGroup = panelRoot.GetComponent<CanvasGroup>();
-        if (canvasGroup != null)
-        {
-            canvasGroup.alpha = visible ? 1f : 0f;
-            canvasGroup.interactable = visible;
-            canvasGroup.blocksRaycasts = visible;
-        }
-    }
-
     private void SetActiveIfAssigned(GameObject target, bool isActive)
     {
         if (target != null)
             target.SetActive(isActive);
     }
 
-    private void RestoreAllTimeScales()
+    private void ResolveWindowReferences()
     {
-        if (changedTimeScaleOnDeath)
+        if (winQuestWindow == null)
+            winQuestWindow = FindWindow<WinQuestWindow>();
+
+        if (deathWindowComponent == null)
+            deathWindowComponent = FindWindow<DeathWindow>();
+    }
+
+    private void RefreshPlayerHealthReference()
+    {
+        if (playerHealth == null)
+            playerHealth = mainCharacter?.GetComponent<IDamageable>();
+    }
+
+    private void HandleEndStates()
+    {
+        Health healthComp = GetPlayerHealth();
+        if (healthComp == null)
+            return;
+
+        if (healthComp.CurrentHealth <= 0f)
         {
-            Time.timeScale = 1f;
-            changedTimeScaleOnDeath = false;
+            if (!isDeathHandled)
+            {
+                isDeathHandled = true;
+                SetPlayerDeathState(true);
+                ShowDeathScreen();
+            }
+
+            return;
         }
 
-        if (changedTimeScaleOnWin)
+        if (isDeathHandled)
         {
-            Time.timeScale = 1f;
-            changedTimeScaleOnWin = false;
+            isDeathHandled = false;
+            HideDeathScreen();
+            SetPlayerDeathState(false);
         }
+    }
+
+    private void ShowDeathScreen()
+    {
+        CloseMenu();
+
+        if (deathWindowComponent != null)
+        {
+            deathWindowComponent.ShowWindow();
+            return;
+        }
+
+        timeScaleManager.Pause();
+    }
+
+    private void HideDeathScreen()
+    {
+        if (deathWindowComponent != null)
+        {
+            deathWindowComponent.HideWindow();
+        }
+    }
+
+    private bool IsEndScreenVisible()
+    {
+        if (winQuestWindow != null && winQuestWindow.IsVisible)
+            return true;
+
+        if (deathWindowComponent != null && deathWindowComponent.IsVisible)
+            return true;
+
+        return false;
+    }
+
+    private void ResetWinWindow()
+    {
+        if (winQuestWindow != null)
+            winQuestWindow.ResetState();
+    }
+
+    private T FindWindow<T>() where T : Component
+    {
+        GameObject[] roots = gameObject.scene.GetRootGameObjects();
+        for (int r = 0; r < roots.Length; r++)
+        {
+            T found = roots[r].GetComponentInChildren<T>(true);
+            if (found != null)
+                return found;
+        }
+
+        return null;
+    }
+
+    private void SetPlayerDeathState(bool isDead)
+    {
+        if (mainCharacter == null)
+            return;
+
+        CharacterMovements movements = mainCharacter.GetComponent<CharacterMovements>();
+        if (movements != null)
+            movements.enabled = !isDead;
+
+        CharacterInputReader inputReader = mainCharacter.GetComponent<CharacterInputReader>();
+        if (inputReader != null)
+            inputReader.enabled = !isDead;
+
+        CharacterMeleeAttack meleeAttack = mainCharacter.GetComponent<CharacterMeleeAttack>();
+        if (meleeAttack != null)
+            meleeAttack.enabled = !isDead;
+
+        Combat combat = mainCharacter.GetComponent<Combat>();
+        if (combat != null)
+            combat.ClearTarget();
+
+        CharacterMotor motor = mainCharacter.GetComponent<CharacterMotor>();
+        if (motor != null)
+            motor.ResetMotion();
+
+        CharacterMovementAnimation movementAnimation = mainCharacter.GetComponent<CharacterMovementAnimation>();
+        if (movementAnimation != null)
+            movementAnimation.Tick(Vector2.zero, Vector3.zero, 0f, Vector3.zero);
+    }
+
+    public Health GetPlayerHealth() => playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
+
+    public GameObject[] GetSceneRoots() => gameObject.scene.GetRootGameObjects();
+
+    public CharacterMovements GetMainCharacter() => mainCharacter;
+
+    public void FinishQuest()
+    {
+        if (currentQuest != null && guildWindow != null)
+            guildWindow.RemoveQuest(currentQuest);
     }
 }
 

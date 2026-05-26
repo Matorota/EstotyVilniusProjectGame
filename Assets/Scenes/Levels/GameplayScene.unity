@@ -141,10 +141,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0436a76ff63744cebb6542e213001c48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DeathWindow
+  mainCharacter: {fileID: 412086697}
   gameUIController: {fileID: 1890011324555023794}
+  deathScreenGameObject: {fileID: 1975996}
   restartButton: {fileID: 1579426803}
-  quildButton: {fileID: 1580471743}
+  guildButton: {fileID: 1580471743}
   quitButton: {fileID: 2091863900}
+  guildWindowGameObject: {fileID: 488929854}
 --- !u!114 &4533689 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4616509921898211217, guid: d937679144ecb5e43a37d550bfe31178, type: 3}
@@ -2799,9 +2802,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WinQuestWindow
   gameUIController: {fileID: 1890011324555023794}
-  buttonResume: {fileID: 4533689}
-  objectToAppear: {fileID: 6984857003954005619}
+  timeScaleManager: {fileID: 463901196}
+  winScreenGameObject: {fileID: 158442569}
+  buttonContinue: {fileID: 4533689}
+  hudWindowGameObject: {fileID: 6792995631686690106}
   endQuestButton: {fileID: 7345514619677770855}
+  guildWindowGameObject: {fileID: 488929854}
+  menuUIGameObject: {fileID: 2101639980}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8675,7 +8682,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 23.7
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8711,7 +8718,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -23.699951
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -8868,7 +8875,7 @@ PrefabInstance:
     - target: {fileID: 9211990220574901692, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: openQuestButton
       value: 
-      objectReference: {fileID: 1941816641}
+      objectReference: {fileID: 0}
     - target: {fileID: 9211990220574901692, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: gameUIController
       value: 
@@ -10695,6 +10702,20 @@ MonoBehaviour:
   backButton: {fileID: 1441739141}
   settingsButton: {fileID: 1876821813}
   quitButton: {fileID: 49399913}
+--- !u!114 &556049624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 556049621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20008382641a7c341b49e2629498cc8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryMenuWindow
+  backButton: {fileID: 0}
+  inventoryWindowGameObject: {fileID: 0}
 --- !u!1001 &558885235
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11545,8 +11566,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 692ac79f21c640a5b40be3357d2d8ac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIMenuWindow
-  gameUIController: {fileID: 1890011324555023794}
   menuButton: {fileID: 1199234387}
+  openGuildButton: {fileID: 1941816641}
+  inventoryMenuWindowGameObject: {fileID: 556049621}
+  guildWindowGameObject: {fileID: 488929854}
 --- !u!114 &607881566 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1422907518965772679, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
@@ -15117,6 +15140,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5754300876776314605, guid: 9a65f32d2e74ba74481c18af84381999, type: 3}
       insertIndex: -1
       addedObject: {fileID: 556049623}
+    - targetCorrespondingSourceObject: {fileID: 5754300876776314605, guid: 9a65f32d2e74ba74481c18af84381999, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 556049624}
   m_SourcePrefab: {fileID: 100100000, guid: 9a65f32d2e74ba74481c18af84381999, type: 3}
 --- !u!1001 &834852878
 PrefabInstance:
@@ -35887,17 +35913,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
---- !u!114 &2068978449 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6625062917147237157, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
-  m_PrefabInstance: {fileID: 4518272968763509902}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1 &2072712006
 GameObject:
   m_ObjectHideFlags: 0
@@ -36317,11 +36332,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 747b8d51b25f48048894e3260d0e519b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuWindowControler
-  gameUIController: {fileID: 1890011324555023794}
   inventoryButton: {fileID: 2111669483}
   resumeButton: {fileID: 326396311}
   settingsButton: {fileID: 607881566}
   quitButton: {fileID: 953767844}
+  inventoryWindowGameObject: {fileID: 3273973556273018644}
+  timeScaleManager: {fileID: 463901196}
 --- !u!4 &2107668370 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -37523,7 +37539,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 6.6667
+      value: 23.7
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -37559,7 +37575,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -6.66687
+      value: -23.699951
       objectReference: {fileID: 0}
     - target: {fileID: 4910355935829667121, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -37620,7 +37636,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7688594493581549258, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3273973556273018649}
   m_SourcePrefab: {fileID: 100100000, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
 --- !u!224 &974084818398243002
 RectTransform:
@@ -38734,6 +38753,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8c93723ff6ffea47a88cb72123f88b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectedCardsManager
+--- !u!114 &3273973556273018649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3273973556273018644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d0e497cd7ec1f04f84f63b8f2d4b43d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InvetoryWindow
+  hudWindowGameObject: {fileID: 6792995631686690106}
+  closeInventoryButton: {fileID: 1731929708}
 --- !u!1 &3374299838289410651
 GameObject:
   m_ObjectHideFlags: 0
@@ -39090,6 +39123,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 463901196}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: guildWindow
+      value: 
+      objectReference: {fileID: 4518272968763509906}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: enemySpawner
       value: 
       objectReference: {fileID: 262327338}
@@ -39106,11 +39143,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1890011324555023794}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: hudWindowGameObject
+      value: 
+      objectReference: {fileID: 6792995631686690106}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: levelProgressWidget
       value: 
       objectReference: {fileID: 1660067095}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: inventoryGuildSideWindow
+      value: 
+      objectReference: {fileID: 605257264}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: inventoryGuildSideWindowGameObject
       value: 
       objectReference: {fileID: 605257264}
     - target: {fileID: 4390054394631068883, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
@@ -39148,30 +39193,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3043732931553685641, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4518272968763509905}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
 --- !u!224 &4518272968763509903 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 336586589113287538, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
   m_PrefabInstance: {fileID: 4518272968763509902}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4518272968763509905
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 488929854}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 692ac79f21c640a5b40be3357d2d8ac1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InvetoryMenuWindow
-  gameUIController: {fileID: 1890011324555023794}
-  menuButton: {fileID: 2068978449}
 --- !u!114 &4518272968763509906 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
@@ -40178,6 +40206,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 488929854}
     - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
+      propertyPath: winQuestWindow
+      value: 
+      objectReference: {fileID: 158442571}
+    - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
       propertyPath: deathScreenRoot
       value: 
       objectReference: {fileID: 1975996}
@@ -40214,9 +40246,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1938720480}
     - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
+      propertyPath: deathWindowGameObject
+      value: 
+      objectReference: {fileID: 1975996}
+    - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
       propertyPath: inventoryFromQuildSide
       value: 
       objectReference: {fileID: 605257264}
+    - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
+      propertyPath: winQuestWindowGameObject
+      value: 
+      objectReference: {fileID: 158442569}
     - target: {fileID: 280385879274289147, guid: deaa39483b686a044b1b7b4bdd2533cd, type: 3}
       propertyPath: quildBacktoquildPanelRoot
       value: 

@@ -17,6 +17,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     private ICombat combat;
     private FindTargetables targetables;
     private PlayerStats stats;
+    private Health selfHealth;
 
     private float nextAttackTime;
     private float hitTime;
@@ -35,6 +36,7 @@ public class CharacterMeleeAttack : MonoBehaviour
         combat = GetComponent<ICombat>();
         targetables = GetComponent<FindTargetables>();
         stats = GetComponent<PlayerStats>();
+        selfHealth = GetComponent<Health>();
         range = Mathf.Max(0f, range);
     }
 
@@ -42,6 +44,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     {
         if (!CanRunCombat())
         {
+            StopAttack();
             return;
         }
 
@@ -84,7 +87,16 @@ public class CharacterMeleeAttack : MonoBehaviour
 
     private bool CanRunCombat()
     {
-        return combat != null && combat.HasValidSelf;
+        return combat != null && combat.HasValidSelf && (selfHealth == null || selfHealth.CurrentHealth > 0f);
+    }
+
+    private void StopAttack()
+    {
+        isAttacking = false;
+        hasHitThisAttack = false;
+
+        if (combat != null)
+            combat.ClearTarget();
     }
     private void StartAttack()
     {

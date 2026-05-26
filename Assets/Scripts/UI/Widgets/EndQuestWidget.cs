@@ -1,5 +1,4 @@
-﻿﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Windows
@@ -19,7 +18,6 @@ namespace UI.Windows
         private void OnDisable()
         {
             endGameButton.onClick.RemoveListener(HandleEndGameButtonClick);
-
         }
 
         private void HandleEndGameButtonClick()
@@ -34,7 +32,5 @@ namespace UI.Windows
                 gameUIController.OnEndQuestButtonPressed();
             }
         }
-    
-
     }
 }

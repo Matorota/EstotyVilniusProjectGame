@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class InvetoryWindow : MonoBehaviour
+public class InventoryWindow : MonoBehaviour
 {
     [SerializeField] private GameObject hudWindowGameObject;
     [SerializeField] private Button closeInventoryButton;
