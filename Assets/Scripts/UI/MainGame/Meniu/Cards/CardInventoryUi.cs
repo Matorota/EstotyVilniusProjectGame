@@ -9,16 +9,12 @@ public class CardInventoryUi : MonoBehaviour
     [SerializeField] private SelectedCardsManager selectedCardsManager;
     [SerializeField] private Transform cardsContainer;
     [SerializeField] private CardWidget cardPrefab;
-    [SerializeField] private Button openQuestButton;
     [SerializeField] private Button reOpenQuestButton;
     [SerializeField] private GameUIController gameUIController;
     [SerializeField] private GameObject hudWindowRoot;
-    [SerializeField] private GameObject objectToShowWhenWon;
 
     private void OnEnable()
     {
-        if (openQuestButton != null)
-            openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
         if (reOpenQuestButton != null)
             reOpenQuestButton.onClick.AddListener(HandleReOpenQuestButtonClicked);
         inventory.OnInventoryChanged += Refresh;
@@ -27,8 +23,6 @@ public class CardInventoryUi : MonoBehaviour
 
     private void OnDisable()
     {
-        if (openQuestButton != null)
-            openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
         if (reOpenQuestButton != null)
             reOpenQuestButton.onClick.RemoveListener(HandleReOpenQuestButtonClicked);
         inventory.OnInventoryChanged -= Refresh;

@@ -3,11 +3,12 @@ using UnityEngine.UI;
 
 public class MenuWindow : MonoBehaviour
 {
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private Button inventoryButton;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private GameObject inventoryWindowGameObject;
+    [SerializeField] private TimeScale timeScaleManager;
 
     private void OnEnable()
     {
@@ -27,19 +28,22 @@ public class MenuWindow : MonoBehaviour
 
     private void HandleInventoryButtonClick()
     {
-        gameUIController.OpenCardsPanel();
+        if (inventoryWindowGameObject != null)
+            inventoryWindowGameObject.SetActive(true);
+        
         gameObject.SetActive(false);
     }
     
     private void HandleResumeButtonClick()
     {
-        gameUIController.Resume();
+        if (timeScaleManager != null)
+            timeScaleManager.Resume();
+        
         gameObject.SetActive(false);
     }
     
-    private void HandleQuitButtonClick() // for now for settings and quit
+    private void HandleQuitButtonClick()
     {
-        gameUIController.ContinueAndOpenQuitPopup();
-        gameObject.SetActive(false);
+        Application.Quit();
     }
 }

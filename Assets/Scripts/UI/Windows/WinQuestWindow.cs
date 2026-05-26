@@ -7,6 +7,7 @@ public class WinQuestWindow : MonoBehaviour
     [SerializeField] private Button buttonResume;
     [SerializeField] private GameObject objectToAppear;
     [SerializeField] private Button endQuestButton;
+    [SerializeField] private GameObject guildWindowGameObject;
 
 
 
@@ -33,7 +34,11 @@ public class WinQuestWindow : MonoBehaviour
 
     private void HandleEndQuestButtonClick()
     {
-        gameUIController.OpenAdditionalPanel();
-        endQuestButton.gameObject.SetActive(false);
+        gameUIController.OnEndQuestButtonPressed();
+        
+        if (guildWindowGameObject != null)
+            guildWindowGameObject.SetActive(true);
+        
+        gameObject.SetActive(false);
     }
 }

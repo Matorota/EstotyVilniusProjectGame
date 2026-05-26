@@ -1,24 +1,18 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using System.Collections;
 
-public class GameUIController : MonoBehaviour  // This part of the code need a lot of refactoring
+public class GameUIController : MonoBehaviour
 {
-    [SerializeField] private GameObject menuRoot;
-    [SerializeField] private GameObject inventoryWindow;
-    [SerializeField] private GameObject quildWindow;
-    [SerializeField] private GameObject inventoryMenuWindow;
-    [SerializeField] private GameObject hudWindow;
-    [SerializeField] private GameObject winWindow;
-    [SerializeField] private GameObject deathWindow;
-
-
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private RespawnPlayer respawnPlayer;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private GuildWindow guildWindow;
+    [SerializeField] private GameObject winWindow;
+    [SerializeField] private GameObject deathWindow;
+    [SerializeField] private GameObject menuRoot;
 
     [SerializeField] private bool pauseGameOnDeath = true;
     [SerializeField] private bool pauseGameOnWin = true;
@@ -44,11 +38,7 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
 
-        SetActiveIfAssigned(hudWindow, false);
         SetActiveIfAssigned(menuRoot, false);
-        SetActiveIfAssigned(inventoryWindow, false);
-        SetActiveIfAssigned(quildWindow, false);
-        SetActiveIfAssigned(inventoryMenuWindow, false);
         SetActiveIfAssigned(winWindow, false);
         SetActiveIfAssigned(deathWindow, false);
     }
@@ -110,9 +100,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         SetActiveIfAssigned(menuRoot, false);
         SetActiveIfAssigned(winWindow, false);
         SetActiveIfAssigned(deathWindow, false);
-        SetPanelVisible(hudWindow, true);
-
-        CloseAllPanels();
         timeScaleManager.Resume();
     }
 
@@ -163,33 +150,23 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
 
         SetPanelVisible(deathWindow, false);
         SetPanelVisible(winWindow, false);
-        SetPanelVisible(hudWindow, true);
         isOpen = false;
-        CloseAllPanels();
         timeScaleManager.Resume();
     }
 
-    public void OpenCardsPanel() => OpenPanel(inventoryWindow);
+    public void OpenCardsPanel() => SetMenu(true);
 
-    public void CloseCardsPanel() => SetPanelVisible(inventoryWindow, false);
+    public void CloseCardsPanel() => SetMenu(false);
 
-    public void OpenAdditionalPanel() => OpenPanel(quildWindow);
+    public void OpenAdditionalPanel() => SetMenu(true);
 
-    public void CloseAdditionalPanel() => SetPanelVisible(quildWindow, false);
+    public void CloseAdditionalPanel() => SetMenu(false);
 
-    public void OpenBuildUI() => OpenPanel(quildWindow);
+    public void OpenBuildUI() => SetMenu(true);
 
-    public void OpenOtherPanel()
-    {
-        if (!isOpen)
-            SetMenu(true);
+    public void OpenOtherPanel() => SetMenu(true);
 
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
-        SetPanelVisible(inventoryMenuWindow, true);
-    }
-
-    public void CloseOtherPanel() => SetPanelVisible(inventoryMenuWindow, false);
+    public void CloseOtherPanel() => SetMenu(false);
 
     public void ShowDeathScreen()
     {
@@ -197,7 +174,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
 
         deathScreenShown = true;
         SetPanelVisible(deathWindow, true);
-        SetActiveIfAssigned(hudWindow, false);
 
         if (pauseGameOnDeath)
         {
@@ -218,8 +194,8 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
 
         winScreenShown = true;
         HasWon = true;
+        
         SetPanelVisible(winWindow, true);
-        SetActiveIfAssigned(hudWindow, false);
 
         if (winWindow != null)
         {
@@ -395,10 +371,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
 
         isOpen = open;
         SetActiveIfAssigned(menuRoot, open);
-        SetActiveIfAssigned(hudWindow, !open);
-
-        if (!open)
-            CloseAllPanels();
 
         if (open)
             timeScaleManager.Pause();
@@ -410,35 +382,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     {
         return (winWindow != null && winWindow.activeInHierarchy) ||
                (deathWindow != null && deathWindow.activeInHierarchy);
-    }
-
-    private void OpenPanel(GameObject panelRoot)
-    {
-        if (!isOpen)
-            SetMenu(true);
-
-        CloseAllPanels();
-        SetActiveIfAssigned(winWindow, false);
-        SetActiveIfAssigned(deathWindow, false);
-        SetActiveIfAssigned(hudWindow, false);
-        SetPanelVisible(panelRoot, true);
-    }
-
-    private void CloseAllPanels()
-    {
-        SetPanelVisible(inventoryWindow, false);
-        SetPanelVisible(quildWindow, false);
-        SetPanelVisible(inventoryMenuWindow, false);
-
-        if (!isOpen && !IsAnyPanelOpen())
-            SetActiveIfAssigned(hudWindow, true);
-    }
-
-    private bool IsAnyPanelOpen()
-    {
-        return (inventoryWindow != null && inventoryWindow.activeInHierarchy) ||
-               (quildWindow != null && quildWindow.activeInHierarchy) ||
-               (inventoryMenuWindow != null && inventoryMenuWindow.activeInHierarchy);
     }
 
     private void SetPanelVisible(GameObject panelRoot, bool visible)

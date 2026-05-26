@@ -13,8 +13,8 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
     [SerializeField] private GameUIController gameUIController;
-    [SerializeField] private GameObject inventoryGuildSideWindow;
-    [SerializeField] private GuildWindow guildWindow;
+    [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
+    [SerializeField] private GameObject hudWindowGameObject;
     
     [SerializeField] private TimeScale timeScale;
     
@@ -60,8 +60,13 @@ public class GuildWindow : MonoBehaviour
         gameUIController.OnQuestStarted(quest);
         gameUIController.Resume();
         
+        if (hudWindowGameObject != null)
+            hudWindowGameObject.SetActive(true);
+        
         enemySpawner.SpawnEnemies(quest.EnemiesAmount);
         levelProgressWidget.Setup(quest);
+        
+        gameObject.SetActive(false);
     }
     
     private void OnDisable()
@@ -71,9 +76,10 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleOpenQuestButtonClicked()
     {
-        if (inventoryGuildSideWindow != null)
-            inventoryGuildSideWindow.SetActive(true);
+        if (inventoryGuildSideWindowGameObject != null)
+            inventoryGuildSideWindowGameObject.SetActive(true);
         
         gameObject.SetActive(false);
     }
 }
+

@@ -1,0 +1,28 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class InvetoryWindow : MonoBehaviour
+{
+    [SerializeField] private GameObject hudWindowGameObject;
+    [SerializeField] private Button closeInventoryButton;
+
+    private void OnEnable()
+    {
+        if (closeInventoryButton != null)
+            closeInventoryButton.onClick.AddListener(HandleCloseButtonClick);
+    }
+
+    private void OnDisable()
+    {
+        if (closeInventoryButton != null)
+            closeInventoryButton.onClick.RemoveListener(HandleCloseButtonClick);
+    }
+
+    private void HandleCloseButtonClick()
+    {
+        if (hudWindowGameObject != null)
+            hudWindowGameObject.SetActive(true);
+        
+        gameObject.SetActive(false);
+    }
+}

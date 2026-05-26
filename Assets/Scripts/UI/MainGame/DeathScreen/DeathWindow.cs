@@ -7,6 +7,7 @@ public class DeathWindow : MonoBehaviour
     [SerializeField] private Button restartButton;
     [SerializeField] private Button quildButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private GameObject guildWindowGameObject;
 
     private void OnEnable()
     {
@@ -18,13 +19,15 @@ public class DeathWindow : MonoBehaviour
     private void OnDisable()
     {
         restartButton.onClick.RemoveListener(HandleRestartButtonClick);
-        quildButton.onClick.RemoveListener(HandleQuitButtonClick);
+        quildButton.onClick.RemoveListener(HandleQuildButtonClick);
         quitButton.onClick.RemoveListener(HandleQuitButtonClick);
     }
 
     private void HandleQuildButtonClick()
     {
-        gameUIController.OpenAdditionalPanel();
+        if (guildWindowGameObject != null)
+            guildWindowGameObject.SetActive(true);
+        
         gameObject.SetActive(false);
     }
     
