@@ -13,6 +13,8 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
     [SerializeField] private GameUIController gameUIController;
+    [SerializeField] private GameObject inventoryGuildSideWindow;
+    [SerializeField] private GuildWindow guildWindow;
     
     [SerializeField] private TimeScale timeScale;
     
@@ -69,7 +71,9 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleOpenQuestButtonClicked()
     {
-        gameUIController.OpenBacktoquildPanel();
+        if (inventoryGuildSideWindow != null)
+            inventoryGuildSideWindow.SetActive(true);
+        
         gameObject.SetActive(false);
     }
 }

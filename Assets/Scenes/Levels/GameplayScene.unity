@@ -10325,7 +10325,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &523475396
 RectTransform:
   m_ObjectHideFlags: 0
@@ -32317,6 +32317,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 217002760}
   - {fileID: 2101639981}
   - {fileID: 605257265}
   - {fileID: 4518272968763509903}
@@ -32326,7 +32327,6 @@ RectTransform:
   - {fileID: 158442570}
   - {fileID: 556049622}
   - {fileID: 3272173147317328137}
-  - {fileID: 217002760}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -39109,6 +39109,10 @@ PrefabInstance:
       propertyPath: levelProgressWidget
       value: 
       objectReference: {fileID: 1660067095}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: inventoryGuildSideWindow
+      value: 
+      objectReference: {fileID: 605257264}
     - target: {fileID: 4390054394631068883, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: m_Name
       value: Menu

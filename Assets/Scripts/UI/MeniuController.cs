@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using System.Collections;
@@ -8,11 +8,11 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     [SerializeField] private GameObject menuRoot;
     [SerializeField] private GameObject inventoryWindow;
     [SerializeField] private GameObject quildWindow;
-    [SerializeField] private GameObject inventoryFromQuildSide;
     [SerializeField] private GameObject inventoryMenuWindow;
     [SerializeField] private GameObject hudWindow;
     [SerializeField] private GameObject winWindow;
     [SerializeField] private GameObject deathWindow;
+
 
     [SerializeField] private CharacterMovements mainCharacter;
     [SerializeField] private Transform respawnLocationCube;
@@ -39,7 +39,7 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     private int initialEnemyCount;
     private int aliveEnemyCount;
     private Coroutine refreshEnemiesCoroutine;
-
+    
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
@@ -48,7 +48,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         SetActiveIfAssigned(menuRoot, false);
         SetActiveIfAssigned(inventoryWindow, false);
         SetActiveIfAssigned(quildWindow, false);
-        SetActiveIfAssigned(inventoryFromQuildSide, false);
         SetActiveIfAssigned(inventoryMenuWindow, false);
         SetActiveIfAssigned(winWindow, false);
         SetActiveIfAssigned(deathWindow, false);
@@ -179,10 +178,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     public void CloseAdditionalPanel() => SetPanelVisible(quildWindow, false);
 
     public void OpenBuildUI() => OpenPanel(quildWindow);
-
-    public void OpenBacktoquildPanel() => OpenPanel(inventoryFromQuildSide);
-
-    public void CloseBacktoquildPanel() => SetPanelVisible(inventoryFromQuildSide, false);
 
     public void OpenOtherPanel()
     {
@@ -433,7 +428,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     {
         SetPanelVisible(inventoryWindow, false);
         SetPanelVisible(quildWindow, false);
-        SetPanelVisible(inventoryFromQuildSide, false);
         SetPanelVisible(inventoryMenuWindow, false);
 
         if (!isOpen && !IsAnyPanelOpen())
@@ -444,7 +438,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     {
         return (inventoryWindow != null && inventoryWindow.activeInHierarchy) ||
                (quildWindow != null && quildWindow.activeInHierarchy) ||
-               (inventoryFromQuildSide != null && inventoryFromQuildSide.activeInHierarchy) ||
                (inventoryMenuWindow != null && inventoryMenuWindow.activeInHierarchy);
     }
 

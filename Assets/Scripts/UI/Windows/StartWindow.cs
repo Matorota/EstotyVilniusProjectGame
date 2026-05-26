@@ -10,23 +10,18 @@ namespace UI.Windows
 
         private void Awake()
         {
-            if (storyWindow != null)
-                storyWindow.gameObject.SetActive(false);
-
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
+            storyWindow.gameObject.SetActive(false);
+            gameObject.SetActive(true);
         }
 
         private void OnEnable()
         {
-            if (startGameButton != null)
-                startGameButton.onClick.AddListener(HandleStartButtonClicked);
+            startGameButton.onClick.AddListener(HandleStartButtonClicked);
         }
 
         private void OnDisable()
         {
-            if (startGameButton != null)
-                startGameButton.onClick.RemoveListener(HandleStartButtonClicked);
+            startGameButton.onClick.RemoveListener(HandleStartButtonClicked);
         }
 
         private void HandleStartButtonClicked()
