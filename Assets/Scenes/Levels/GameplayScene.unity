@@ -2807,8 +2807,8 @@ MonoBehaviour:
   buttonContinue: {fileID: 4533689}
   hudWindowGameObject: {fileID: 6792995631686690106}
   endQuestButton: {fileID: 7345514619677770855}
+  guildWindowRef: {fileID: 4518272968763509906}
   guildWindowGameObject: {fileID: 488929854}
-  menuUIGameObject: {fileID: 0}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8880,6 +8880,10 @@ PrefabInstance:
       propertyPath: gameUIController
       value: 
       objectReference: {fileID: 1890011324555023794}
+    - target: {fileID: 9211990220574901692, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
+      propertyPath: reOpenQuestButton
+      value: 
+      objectReference: {fileID: 1731929708}
     - target: {fileID: 9211990220574901692, guid: 8f4874c338d233e488685111c978cbfb, type: 3}
       propertyPath: objectToShowWhenWon
       value: 
@@ -36338,6 +36342,7 @@ MonoBehaviour:
   quitButton: {fileID: 953767844}
   inventoryWindowGameObject: {fileID: 3273973556273018644}
   timeScaleManager: {fileID: 463901196}
+  hub: {fileID: 4502405758853742797}
 --- !u!4 &2107668370 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -38767,6 +38772,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InvetoryWindow
   hudWindowGameObject: {fileID: 6792995631686690106}
   closeInventoryButton: {fileID: 1731929708}
+  hub: {fileID: 4502405758853742797}
 --- !u!1 &3374299838289410651
 GameObject:
   m_ObjectHideFlags: 0
@@ -39122,6 +39128,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: hub
+      value: 
+      objectReference: {fileID: 4502405758853742797}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: timeScale
       value: 
