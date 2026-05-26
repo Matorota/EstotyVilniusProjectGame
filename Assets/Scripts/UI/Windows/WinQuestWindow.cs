@@ -248,8 +248,13 @@ public class WinQuestWindow : MonoBehaviour
             }
         }
 
-        if (gameUIController != null)
-            gameUIController.FinishQuest();
+        // Remove finished quest from guild window
+        var guild = FindObjectOfType<GuildWindow>(true);
+        if (guild != null)
+            guild.RemoveQuest(ActiveQuestRegistry.CurrentQuest);
+
+        // clear active quest
+        ActiveQuestRegistry.CurrentQuest = null;
 
         if (guildWindowGameObject != null)
             guildWindowGameObject.SetActive(true);

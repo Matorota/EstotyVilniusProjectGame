@@ -2808,7 +2808,7 @@ MonoBehaviour:
   hudWindowGameObject: {fileID: 6792995631686690106}
   endQuestButton: {fileID: 7345514619677770855}
   guildWindowGameObject: {fileID: 488929854}
-  menuUIGameObject: {fileID: 2101639980}
+  menuUIGameObject: {fileID: 0}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32343,13 +32343,13 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3856218194414729387}
   - {fileID: 217002760}
   - {fileID: 2101639981}
   - {fileID: 605257265}
   - {fileID: 4518272968763509903}
   - {fileID: 2221418370803778668}
   - {fileID: 1975997}
-  - {fileID: 3856218194414729387}
   - {fileID: 158442570}
   - {fileID: 556049622}
   - {fileID: 3272173147317328137}
@@ -39022,6 +39022,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UI.Windows.GameHubWindow
   gameUIController: {fileID: 1890011324555023794}
   gameGubMenuWindowButton: {fileID: 2453834915924229019}
+  hudWindow: {fileID: 6792995631686690106}
+  mainCharacter: {fileID: 412086697}
 --- !u!1001 &4518272968763509902
 PrefabInstance:
   m_ObjectHideFlags: 0

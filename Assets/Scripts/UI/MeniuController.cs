@@ -7,20 +7,17 @@ public class GameUIController : MonoBehaviour
     [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private RespawnPlayer respawnPlayer;
     [SerializeField] private TimeScale timeScaleManager;
-    [SerializeField] private GuildWindow guildWindow;
-    [SerializeField] private GameObject menuRoot;
 
-    private bool isOpen;
-    private IDamageable playerHealth;
-    private Configs.QuestConfig currentQuest;
     private WinQuestWindow winQuestWindow;
     private DeathWindow deathWindowComponent;
+    private MenuWindow menuWindow;
+    private IDamageable playerHealth;
     private bool isDeathHandled;
+    private bool isOpen;
 
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
-        SetActiveIfAssigned(menuRoot, false);
     }
 
     private void Start()
@@ -48,8 +45,11 @@ public class GameUIController : MonoBehaviour
     public void Resume()
     {
         isOpen = false;
-        SetActiveIfAssigned(menuRoot, false);
-        timeScaleManager.Resume();
+        MenuWindow mw = menuWindow ?? FindWindow<MenuWindow>();
+        if (mw != null)
+            mw.Close();
+        else if (timeScaleManager != null)
+            timeScaleManager.Resume();
     }
 
     public void ContinueAndOpenQuitPopup() => Resume();
@@ -61,6 +61,9 @@ public class GameUIController : MonoBehaviour
     public void ToggleMenu() => SetMenu(!isOpen);
 
     public bool IsOpen => isOpen;
+
+    // Indicates whether a quest is currently active (not null)
+    public bool IsQuestActive => ActiveQuestRegistry.HasActiveQuest;
 
     public void OpenQuitPopup()
     {
@@ -117,7 +120,7 @@ public class GameUIController : MonoBehaviour
 
     public void OnEndQuestButtonPressed()
     {
-        Health healthComp = playerHealth as Health ?? mainCharacter?.GetComponent<Health>();
+        Health healthComp = GetPlayerHealth();
         if (healthComp != null)
         {
             float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
@@ -141,36 +144,34 @@ public class GameUIController : MonoBehaviour
                 Destroy(cp.gameObject);
         }
 
-        var finishState = new UI.QuestRemoval(guildWindow);
-        finishState.FinishQuest(currentQuest);
+        var guild = FindWindow<GuildWindow>();
+        if (guild != null)
+        {
+            var finishState = new UI.QuestRemoval(guild);
+            finishState.FinishQuest(ActiveQuestRegistry.CurrentQuest);
+        }
+
+        ActiveQuestRegistry.CurrentQuest = null;
 
         OpenBuildUI();
     }
 
-    public void OnQuestStarted(Configs.QuestConfig quest)
-    {
-        currentQuest = quest;
-        isDeathHandled = false;
-        HideDeathScreen();
-        ResetWinWindow();
-        SetPlayerDeathState(false);
-    }
-
     private void SetMenu(bool open)
     {
-        isOpen = open;
-        SetActiveIfAssigned(menuRoot, open);
+        menuWindow = menuWindow ?? FindWindow<MenuWindow>();
+        if (menuWindow != null)
+        {
+            if (open) menuWindow.Open(); else menuWindow.Close();
+            isOpen = menuWindow.IsOpen;
+            return;
+        }
 
+        // fallback when MenuWindow isn't present: manage timescale directly
+        isOpen = open;
         if (open)
             timeScaleManager.Pause();
         else
             timeScaleManager.Resume();
-    }
-
-    private void SetActiveIfAssigned(GameObject target, bool isActive)
-    {
-        if (target != null)
-            target.SetActive(isActive);
     }
 
     private void ResolveWindowReferences()
@@ -180,6 +181,9 @@ public class GameUIController : MonoBehaviour
 
         if (deathWindowComponent == null)
             deathWindowComponent = FindWindow<DeathWindow>();
+
+        if (menuWindow == null)
+            menuWindow = FindWindow<MenuWindow>();
     }
 
     private void RefreshPlayerHealthReference()
@@ -252,7 +256,7 @@ public class GameUIController : MonoBehaviour
             winQuestWindow.ResetState();
     }
 
-    private T FindWindow<T>() where T : Component
+    private T FindWindow<T>() where T : Component // was used for testing
     {
         GameObject[] roots = gameObject.scene.GetRootGameObjects();
         for (int r = 0; r < roots.Length; r++)
@@ -301,11 +305,6 @@ public class GameUIController : MonoBehaviour
 
     public CharacterMovements GetMainCharacter() => mainCharacter;
 
-    public void FinishQuest()
-    {
-        if (currentQuest != null && guildWindow != null)
-            guildWindow.RemoveQuest(currentQuest);
-    }
 }
 
 public class MeniuController : GameUIController { }

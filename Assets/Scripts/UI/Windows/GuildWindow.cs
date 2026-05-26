@@ -12,12 +12,15 @@ public class GuildWindow : MonoBehaviour
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private Widgets.LevelProgressWidget levelProgressWidget;
     [SerializeField] private Button openQuestButton;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
     [SerializeField] private GameObject hudWindowGameObject;
     
     [SerializeField] private TimeScale timeScale;
+
+    private Configs.QuestConfig currentQuest;
     
+    public Configs.QuestConfig CurrentQuest => currentQuest;
+
     private void OnEnable()
     {
         openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
@@ -57,15 +60,22 @@ public class GuildWindow : MonoBehaviour
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        gameUIController.OnQuestStarted(quest);
-        gameUIController.Resume();
-        
+        // Start quest locally: set active quest, resume time, show HUD, spawn enemies, setup UI.
+        currentQuest = quest;
+        ActiveQuestRegistry.CurrentQuest = quest;
+
+        if (timeScale != null)
+            timeScale.Resume();
+
         if (hudWindowGameObject != null)
             hudWindowGameObject.SetActive(true);
-        
-        enemySpawner.SpawnEnemies(quest.EnemiesAmount);
-        levelProgressWidget.Setup(quest);
-        
+
+        if (enemySpawner != null)
+            enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+
+        if (levelProgressWidget != null)
+            levelProgressWidget.Setup(quest);
+
         gameObject.SetActive(false);
     }
     

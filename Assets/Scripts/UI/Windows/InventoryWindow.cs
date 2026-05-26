@@ -8,6 +8,9 @@ public class InventoryWindow : MonoBehaviour
 
     private void OnEnable()
     {
+        if (hudWindowGameObject != null)
+            hudWindowGameObject.SetActive(false);
+
         if (closeInventoryButton != null)
             closeInventoryButton.onClick.AddListener(HandleCloseButtonClick);
     }

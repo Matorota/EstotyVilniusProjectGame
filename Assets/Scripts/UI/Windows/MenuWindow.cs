@@ -46,4 +46,21 @@ public class MenuWindow : MonoBehaviour
     {
         Application.Quit();
     }
+
+    // Window control API used by GameUIController
+    public void Open()
+    {
+        gameObject.SetActive(true);
+        if (timeScaleManager != null)
+            timeScaleManager.Pause();
+    }
+
+    public void Close()
+    {
+        gameObject.SetActive(false);
+        if (timeScaleManager != null)
+            timeScaleManager.Resume();
+    }
+
+    public bool IsOpen => gameObject.activeSelf;
 }
