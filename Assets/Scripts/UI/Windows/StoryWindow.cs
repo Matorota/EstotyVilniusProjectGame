@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using Configs;
 using TMPro;
 using UnityEngine;
@@ -25,6 +25,7 @@ public class StoryWindow : MonoBehaviour
 
     private void OnEnable()
     {
+        currentIndex = 0;
         nextStoryButton.onClick.AddListener(HandleNextButtonClicked);
         previousStoryButton.onClick.AddListener(HandlePreviousButtonClicked);
 
@@ -39,6 +40,13 @@ public class StoryWindow : MonoBehaviour
     
     private void ShowCurrentPage()
     {
+        if (storyPages.Count == 0)
+        {
+            previousStoryButton.gameObject.SetActive(false);
+            nextStoryButton.gameObject.SetActive(false);
+            return;
+        }
+
         currentIndex = Mathf.Clamp(currentIndex, 0, storyPages.Count - 1);
         StoryPageConfig storyPage = storyPages[currentIndex];
         
@@ -54,7 +62,6 @@ public class StoryWindow : MonoBehaviour
     {
         previousStoryButton.gameObject.SetActive(IsFirstPage() == false);
         nextStoryButton.gameObject.SetActive(HasNextPage() || IsLastPage());
-        
         nextButtonText.text = IsLastPage() ? "Play" : "Next";
     }
 
@@ -82,11 +89,10 @@ public class StoryWindow : MonoBehaviour
         {
             guildWindow.SetActive(true);
             gameObject.SetActive(false);
+            return;
         }
-        else
-        {
-            GoToNextPage();
-        }
+
+        GoToNextPage();
     }
 
     private void HandlePreviousButtonClicked()
@@ -96,7 +102,7 @@ public class StoryWindow : MonoBehaviour
 
     private bool HasNextPage()
     {
-        return currentIndex < storyPages.Count - 1;
+        return storyPages != null && currentIndex < storyPages.Count - 1;
     }
     
     private bool IsFirstPage()
@@ -106,7 +112,6 @@ public class StoryWindow : MonoBehaviour
 
     private bool IsLastPage()
     {
-        return currentIndex == storyPages.Count - 1;
+        return storyPages != null && storyPages.Count > 0 && currentIndex == storyPages.Count - 1;
     }
 }
-

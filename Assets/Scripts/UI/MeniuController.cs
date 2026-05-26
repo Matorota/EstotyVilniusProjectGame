@@ -10,8 +10,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     [SerializeField] private GameObject quildWindow;
     [SerializeField] private GameObject inventoryFromQuildSide;
     [SerializeField] private GameObject inventoryMenuWindow;
-    [SerializeField] private GameObject startGameWindow;
-    [SerializeField] private GameObject storyWindow;
     [SerializeField] private GameObject hudWindow;
     [SerializeField] private GameObject winWindow;
     [SerializeField] private GameObject deathWindow;
@@ -42,20 +40,16 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     private int aliveEnemyCount;
     private Coroutine refreshEnemiesCoroutine;
 
-    private bool isFirstLoad = true;
-
     private void Awake()
     {
         playerHealth = mainCharacter?.GetComponent<IDamageable>();
 
-        SetActiveIfAssigned(startGameWindow, isFirstLoad);
         SetActiveIfAssigned(hudWindow, false);
         SetActiveIfAssigned(menuRoot, false);
         SetActiveIfAssigned(inventoryWindow, false);
         SetActiveIfAssigned(quildWindow, false);
         SetActiveIfAssigned(inventoryFromQuildSide, false);
         SetActiveIfAssigned(inventoryMenuWindow, false);
-        SetActiveIfAssigned(storyWindow, false);
         SetActiveIfAssigned(winWindow, false);
         SetActiveIfAssigned(deathWindow, false);
     }
@@ -63,20 +57,7 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
     private void Start()
     {
         InitializeScreens();
-        
-        if (isFirstLoad)
-        {
-            timeScaleManager.Pause();
-            isOpen = true;
-            isFirstLoad = false;
-        }
-        else
-        {
-            SetActiveIfAssigned(startGameWindow, false);
-            SetActiveIfAssigned(hudWindow, true);
-            timeScaleManager.Resume();
-            isOpen = false;
-        }
+        timeScaleManager.Pause();
     }
 
     private void InitializeScreens()
@@ -215,20 +196,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
 
     public void CloseOtherPanel() => SetPanelVisible(inventoryMenuWindow, false);
 
-    public void OpenStartGameWindow() => OpenPanel(startGameWindow);
-
-    public void CloseStartGameWindow()
-    {
-        SetPanelVisible(startGameWindow, false);
-        isOpen = false;
-        SetPanelVisible(hudWindow, true);
-        timeScaleManager.Resume();
-    }
-
-    public void OpenStoryWindow() => OpenPanel(storyWindow);
-
-    public void CloseStoryWindow() => SetPanelVisible(storyWindow, false);
-
     public void ShowDeathScreen()
     {
         if (deathScreenShown) return;
@@ -314,7 +281,6 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
             }
         }
 
-        // Delegate quest removal to QuestFinnishState
         var finishState = new UI.QuestRemoval(guildWindow);
         finishState.FinishQuest(currentQuest);
 
@@ -469,9 +435,8 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         SetPanelVisible(quildWindow, false);
         SetPanelVisible(inventoryFromQuildSide, false);
         SetPanelVisible(inventoryMenuWindow, false);
-        SetPanelVisible(storyWindow, false);
 
-        if (!isOpen && !IsAnyPanelOpen() && (startGameWindow == null || !startGameWindow.activeInHierarchy))
+        if (!isOpen && !IsAnyPanelOpen())
             SetActiveIfAssigned(hudWindow, true);
     }
 
@@ -480,8 +445,7 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         return (inventoryWindow != null && inventoryWindow.activeInHierarchy) ||
                (quildWindow != null && quildWindow.activeInHierarchy) ||
                (inventoryFromQuildSide != null && inventoryFromQuildSide.activeInHierarchy) ||
-               (inventoryMenuWindow != null && inventoryMenuWindow.activeInHierarchy) ||
-               (storyWindow != null && storyWindow.activeInHierarchy);
+               (inventoryMenuWindow != null && inventoryMenuWindow.activeInHierarchy);
     }
 
     private void SetPanelVisible(GameObject panelRoot, bool visible)
@@ -520,3 +484,5 @@ public class GameUIController : MonoBehaviour  // This part of the code need a l
         }
     }
 }
+
+public class MeniuController : GameUIController { }
