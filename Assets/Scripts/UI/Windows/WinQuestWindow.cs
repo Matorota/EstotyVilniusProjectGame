@@ -18,12 +18,30 @@ public class WinQuestWindow : MonoBehaviour
         HideWindow();
     }
 
+    private void OnEnable()
+    {
+        EnsureInitialized();
+        ResolveQuestRunner();
+    }
+
+    private void OnDisable()
+    {
+        if (buttonContinue != null)
+            buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
+
+        if (questRunner != null)
+        {
+            questRunner.OnQuestWon -= HandleQuestWon;
+            questRunner.OnQuestEnded -= HandleQuestEnded;
+        }
+    }
+
     private void OnDestroy()
     {
-        if (!isInitialized)
-            return;
+        // just in case
+        if (buttonContinue != null)
+            buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
 
-        buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
         if (questRunner != null)
         {
             questRunner.OnQuestWon -= HandleQuestWon;
@@ -34,6 +52,23 @@ public class WinQuestWindow : MonoBehaviour
     public void ShowWindow()
     {
         EnsureInitialized();
+
+        // ensure listeners exist even if window was previously inactive
+        ResolveQuestRunner();
+        if (buttonContinue != null)
+        {
+            buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
+            buttonContinue.onClick.AddListener(HandleContinueButtonClick);
+        }
+
+        if (questRunner != null)
+        {
+            // ensure events are hooked so HideWindow will run when quest ends
+            questRunner.OnQuestWon -= HandleQuestWon;
+            questRunner.OnQuestEnded -= HandleQuestEnded;
+            questRunner.OnQuestWon += HandleQuestWon;
+            questRunner.OnQuestEnded += HandleQuestEnded;
+        }
 
         GameObject screenRoot = GetScreenRoot();
         if (!screenRoot.activeSelf)
@@ -96,14 +131,6 @@ public class WinQuestWindow : MonoBehaviour
 
         ResolveQuestRunner();
 
-        buttonContinue.onClick.AddListener(HandleContinueButtonClick);
-
-        if (questRunner != null)
-        {
-            questRunner.OnQuestWon += HandleQuestWon;
-            questRunner.OnQuestEnded += HandleQuestEnded;
-        }
-
         isInitialized = true;
     }
 
@@ -123,6 +150,7 @@ public class WinQuestWindow : MonoBehaviour
 
     private GameObject GetScreenRoot()
     {
+        
         return winScreenGameObject != null ? winScreenGameObject : gameObject;
     }
 }

@@ -10,6 +10,8 @@ public class InventoryWindow : MonoBehaviour
     private void OnEnable()
     {
         hub.Close();
+        if (hudWindowGameObject != null)
+            hudWindowGameObject.SetActive(false);
         closeInventoryButton.onClick.AddListener(HandleCloseButtonClick);
     }
 
@@ -20,6 +22,8 @@ public class InventoryWindow : MonoBehaviour
 
     private void HandleCloseButtonClick()
     {
+        if (hudWindowGameObject != null)
+            hudWindowGameObject.SetActive(true);
         hub.Open();
         gameObject.SetActive(false);
     }

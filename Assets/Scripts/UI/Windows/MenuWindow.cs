@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class MenuWindow : MonoBehaviour
@@ -10,7 +11,7 @@ public class MenuWindow : MonoBehaviour
     [SerializeField] private GameObject inventoryWindowGameObject;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private UI.Windows.GameHubWindow hub;
-    
+
     private void OnEnable()
     {
         inventoryButton.onClick.AddListener(HandleInventoryButtonClick);
@@ -27,10 +28,21 @@ public class MenuWindow : MonoBehaviour
         quitButton.onClick.RemoveListener(HandleQuitButtonClick);
     }
 
+    private void Update()
+    {
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            if (gameObject.activeSelf)
+                Close();
+            else
+                Open();
+        }
+    }
+
     private void HandleInventoryButtonClick()
     {
         inventoryWindowGameObject.SetActive(true);
-        gameObject.SetActive(false);
+        Close();
     }
 
     private void HandleResumeButtonClick()
@@ -41,6 +53,7 @@ public class MenuWindow : MonoBehaviour
 
     private void HandleQuitButtonClick()
     {
+        timeScaleManager?.Resume();
         Application.Quit();
     }
 
@@ -58,3 +71,4 @@ public class MenuWindow : MonoBehaviour
 
     public bool IsOpen => gameObject.activeSelf;
 }
+

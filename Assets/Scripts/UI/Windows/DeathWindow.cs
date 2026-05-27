@@ -9,10 +9,13 @@ public class DeathWindow : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject guildWindowGameObject;
     [SerializeField] private PlayerLifecycle playerLifecycle;
+    [SerializeField] private Transform respawnLocationCube;
+    [SerializeField] private TimeScale timeScaleManager;
 
     private CanvasGroup canvasGroup;
     private bool isVisible;
     private bool isInitialized;
+    private QuestRunner questRunner;
 
     private void Awake()
     {
@@ -20,11 +23,28 @@ public class DeathWindow : MonoBehaviour
         HideWindow();
     }
 
+    private void OnEnable()
+    {
+        EnsureInitialized();
+        ResolvePlayerLifecycle();
+        SubscribeToPlayerLifecycle();
+
+        restartButton?.onClick.AddListener(HandleRestartButtonClick);
+        guildButton?.onClick.AddListener(HandleGuildButtonClick);
+        quitButton?.onClick.AddListener(HandleQuitButtonClick);
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromPlayerLifecycle();
+        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
+    }
+
     private void OnDestroy()
     {
-        if (!isInitialized)
-            return;
-
+        // safety cleanup
         UnsubscribeFromPlayerLifecycle();
         restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
         guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
@@ -73,12 +93,19 @@ public class DeathWindow : MonoBehaviour
 
     private void HandleRestartButtonClick()
     {
+        ResolvePlayerLifecycle();
+        ResolveQuestRunner();
+
+        playerLifecycle?.Respawn(respawnLocationCube);
+        questRunner?.EndQuest();
+        timeScaleManager?.Resume();
         HideWindow();
     }
 
     private void HandleQuitButtonClick()
     {
-        HideWindow();
+        timeScaleManager?.Resume();
+        Application.Quit();
     }
 
     private void HandlePlayerDied()
@@ -103,11 +130,6 @@ public class DeathWindow : MonoBehaviour
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
         ResolvePlayerLifecycle();
-        SubscribeToPlayerLifecycle();
-
-        restartButton?.onClick.AddListener(HandleRestartButtonClick);
-        guildButton?.onClick.AddListener(HandleGuildButtonClick);
-        quitButton?.onClick.AddListener(HandleQuitButtonClick);
 
         isInitialized = true;
     }
@@ -129,6 +151,20 @@ public class DeathWindow : MonoBehaviour
                 if (playerLifecycle != null)
                     return;
             }
+        }
+    }
+
+    private void ResolveQuestRunner()
+    {
+        if (questRunner != null)
+            return;
+
+        GameObject[] roots = gameObject.scene.GetRootGameObjects();
+        foreach (GameObject root in roots)
+        {
+            questRunner = root.GetComponentInChildren<QuestRunner>(true);
+            if (questRunner != null)
+                return;
         }
     }
 

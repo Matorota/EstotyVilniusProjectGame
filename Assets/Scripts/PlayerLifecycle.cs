@@ -46,14 +46,17 @@ public class PlayerLifecycle : MonoBehaviour
         OnPlayerDied?.Invoke();
     }
 
-    public void Respawn(Vector3 position)
+    public void Respawn(Transform respawnLocation)
     {
-        if (!isDead)
+        if (respawnLocation == null)
             return;
 
         isDead = false;
-        transform.position = position;
-        
+
+        ResetCharacterController();
+        transform.SetPositionAndRotation(respawnLocation.position, respawnLocation.rotation);
+        ResetCharacterMotor();
+
         if (health != null)
             health.Heal(health.MaxHealth);
 
@@ -97,6 +100,22 @@ public class PlayerLifecycle : MonoBehaviour
             if (component != null)
                 component.enabled = true;
         }
+    }
+
+    private void ResetCharacterController()
+    {
+        CharacterController controller = GetComponent<CharacterController>();
+        if (controller != null)
+        {
+            controller.enabled = false;
+            controller.enabled = true;
+        }
+    }
+
+    private void ResetCharacterMotor()
+    {
+        CharacterMotor motor = GetComponent<CharacterMotor>();
+        motor?.ResetMotion();
     }
 
     private void DestroyAllEnemies()

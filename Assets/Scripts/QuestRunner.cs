@@ -7,7 +7,6 @@ using UnityEngine;
 public class QuestRunner : MonoBehaviour
 {
     [SerializeField] private EnemySpawner enemySpawner;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private GameHubWindow hubWindow;
     
@@ -149,12 +148,15 @@ public class QuestRunner : MonoBehaviour
         {
             Status = QuestStatus.Completed;
             OnQuestWon?.Invoke();
+
+            // fallback: directly show WinQuestWindow if UI isn't subscribed yet
+            WinQuestWindow winWindow = FindSceneComponent<WinQuestWindow>();
+            winWindow?.ShowWindow();
         }
     }
 
     private void SubscribeToEnemySpawner()
     {
-        EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
         EnemySpawner.OnEnemySpawned += HandleEnemySpawned;
     }
 
@@ -177,7 +179,7 @@ public class QuestRunner : MonoBehaviour
 
     private void HealPlayer()
     {
-        Health healthComp = gameUIController.GetPlayerHealth();
+        Health healthComp = FindSceneComponent<Health>();
         if (healthComp == null)
             return;
 
@@ -216,7 +218,6 @@ public class QuestRunner : MonoBehaviour
     private void ResolveDependencies()
     { 
         enemySpawner ??= FindSceneComponent<EnemySpawner>();
-        gameUIController ??= FindSceneComponent<GameUIController>();
         timeScaleManager ??= FindSceneComponent<TimeScale>();
         hubWindow ??= FindSceneComponent<GameHubWindow>();
     }

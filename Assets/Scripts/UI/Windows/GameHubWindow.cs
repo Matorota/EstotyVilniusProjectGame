@@ -5,14 +5,8 @@ namespace UI.Windows
 {
     public class GameHubWindow : MonoBehaviour
     {
-        [SerializeField] private GameUIController gameUIController;
+        [SerializeField] private MenuWindow menuWindow;
         [SerializeField] private Button gameGubMenuWindowButton;
-        [SerializeField] private GameObject hudWindow; 
-        [SerializeField] private CharacterMovements mainCharacter; 
-
-        [SerializeField] private WinQuestWindow winQuestWindow;
-        [SerializeField] private DeathWindow deathWindow;
-
 
         private void OnEnable()
         {
@@ -26,7 +20,8 @@ namespace UI.Windows
         
         private void HandleMenuButtonClicked()
         {
-            gameUIController.OpenQuitPopup();
+            ResolveMenuWindow();
+            menuWindow?.Open();
             gameObject.SetActive(false);
         }
 
@@ -42,5 +37,18 @@ namespace UI.Windows
 
         public bool IsOpen => gameObject.activeSelf;
 
+        private void ResolveMenuWindow()
+        {
+            if (menuWindow != null)
+                return;
+
+            GameObject[] roots = gameObject.scene.GetRootGameObjects();
+            foreach (GameObject root in roots)
+            {
+                menuWindow = root.GetComponentInChildren<MenuWindow>(true);
+                if (menuWindow != null)
+                    return;
+            }
+        }
     }
 }
