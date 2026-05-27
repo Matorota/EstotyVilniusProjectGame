@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class WinQuestWindow : MonoBehaviour
 {
     [SerializeField] private QuestRunner questRunner;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private GameObject winScreenGameObject;
     [SerializeField] private Button buttonContinue;
@@ -35,9 +34,6 @@ public class WinQuestWindow : MonoBehaviour
     public void ShowWindow()
     {
         EnsureInitialized();
-
-        if (gameUIController != null && gameUIController.IsOpen)
-            gameUIController.CloseMenu();
 
         GameObject screenRoot = GetScreenRoot();
         if (!screenRoot.activeSelf)
@@ -72,14 +68,7 @@ public class WinQuestWindow : MonoBehaviour
 
     private void HandleContinueButtonClick()
     {
-        if (questRunner != null)
-        {
-            questRunner.EndQuest();
-        }
-        else
-        {
-            HideWindow();
-        }
+        questRunner.EndQuest();
     }
 
     private void HandleQuestWon()
@@ -121,18 +110,14 @@ public class WinQuestWindow : MonoBehaviour
     private void ResolveQuestRunner()
     {
         if (questRunner != null)
-        {
             return;
-        }
 
         GameObject[] roots = gameObject.scene.GetRootGameObjects();
-        for (int r = 0; r < roots.Length; r++)
+        foreach (GameObject root in roots)
         {
-            questRunner = roots[r].GetComponentInChildren<QuestRunner>(true);
+            questRunner = root.GetComponentInChildren<QuestRunner>(true);
             if (questRunner != null)
-            {
                 return;
-            }
         }
     }
 

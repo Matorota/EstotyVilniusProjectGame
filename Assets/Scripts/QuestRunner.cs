@@ -58,6 +58,7 @@ public class QuestRunner : MonoBehaviour
         ResumeGame();
         ShowHud();
         HideEndQuestButton();
+        EnablePlayerMovement();
 
         OnQuestStarted?.Invoke(quest);
         OnAliveCountChanged?.Invoke();
@@ -76,7 +77,6 @@ public class QuestRunner : MonoBehaviour
     {
         ResumeGame();
         HealPlayer();
-        DestroyCardPickups();
         ClearTrackedEnemies();
         UnsubscribeFromEnemySpawner();
 
@@ -168,9 +168,7 @@ public class QuestRunner : MonoBehaviour
         foreach (KeyValuePair<Health, Action> entry in enemyDeathHandlers)
         {
             if (entry.Key != null)
-            {
                 entry.Key.OnDeath -= entry.Value;
-            }
         }
 
         enemyDeathHandlers.Clear();
@@ -179,80 +177,48 @@ public class QuestRunner : MonoBehaviour
 
     private void HealPlayer()
     {
-        if (gameUIController == null)
-        {
-            return;
-        }
-
         Health healthComp = gameUIController.GetPlayerHealth();
         if (healthComp == null)
-        {
             return;
-        }
 
         float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
         if (missing > 0f)
-        {
             healthComp.Heal(missing);
-        }
-    }
-
-    private void DestroyCardPickups()
-    {
-        CharacterMovements mainCharacter = gameUIController != null ? gameUIController.GetMainCharacter() : null;
-        List<CardPickup> pickups = CardPickup.GetActivePickups();
-
-        for (int i = 0; i < pickups.Count; i++)
-        {
-            CardPickup pickup = pickups[i];
-            if (pickup != null && pickup.gameObject != mainCharacter?.gameObject)
-            {
-                Destroy(pickup.gameObject);
-            }
-        }
     }
 
     private void ResumeGame()
     {
         if (timeScaleManager != null)
-        {
             timeScaleManager.Resume();
-            return;
-        }
-
-        Time.timeScale = 1f;
+        else
+            Time.timeScale = 1f;
     }
 
     private void ShowHud()
     {
-        if (hubWindow != null)
-        {
-            hubWindow.Open();
-        }
-
+        hubWindow?.Open();
         EndQuestWidget endQuestWidget = FindSceneComponent<EndQuestWidget>();
-        if (endQuestWidget != null)
-        {
-            endQuestWidget.ShowButton();
-        }
-
+        endQuestWidget?.ShowButton();
     }
 
     private void HideEndQuestButton()
     {
         EndQuestWidget endQuestWidget = FindSceneComponent<EndQuestWidget>();
-        if (endQuestWidget != null)
-        {
-            endQuestWidget.HideButton();
-        }
+        endQuestWidget?.HideButton();
+    }
+
+    private void EnablePlayerMovement()
+    {
+        PlayerLifecycle playerLifecycle = FindSceneComponent<PlayerLifecycle>();
+        playerLifecycle?.EnableMovement();
     }
 
     private void ResolveDependencies()
     { 
-        enemySpawner = FindSceneComponent<EnemySpawner>();
-        gameUIController = FindSceneComponent<GameUIController>();
-        timeScaleManager = FindSceneComponent<TimeScale>();
-        hubWindow = FindSceneComponent<GameHubWindow>();
+        enemySpawner ??= FindSceneComponent<EnemySpawner>();
+        gameUIController ??= FindSceneComponent<GameUIController>();
+        timeScaleManager ??= FindSceneComponent<TimeScale>();
+        hubWindow ??= FindSceneComponent<GameHubWindow>();
     }
 
     private T FindSceneComponent<T>() where T : Component

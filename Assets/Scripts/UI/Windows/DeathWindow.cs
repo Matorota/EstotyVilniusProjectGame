@@ -3,18 +3,15 @@ using UnityEngine.UI;
 
 public class DeathWindow : MonoBehaviour
 {
-    [SerializeField] private CharacterMovements mainCharacter;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private GameObject deathScreenGameObject;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button guildButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject guildWindowGameObject;
+    [SerializeField] private PlayerLifecycle playerLifecycle;
 
     private CanvasGroup canvasGroup;
-    private Health playerHealth;
     private bool isVisible;
-    private bool isDismissed;
     private bool isInitialized;
 
     private void Awake()
@@ -23,45 +20,20 @@ public class DeathWindow : MonoBehaviour
         HideWindow();
     }
 
-    private void Update()
-    {
-        EnsureInitialized();
-
-        if (playerHealth == null)
-            return;
-
-        if (isVisible && gameUIController.IsOpen)
-            gameUIController.CloseMenu();
-
-        bool isDead = playerHealth.CurrentHealth <= 0f;
-        if (!isDead)
-        {
-            isDismissed = false;
-            if (isVisible)
-                HideWindow();
-            return;
-        }
-
-        if (!isDismissed && !isVisible)
-            ShowWindow();
-    }
-
     private void OnDestroy()
     {
         if (!isInitialized)
             return;
 
-        restartButton.onClick.RemoveListener(HandleRestartButtonClick);
-        guildButton.onClick.RemoveListener(HandleGuildButtonClick);
-        quitButton.onClick.RemoveListener(HandleQuitButtonClick);
+        UnsubscribeFromPlayerLifecycle();
+        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
     }
 
     public void ShowWindow()
     {
         EnsureInitialized();
-
-        if (gameUIController.IsOpen)
-            gameUIController.CloseMenu();
 
         GameObject screenRoot = GetScreenRoot();
         if (!screenRoot.activeSelf)
@@ -78,6 +50,7 @@ public class DeathWindow : MonoBehaviour
     public void HideWindow()
     {
         EnsureInitialized();
+
         GameObject screenRoot = GetScreenRoot();
         isVisible = false;
         canvasGroup.alpha = 0f;
@@ -86,34 +59,35 @@ public class DeathWindow : MonoBehaviour
 
         if (screenRoot != gameObject)
             screenRoot.SetActive(false);
+        
+        Time.timeScale = 1f;
     }
 
     public bool IsVisible => isVisible;
 
     private void HandleGuildButtonClick()
     {
-        isDismissed = true;
-
         guildWindowGameObject.SetActive(true);
-
         HideWindow();
     }
 
     private void HandleRestartButtonClick()
     {
-        isDismissed = true;
-
-        gameUIController.RestartCurrentLevel();
-
         HideWindow();
     }
 
     private void HandleQuitButtonClick()
     {
-        isDismissed = true;
+        HideWindow();
+    }
 
-        gameUIController.ContinueAndOpenQuitPopup();
+    private void HandlePlayerDied()
+    {
+        ShowWindow();
+    }
 
+    private void HandlePlayerRespawned()
+    {
         HideWindow();
     }
 
@@ -128,13 +102,52 @@ public class DeathWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
-        playerHealth = gameUIController.GetPlayerHealth();
+        ResolvePlayerLifecycle();
+        SubscribeToPlayerLifecycle();
 
-        restartButton.onClick.AddListener(HandleRestartButtonClick);
-        guildButton.onClick.AddListener(HandleGuildButtonClick);
-        quitButton.onClick.AddListener(HandleQuitButtonClick);
+        restartButton?.onClick.AddListener(HandleRestartButtonClick);
+        guildButton?.onClick.AddListener(HandleGuildButtonClick);
+        quitButton?.onClick.AddListener(HandleQuitButtonClick);
 
         isInitialized = true;
+    }
+
+    private void ResolvePlayerLifecycle()
+    {
+        if (playerLifecycle != null)
+            return;
+
+        CharacterMovements charMovements = FindObjectOfType<CharacterMovements>();
+        playerLifecycle = charMovements?.GetComponent<PlayerLifecycle>();
+
+        if (playerLifecycle == null)
+        {
+            GameObject[] roots = gameObject.scene.GetRootGameObjects();
+            foreach (GameObject root in roots)
+            {
+                playerLifecycle = root.GetComponentInChildren<PlayerLifecycle>(true);
+                if (playerLifecycle != null)
+                    return;
+            }
+        }
+    }
+
+    private void SubscribeToPlayerLifecycle()
+    {
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
+        }
+    }
+
+    private void UnsubscribeFromPlayerLifecycle()
+    {
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned -= HandlePlayerRespawned;
+        }
     }
 
     private GameObject GetScreenRoot()
@@ -142,3 +155,4 @@ public class DeathWindow : MonoBehaviour
         return deathScreenGameObject != null ? deathScreenGameObject : gameObject;
     }
 }
+

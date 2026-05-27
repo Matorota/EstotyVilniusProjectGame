@@ -16,7 +16,7 @@ public class GameUIController : MonoBehaviour
     private MenuWindow menuWindow;
     private IDamageable playerHealth;
     private QuestRunner questRunner;
-    private bool isDeathHandled;
+    private PlayerLifecycle playerLifecycle;
     private bool isOpen;
 
     private void Awake()
@@ -27,17 +27,13 @@ public class GameUIController : MonoBehaviour
     private void Start()
     {
         ResolveWindowReferences();
-        HideDeathScreen();
         ResetWinWindow();
-        SetPlayerDeathState(false);
         timeScaleManager.Pause();
     }
 
     private void Update()
     {
         ResolveWindowReferences();
-        RefreshPlayerHealthReference();
-        HandleEndStates();
 
         if (IsEndScreenVisible())
             return;
@@ -87,14 +83,10 @@ public class GameUIController : MonoBehaviour
 
     public void RestartCurrentLevel()
     {
-
         if (!respawnPlayer.RespawnMainCharacter(mainCharacter, respawnLocationCube))
             return;
 
-        isDeathHandled = false;
-        HideDeathScreen();
         ResetWinWindow();
-        SetPlayerDeathState(false);
         Time.timeScale = 1f;
         isOpen = false;
         timeScaleManager.Resume();
@@ -149,59 +141,6 @@ public class GameUIController : MonoBehaviour
             questRunner = FindWindow<QuestRunner>();
     }
 
-    private void RefreshPlayerHealthReference()
-    {
-        if (playerHealth == null)
-            playerHealth = mainCharacter?.GetComponent<IDamageable>();
-    }
-
-    private void HandleEndStates()
-    {
-        Health healthComp = GetPlayerHealth();
-        if (healthComp == null)
-            return;
-
-        if (healthComp.CurrentHealth <= 0f)
-        {
-            if (!isDeathHandled)
-            {
-                isDeathHandled = true;
-                SetPlayerDeathState(true);
-                ShowDeathScreen();
-            }
-
-            return;
-        }
-
-        if (isDeathHandled)
-        {
-            isDeathHandled = false;
-            HideDeathScreen();
-            SetPlayerDeathState(false);
-        }
-    }
-
-    private void ShowDeathScreen()
-    {
-        CloseMenu();
-
-        if (deathWindowComponent != null)
-        {
-            deathWindowComponent.ShowWindow();
-            return;
-        }
-
-        timeScaleManager.Pause();
-    }
-
-    private void HideDeathScreen()
-    {
-        if (deathWindowComponent != null)
-        {
-            deathWindowComponent.HideWindow();
-        }
-    }
-
     private bool IsEndScreenVisible()
     {
         if (winQuestWindow != null && winQuestWindow.IsVisible)
@@ -230,36 +169,6 @@ public class GameUIController : MonoBehaviour
         }
 
         return null;
-    }
-
-    private void SetPlayerDeathState(bool isDead)
-    {
-        if (mainCharacter == null)
-            return;
-
-        CharacterMovements movements = mainCharacter.GetComponent<CharacterMovements>();
-        if (movements != null)
-            movements.enabled = !isDead;
-
-        CharacterInputReader inputReader = mainCharacter.GetComponent<CharacterInputReader>();
-        if (inputReader != null)
-            inputReader.enabled = !isDead;
-
-        CharacterMeleeAttack meleeAttack = mainCharacter.GetComponent<CharacterMeleeAttack>();
-        if (meleeAttack != null)
-            meleeAttack.enabled = !isDead;
-
-        Combat combat = mainCharacter.GetComponent<Combat>();
-        if (combat != null)
-            combat.ClearTarget();
-
-        CharacterMotor motor = mainCharacter.GetComponent<CharacterMotor>();
-        if (motor != null)
-            motor.ResetMotion();
-
-        CharacterMovementAnimation movementAnimation = mainCharacter.GetComponent<CharacterMovementAnimation>();
-        if (movementAnimation != null)
-            movementAnimation.Tick(Vector2.zero, Vector3.zero, 0f, Vector3.zero);
     }
 
     public Health GetPlayerHealth() => playerHealth as Health ?? mainCharacter?.GetComponent<Health>();

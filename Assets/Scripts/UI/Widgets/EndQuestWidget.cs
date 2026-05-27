@@ -8,6 +8,7 @@ namespace UI.Windows
         [SerializeField] private QuestRunner questRunner;
         [SerializeField] private Button endGameButton;
         [SerializeField] private GuildWindow guildWindow;
+        [SerializeField] private PlayerLifecycle playerLifecycle;
         private CanvasGroup canvasGroup;
 
 
@@ -29,42 +30,21 @@ namespace UI.Windows
         private void HandleEndGameButtonClick()
         {
             HideButton();
-
-            if (questRunner != null)
-            {
-                questRunner.EndQuest();
-            }
-
-            // Open Guild Window after quest ends
-            if (guildWindow != null)
-            {
-                guildWindow.gameObject.SetActive(true);
-                Debug.Log("GuildWindow opened");
-            }
+            DestroyAllCardPickups();
+            DisablePlayerMovement();
+            questRunner.EndQuest();
+            guildWindow.gameObject.SetActive(true);
         }
 
         public void ShowButton()
         {
-            Debug.Log("EndQuestWidget.ShowButton() called");
             ResolveEndGameButton();
-            
-            if (endGameButton == null)
-            {
-                Debug.LogError("endGameButton is NULL in ShowButton()!");
-                return;
-            }
-            
-            // Unhide button
             endGameButton.gameObject.SetActive(true);
-            Debug.Log("EndQuestButton SetActive(true)");
-            
-            // Ensure CanvasGroup is visible
             EnsureCanvasGroup();
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
             
-            // Unhide all parents that have CanvasGroups
             Transform parent = endGameButton.transform.parent;
             while (parent != null)
             {
@@ -74,22 +54,14 @@ namespace UI.Windows
                     parentCG.alpha = 1f;
                     parentCG.interactable = true;
                     parentCG.blocksRaycasts = true;
-                    Debug.Log($"Unhid parent CanvasGroup on {parent.name}");
                 }
-                
                 parent = parent.parent;
             }
-            
-            Debug.Log($"EndQuestButton CanvasGroup: alpha={canvasGroup.alpha}, interactable={canvasGroup.interactable}");
         }
 
         public void HideButton()
         {
-            Debug.Log("EndQuestWidget.HideButton() called");
             ResolveEndGameButton();
-            if (endGameButton == null)
-                return;
-                
             EnsureCanvasGroup();
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
@@ -105,7 +77,6 @@ namespace UI.Windows
                 if (canvasGroup == null)
                 {
                     canvasGroup = endGameButton.gameObject.AddComponent<CanvasGroup>();
-                    Debug.Log("Created CanvasGroup on EndQuestButton");
                 }
             }
         }
@@ -114,10 +85,7 @@ namespace UI.Windows
         {
             if (endGameButton != null)
                 return;
-
             endGameButton = GetComponentInChildren<Button>(true);
-            if (endGameButton == null)
-                Debug.LogError("Could not find Button in EndQuestWidget!");
         }
 
         private void ResolveGuildWindow()
@@ -126,12 +94,24 @@ namespace UI.Windows
                 return;
 
             GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            for (int r = 0; r < roots.Length; r++)
+            foreach (GameObject root in roots)
             {
-                guildWindow = roots[r].GetComponentInChildren<GuildWindow>(true);
+                guildWindow = root.GetComponentInChildren<GuildWindow>(true);
                 if (guildWindow != null)
-                {
                     return;
+            }
+        }
+
+        private void DestroyAllCardPickups()
+        {
+            CardPickup[] allPickups = FindObjectsByType<CardPickup>(FindObjectsSortMode.None);
+            CharacterMovements player = FindObjectOfType<CharacterMovements>();
+            
+            foreach (CardPickup pickup in allPickups)
+            {
+                if (pickup != null && pickup.gameObject != player?.gameObject)
+                {
+                    Destroy(pickup.gameObject);
                 }
             }
         }
@@ -139,19 +119,30 @@ namespace UI.Windows
         private void ResolveQuestRunner()
         {
             if (questRunner != null)
-            {
                 return;
-            }
 
             GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            for (int r = 0; r < roots.Length; r++)
+            foreach (GameObject root in roots)
             {
-                questRunner = roots[r].GetComponentInChildren<QuestRunner>(true);
+                questRunner = root.GetComponentInChildren<QuestRunner>(true);
                 if (questRunner != null)
-                {
                     return;
-                }
             }
+        }
+
+        private void DisablePlayerMovement()
+        {
+            ResolvePlayerLifecycle();
+            playerLifecycle?.DisableMovement();
+        }
+
+        private void ResolvePlayerLifecycle()
+        {
+            if (playerLifecycle != null)
+                return;
+
+            CharacterMovements charMovements = FindObjectOfType<CharacterMovements>();
+            playerLifecycle = charMovements?.GetComponent<PlayerLifecycle>();
         }
     }
 }
