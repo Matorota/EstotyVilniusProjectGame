@@ -15,6 +15,7 @@ public class GameUIController : MonoBehaviour
     private DeathWindow deathWindowComponent;
     private MenuWindow menuWindow;
     private IDamageable playerHealth;
+    private QuestRunner questRunner;
     private bool isDeathHandled;
     private bool isOpen;
 
@@ -65,9 +66,7 @@ public class GameUIController : MonoBehaviour
 
     public bool IsOpen => isOpen;
 
-    private GuildWindow guildWindow;
-
-    public bool IsQuestActive => guildWindow != null && guildWindow.IsActive;
+    public bool IsQuestActive => questRunner != null && questRunner.Status == QuestStatus.Active;
 
     public void OpenQuitPopup()
     {
@@ -117,43 +116,6 @@ public class GameUIController : MonoBehaviour
 
     public void OnContinueButtonPressed() => Resume();
 
-    public void OnEndQuestButtonPressed() // Like a reset of quests 
-    {
-        Health healthComp = GetPlayerHealth();
-        if (healthComp != null)
-        {
-            float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
-            if (missing > 0f)
-                healthComp.Heal(missing);
-        }
-
-        var roots = gameObject.scene.GetRootGameObjects();
-        var cardsList = new System.Collections.Generic.List<CardPickup>();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            var found = roots[r].GetComponentsInChildren<CardPickup>(true);
-            for (int j = 0; j < found.Length; j++)
-                cardsList.Add(found[j]);
-        }
-
-        for (int i = 0; i < cardsList.Count; i++)
-        {
-            var cp = cardsList[i];
-            if (cp != null && cp.gameObject != mainCharacter?.gameObject)
-                Destroy(cp.gameObject);
-        }
-
-        var guild = guildWindow ?? FindWindow<GuildWindow>();
-        if (guild != null)
-        {
-            var finishState = new UI.QuestRemoval(guild);
-            finishState.FinishQuest(guild.CurrentQuest);
-            guild.EndQuest();
-        }
-
-        OpenBuildUI();
-    }
-
     private void SetMenu(bool open)
     {
         menuWindow = menuWindow ?? FindWindow<MenuWindow>();
@@ -183,8 +145,8 @@ public class GameUIController : MonoBehaviour
         if (menuWindow == null)
             menuWindow = FindWindow<MenuWindow>();
 
-        if (guildWindow == null)
-            guildWindow = FindWindow<GuildWindow>();
+        if (questRunner == null)
+            questRunner = FindWindow<QuestRunner>();
     }
 
     private void RefreshPlayerHealthReference()
@@ -254,7 +216,7 @@ public class GameUIController : MonoBehaviour
     private void ResetWinWindow()
     {
         if (winQuestWindow != null)
-            winQuestWindow.ResetState();
+            winQuestWindow.HideWindow();
     }
 
     private T FindWindow<T>() where T : Component // was used for testing for now permanant (ask how to replace to what) I am for now thinking a registry or something similar

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Configs;
 using TMPro;
 using UnityEngine;
@@ -8,69 +7,37 @@ namespace Widgets
 {
     public class LevelProgressWidget : MonoBehaviour
     {
+        [SerializeField] private QuestRunner questRunner;
         [SerializeField] private TMP_Text nameText;
         [SerializeField] private TMP_Text descriptionText;
         [SerializeField] private Slider enemiesSlider;
         [SerializeField] private GameObject background;
 
         private QuestConfig currentQuest;
-        private  HashSet<Health> trackedEnemies = new HashSet<Health>();
 
         private void OnEnable()
         {
-            EnemySpawner.OnEnemySpawned += OnEnemySpawned;
+            ResolveQuestRunner();
+            if (questRunner != null)
+            {
+                questRunner.OnQuestStarted += HandleQuestStarted;
+                questRunner.OnAliveCountChanged += HandleAliveCountChanged;
+                questRunner.OnQuestEnded += HandleQuestEnded;
+                SyncToQuestRunner();
+                return;
+            }
 
-            RegisterExistingEnemies();
-
-            UpdateEnemiesText();
+            Setup(null);
         }
 
         private void OnDisable()
         {
-            EnemySpawner.OnEnemySpawned -= OnEnemySpawned;
-            UnregisterAllEnemies();
-        }
-
-        private void RegisterExistingEnemies()
-        {
-            var roots = gameObject.scene.GetRootGameObjects();  // cannot think of another way how to do it without findobjectbytype
-            for (int r = 0; r < roots.Length; r++)
+            if (questRunner != null)
             {
-                var found = roots[r].GetComponentsInChildren<Health>(true);
-                for (int i = 0; i < found.Length; i++)
-                {
-                    var h = found[i];
-                    if (h != null && h.Team == Team.Enemy)
-                        RegisterEnemy(h);
-                }
+                questRunner.OnQuestStarted -= HandleQuestStarted;
+                questRunner.OnAliveCountChanged -= HandleAliveCountChanged;
+                questRunner.OnQuestEnded -= HandleQuestEnded;
             }
-        }
-
-        private void RegisterEnemy(Health h)
-        {
-            if (h == null || trackedEnemies.Contains(h)) return;
-            trackedEnemies.Add(h);
-            h.OnDeath += OnTrackedEnemyDeath;
-            UpdateEnemiesText();
-        }
-
-        private void UnregisterAllEnemies()
-        {
-            foreach (var h in trackedEnemies)
-            {
-                if (h != null) h.OnDeath -= OnTrackedEnemyDeath;
-            }
-            trackedEnemies.Clear();
-        }
-
-        private void OnEnemySpawned(Health h)
-        {
-            RegisterEnemy(h);
-        }
-
-        private void OnTrackedEnemyDeath()
-        {
-            UpdateEnemiesText();
         }
 
         public void Setup(QuestConfig quest)
@@ -86,59 +53,111 @@ namespace Widgets
             }
 
             UpdateEnemiesText();
+            SetProgressVisible(quest != null);
         }
 
         private void UpdateEnemiesText()
         {
-            int alive = 0;
-            foreach (var h in trackedEnemies)
-            {
-                if (h != null && h.CurrentHealth > 0f) alive++;
-            }
+            int alive = questRunner != null ? questRunner.AliveEnemies : 0;
+            int total = questRunner != null ? questRunner.TotalEnemies : (currentQuest != null ? currentQuest.EnemiesAmount : 0);
 
             if (descriptionText != null)
             {
                 if (currentQuest != null)
-                    descriptionText.text = $"Enemies: {alive}/{currentQuest.EnemiesAmount}";
+                    descriptionText.text = $"Enemies: {alive}/{total}";
                 else
-                    descriptionText.text = $"Enemies: {alive}";
+                    descriptionText.text = string.Empty;
             }
 
             if (enemiesSlider != null)
             {
-                float val = Mathf.Clamp(alive, 0, (int)enemiesSlider.maxValue);
-                enemiesSlider.value = val;
-                GameObject sliderGO = enemiesSlider.gameObject;
-                bool shouldShow = alive > 0;
-                if (sliderGO != this.gameObject)
-                {
-                    sliderGO.SetActive(shouldShow);
-                }
-                else
-                {
-                    CanvasGroup component = sliderGO.GetComponent<CanvasGroup>();
-                    if (component == null) component = sliderGO.AddComponent<CanvasGroup>();
-                    component.alpha = shouldShow ? 1f : 0f;
-                    component.interactable = shouldShow;
-                    component.blocksRaycasts = shouldShow;
-                }
+                enemiesSlider.maxValue = Mathf.Max(1, total);
+                enemiesSlider.value = Mathf.Clamp(alive, 0, (int)enemiesSlider.maxValue);
             }
 
             if (background != null)
             {
-                GameObject bgGO = background.gameObject;
-                bool bgShow = alive > 0;
-                if (bgGO != this.gameObject)
+                SetTargetVisible(background, currentQuest != null);
+            }
+        }
+
+        private void HandleQuestStarted(QuestConfig quest)
+        {
+            Setup(quest);
+        }
+
+        private void HandleAliveCountChanged()
+        {
+            UpdateEnemiesText();
+        }
+
+        private void HandleQuestEnded()
+        {
+            Setup(null);
+        }
+
+        private void SyncToQuestRunner()
+        {
+            if (questRunner == null || questRunner.CurrentQuest == null)
+            {
+                Setup(null);
+                return;
+            }
+
+            Setup(questRunner.CurrentQuest);
+        }
+
+        private void SetProgressVisible(bool visible)
+        {
+            if (enemiesSlider != null)
+            {
+                SetTargetVisible(enemiesSlider.gameObject, visible);
+            }
+
+            if (background != null)
+            {
+                SetTargetVisible(background, visible);
+            }
+        }
+
+        private void SetTargetVisible(GameObject target, bool visible)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            if (target != gameObject)
+            {
+                target.SetActive(visible);
+                return;
+            }
+
+            CanvasGroup component = target.GetComponent<CanvasGroup>();
+            if (component == null)
+            {
+                component = target.AddComponent<CanvasGroup>();
+            }
+
+            component.alpha = visible ? 1f : 0f;
+            component.interactable = visible;
+            component.blocksRaycasts = visible;
+        }
+
+        private void ResolveQuestRunner()
+        {
+            if (questRunner != null)
+            {
+                return;
+            }
+
+            GameObject[] roots = gameObject.scene.GetRootGameObjects();
+            for (int r = 0; r < roots.Length; r++)
+            {
+                questRunner = roots[r].GetComponentInChildren<QuestRunner>(true);
+                if (questRunner != null)
                 {
-                    bgGO.SetActive(bgShow);
-                }
-                else
-                {
-                    CanvasGroup bgCg = bgGO.GetComponent<CanvasGroup>();
-                    if (bgCg == null) bgCg = bgGO.AddComponent<CanvasGroup>();
-                    bgCg.alpha = bgShow ? 1f : 0f;
-                    bgCg.interactable = bgShow;
-                    bgCg.blocksRaycasts = bgShow;
+                    return;
                 }
             }
         }

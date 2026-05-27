@@ -1360,6 +1360,54 @@ Transform:
   - {fileID: 1101446357}
   m_Father: {fileID: 2012218363}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &81800370
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 81800371}
+  - component: {fileID: 81800372}
+  m_Layer: 0
+  m_Name: 'QuestRunner '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &81800371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81800370}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &81800372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81800370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4a4b2c6ef247789d9a5a4e8ad9c3e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestRunner
+  enemySpawner: {fileID: 262327338}
+  gameUIController: {fileID: 1890011324555023794}
+  timeScaleManager: {fileID: 463901196}
+  hubWindow: {fileID: 4502405758853742797}
 --- !u!4 &85753116 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -2801,14 +2849,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32c2901d6e6f4e268b6246534c8a7645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WinQuestWindow
+  questRunner: {fileID: 81800372}
   gameUIController: {fileID: 1890011324555023794}
   timeScaleManager: {fileID: 463901196}
   winScreenGameObject: {fileID: 158442569}
   buttonContinue: {fileID: 4533689}
-  hudWindowGameObject: {fileID: 6792995631686690106}
-  endQuestButton: {fileID: 7345514619677770855}
-  guildWindowRef: {fileID: 4518272968763509906}
-  guildWindowGameObject: {fileID: 488929854}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38096,6 +38141,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 830605218}
     - target: {fileID: 8335696912033974338, guid: c2be74168cb7b864b93129e176819c58, type: 3}
+      propertyPath: questRunner
+      value: 
+      objectReference: {fileID: 81800372}
+    - target: {fileID: 8335696912033974338, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: enemiesSlider
       value: 
       objectReference: {fileID: 610205626}
@@ -38890,8 +38939,8 @@ RectTransform:
   - {fileID: 5754861590467313721}
   - {fileID: 8769029639498425250}
   - {fileID: 1069004473442513943}
-  - {fileID: 1660067094}
   - {fileID: 9094631231963225583}
+  - {fileID: 1660067094}
   m_Father: {fileID: 1837850371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -39141,6 +39190,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4518272968763509906}
     - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
+      propertyPath: questRunner
+      value: 
+      objectReference: {fileID: 81800372}
+    - target: {fileID: 3703078745422704340, guid: 8869e663a4246ed42bf1c00703c337ab, type: 3}
       propertyPath: enemySpawner
       value: 
       objectReference: {fileID: 262327338}
@@ -39318,8 +39371,8 @@ MonoBehaviour:
   onlyOnMobile: 0
   dragColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   sensitivity: 1000
-  radius: 1
-  deadzone: 0.5
+  radius: 0.365
+  deadzone: 0.13
   edgeSnap: 0
   directions: 0
   angleOffset: 0
@@ -39945,8 +39998,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d91b8264f834f10ba1014a58e87f724, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.Windows.EndQuestOption
-  gameUIController: {fileID: 1890011324555023794}
+  questRunner: {fileID: 81800372}
   endGameButton: {fileID: 7345514619677770855}
+  guildWindow: {fileID: 4518272968763509906}
 --- !u!114 &6858083061902119169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40765,6 +40819,7 @@ SceneRoots:
   - {fileID: 832575519}
   - {fileID: 463901197}
   - {fileID: 7003904087940511831}
+  - {fileID: 81800371}
   - {fileID: 1434614613}
   - {fileID: 330585546}
   - {fileID: 250789537}
