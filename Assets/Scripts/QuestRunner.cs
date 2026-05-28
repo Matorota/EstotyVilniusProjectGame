@@ -154,6 +154,7 @@ public class QuestRunner : MonoBehaviour
     {
         CurrentQuest = null;
         Status = QuestStatus.None;
+        ResumeGame();
     }
 
     private void HandleEnemySpawned(Health health)

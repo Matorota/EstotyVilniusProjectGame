@@ -100,7 +100,6 @@ public class WinQuestWindow : MonoBehaviour
 
         isVisible = true;
 
-        timeScaleManager?.Pause();
     }
 
     public void HideWindow()
@@ -122,16 +121,10 @@ public class WinQuestWindow : MonoBehaviour
     private void HandleContinueButtonClick()
     {
         HideWindow();
-        ResumeTime();
         questRunner?.ResetQuestState();
 
         if (EndQuestWidget.Instance != null)
             EndQuestWidget.Instance.ShowButton();
-    }
-
-    private void ResumeTime()
-    {
-        timeScaleManager?.Resume();
     }
 
     private void EnsureInitialized()

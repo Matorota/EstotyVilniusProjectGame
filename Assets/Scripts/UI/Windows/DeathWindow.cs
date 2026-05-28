@@ -111,7 +111,6 @@ public class DeathWindow : MonoBehaviour
             parent = parent.parent;
         }
 
-        timeScaleManager?.Pause();
     }
 
     public void HideWindow()
