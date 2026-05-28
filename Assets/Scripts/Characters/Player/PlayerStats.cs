@@ -19,6 +19,11 @@ public class PlayerStats : MonoBehaviour
     public void ApplyCardEffect(CardConfig cfg)
     {
         if (cfg == null) return;
+        if (!gameObject.activeInHierarchy)
+        {
+            Debug.LogWarning($"[PlayerStats] Cannot apply card effect: {gameObject.name} is inactive.", this);
+            return;
+        }
         StartCoroutine(ApplyTemporary(cfg));
     }
 

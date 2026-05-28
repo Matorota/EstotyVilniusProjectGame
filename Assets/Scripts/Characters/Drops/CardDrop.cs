@@ -18,6 +18,10 @@ public class CardDrop : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<IDamageable>();
+
+        if (dropCycleState == null)
+            dropCycleState = CardDropCycleState.Instance;
+
         if (dropCycleState == null)
         {
             GameObject stateObject = new GameObject("CardDropCycleState");
@@ -26,8 +30,18 @@ public class CardDrop : MonoBehaviour
 
         if (health == null)
         {
-            Debug.LogWarning($"{nameof(CardDrop)} on {name} is missing IDamageable.");
+            Debug.LogWarning($"[CardDrop] {name} is missing IDamageable. Cards won't drop.", this);
             enabled = false;
+        }
+
+        if (cardDropPrefab == null)
+        {
+            Debug.LogError($"[CardDrop] {name}: cardDropPrefab is not assigned! Assign a CardPickup prefab in the Inspector.", this);
+        }
+
+        if (dropConfigs == null || dropConfigs.Length == 0)
+        {
+            Debug.LogWarning($"[CardDrop] {name}: dropConfigs is empty. No cards will drop. Assign CardConfig ScriptableObjects.", this);
         }
     }
 
@@ -43,21 +57,38 @@ public class CardDrop : MonoBehaviour
 
     private void OnDeath()
     {
+        Debug.Log($"[CardDrop] OnDeath called on {name}. hasDropped={hasDropped}", this);
+
         if (hasDropped)
         {
+            Debug.Log("[CardDrop] Already dropped, skipping.", this);
+            return;
+        }
+
+        if (cardDropPrefab == null)
+        {
+            Debug.LogError("[CardDrop] cardDropPrefab is null! Cannot drop card.", this);
             return;
         }
 
         if (!TrySelectConfig(out CardConfig selectedConfig))
         {
+            Debug.Log("[CardDrop] No config selected. Card won't drop.", this);
             return;
         }
 
         hasDropped = true;
         Vector3 spawnPosition = transform.position;
         spawnPosition.y = CardDropWorldY;
+
+        // Offset slightly so card doesn't spawn inside the player
+        Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
+        spawnPosition.x += randomOffset.x;
+        spawnPosition.z += randomOffset.y;
+
         CardPickup droppedCard = Instantiate(cardDropPrefab, spawnPosition, Quaternion.identity);
         droppedCard.Initialize(selectedConfig);
+        Debug.Log($"[CardDrop] Dropped card: {selectedConfig.Name} at {spawnPosition}", this);
     }
 
     private bool TrySelectConfig(out CardConfig selectedConfig)

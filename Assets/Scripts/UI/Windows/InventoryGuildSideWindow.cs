@@ -8,9 +8,11 @@ public class InventoryGuildSideWindow : MonoBehaviour
     [SerializeField] private GameObject inventoryMenuWindowGameObject;
     [SerializeField] private GameObject guildWindowGameObject;
     [SerializeField] private SelectedAbilitiesUi selectedAbilitiesUi;
+    [SerializeField] private TimeScale timeScaleManager;
 
     private void OnEnable()
     {
+        timeScaleManager?.Pause();
         menuButton.onClick.AddListener(HandleMenuButtonClick);
         openGuildButton.onClick.AddListener(HandleOpenGuildButtonClicked);
         ResolveSelectedAbilitiesUi();
@@ -26,12 +28,14 @@ public class InventoryGuildSideWindow : MonoBehaviour
 
     private void HandleMenuButtonClick()
     {
+        timeScaleManager?.Pause();
         inventoryMenuWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 
     private void HandleOpenGuildButtonClicked()
     {
+        timeScaleManager?.Pause();
         guildWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }

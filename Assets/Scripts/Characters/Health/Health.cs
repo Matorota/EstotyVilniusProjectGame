@@ -23,6 +23,12 @@ public class Health : MonoBehaviour, IDamageable
             PlayerInstance = this;
     }
 
+    private void OnDestroy()
+    {
+        if (team == Team.Player && PlayerInstance == this)
+            PlayerInstance = null;
+    }
+
     private void Start()
     {
         OnHealthChanged?.Invoke(currentHealth);

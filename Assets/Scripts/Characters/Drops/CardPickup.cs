@@ -14,6 +14,7 @@ public class CardPickup : MonoBehaviour
      private RawImage worldIconRawImage;
 
     private CardWidget[] widgets;
+    private bool canBePickedUp;
 
     public static List<CardPickup> GetActivePickups()
     {
@@ -37,6 +38,13 @@ public class CardPickup : MonoBehaviour
     private void OnEnable()
     {
         ActivePickups.Add(this);
+        canBePickedUp = false;
+        Invoke(nameof(EnablePickup), 0.3f);
+    }
+
+    private void EnablePickup()
+    {
+        canBePickedUp = true;
     }
 
     private void OnDisable()
@@ -46,6 +54,9 @@ public class CardPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!canBePickedUp)
+            return;
+
         CardInventory inventory =
             other.GetComponent<CardInventory>() ??
             other.GetComponentInParent<CardInventory>();
@@ -69,6 +80,7 @@ public class CardPickup : MonoBehaviour
 
     public void Initialize(CardConfig config)
     {
+        Debug.Log($"[CardPickup] Initialize called with config: {(config != null ? config.Name : "NULL")}", this);
         cardConfig = config;
         cardWidget ??= GetComponent<CardWidget>() ?? GetComponentInChildren<CardWidget>(true);
         worldIconRawImage ??= GetComponentInChildren<RawImage>(true);
@@ -80,7 +92,24 @@ public class CardPickup : MonoBehaviour
     {
         if (cardConfig == null)
         {
+            Debug.LogWarning("[CardPickup] cardConfig is null. Cannot apply visuals.", this);
             return;
+        }
+
+        Debug.Log($"[CardPickup] Applying visuals for {cardConfig.Name}. cardWidget={(cardWidget != null)} worldIcon={(worldIconRawImage != null)} widgets={(widgets != null ? widgets.Length : 0)}", this);
+
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            Debug.Log($"[CardPickup] Canvas renderMode={canvas.renderMode} scale={canvas.transform.localScale}", this);
+            if (canvas.renderMode != RenderMode.WorldSpace)
+            {
+                Debug.LogWarning("[CardPickup] Canvas is NOT in WorldSpace mode! Card won't be visible in world.", this);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[CardPickup] No Canvas found on prefab! Add a Canvas in WorldSpace mode.", this);
         }
 
         if (cardWidget != null)
@@ -88,17 +117,15 @@ public class CardPickup : MonoBehaviour
             cardWidget.Setup(cardConfig);
         }
 
-        if (widgets == null)
+        if (widgets != null)
         {
-            return;
-        }
-
-        for (int i = 0; i < widgets.Length; i++)
-        {
-            CardWidget widget = widgets[i];
-            if (widget != null)
+            for (int i = 0; i < widgets.Length; i++)
             {
-                widget.Setup(cardConfig);
+                CardWidget widget = widgets[i];
+                if (widget != null)
+                {
+                    widget.Setup(cardConfig);
+                }
             }
         }
 
@@ -107,7 +134,34 @@ public class CardPickup : MonoBehaviour
             if (worldIconRawImage != null)
             {
                 worldIconRawImage.texture = cardConfig.Image.texture;
+                Debug.Log($"[CardPickup] Set RawImage texture to {cardConfig.Image.name}", this);
+            }
+            else
+            {
+                Debug.LogWarning("[CardPickup] worldIconRawImage is null. Card image won't show.", this);
+            }
+
+            if (worldIconRawImage == null || canvas == null || canvas.renderMode != RenderMode.WorldSpace)
+            {
+                EnsureSpriteRendererFallback(cardConfig.Image);
             }
         }
+        else
+        {
+            Debug.LogWarning("[CardPickup] cardConfig.Image is null. No visual to display.", this);
+        }
+    }
+
+    private void EnsureSpriteRendererFallback(Sprite sprite)
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr == null)
+        {
+            sr = gameObject.AddComponent<SpriteRenderer>();
+            Debug.Log("[CardPickup] Added SpriteRenderer as fallback visual.", this);
+        }
+        sr.sprite = sprite;
+        sr.sortingOrder = 100;
+        Debug.Log($"[CardPickup] SpriteRenderer fallback set to {sprite.name}", this);
     }
 }

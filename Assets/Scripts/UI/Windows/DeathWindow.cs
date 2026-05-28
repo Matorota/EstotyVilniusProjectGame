@@ -1,3 +1,4 @@
+using Configs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,15 +27,12 @@ public class DeathWindow : MonoBehaviour
     private void OnEnable()
     {
         EnsureInitialized();
-        if (playerLifecycle == null)
-        {
-            Debug.LogError("DeathWindow: playerLifecycle must be assigned in the Inspector.");
-        }
-        else
-        {
-            playerLifecycle.OnPlayerDied += HandlePlayerDied;
-            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
-        }
+        ResolvePlayerLifecycle();
+
+        if (questRunner == null)
+            questRunner = QuestRunner.Instance;
+        if (questRunner != null)
+            questRunner.OnQuestStarted += HandleQuestStarted;
 
         restartButton?.onClick.AddListener(HandleRestartButtonClick);
         guildButton?.onClick.AddListener(HandleGuildButtonClick);
@@ -43,15 +41,36 @@ public class DeathWindow : MonoBehaviour
 
     private void OnDisable()
     {
+        UnsubscribeFromPlayerLifecycle();
+
+        if (questRunner != null)
+            questRunner.OnQuestStarted -= HandleQuestStarted;
+
+        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
+    }
+
+    private void HandleQuestStarted(QuestConfig config)
+    {
+        ResolvePlayerLifecycle();
+    }
+
+    private void ResolvePlayerLifecycle()
+    {
+        // Always unsubscribe from old to prevent double-subscription or stale references
         if (playerLifecycle != null)
         {
             playerLifecycle.OnPlayerDied -= HandlePlayerDied;
             playerLifecycle.OnPlayerRespawned -= HandlePlayerRespawned;
         }
 
-        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
-        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
-        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
+        playerLifecycle = PlayerLifecycle.Instance;
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
+        }
     }
 
     private void OnDestroy()

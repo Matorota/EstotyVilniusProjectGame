@@ -23,12 +23,40 @@ public class SelectedCardsManager : MonoBehaviour
 
     private void OnEnable()
     {
-        inventory.OnInventoryChanged += HandleInventoryChanged;
+        ResolveInventory();
+        if (inventory != null)
+            inventory.OnInventoryChanged += HandleInventoryChanged;
     }
 
     private void OnDisable()
     {
-        inventory.OnInventoryChanged -= HandleInventoryChanged;
+        if (inventory != null)
+            inventory.OnInventoryChanged -= HandleInventoryChanged;
+    }
+
+    private void ResolveInventory()
+    {
+        if (inventory != null && inventory.gameObject != null)
+            return;
+
+        inventory = CardInventory.Instance;
+    }
+
+    private void ResolvePlayerStats()
+    {
+        if (stats != null && stats.gameObject != null && stats.gameObject.activeInHierarchy)
+            return;
+
+        stats = null;
+        PlayerStats[] allStats = FindObjectsByType<PlayerStats>(FindObjectsSortMode.None);
+        foreach (PlayerStats s in allStats)
+        {
+            if (s != null && s.gameObject != null && s.gameObject.activeInHierarchy)
+            {
+                stats = s;
+                break;
+            }
+        }
     }
 
     public bool TryEquip(CardModel model)
@@ -74,11 +102,13 @@ public class SelectedCardsManager : MonoBehaviour
 
     public bool TryUseByIndex(int index)
     {
+        ResolveInventory();
         List<CardModel> equippedCards = inventory.GetEquippedCards();
         if (index < 0 || index >= equippedCards.Count) return false;
         CardModel model = equippedCards[index];
         if (model.isActive) return false;
 
+        ResolvePlayerStats();
         if (stats == null)
         {
             Debug.LogError("PlayerStats not assigned to SelectedCardsManager!");
@@ -116,6 +146,10 @@ public class SelectedCardsManager : MonoBehaviour
 
     public List<SelectedCardInfo> GetSelectedCards()
     {
+        ResolveInventory();
+        if (inventory == null)
+            return new List<SelectedCardInfo>();
+
         return inventory
             .GetEquippedCards()
             .Select(model => new SelectedCardInfo
@@ -130,6 +164,10 @@ public class SelectedCardsManager : MonoBehaviour
 
     private void HandleInventoryChanged()
     {
+        ResolveInventory();
+        if (inventory == null)
+            return;
+
         foreach (CardModel model in inventory.GetCollectedCards())
         {
             if (model != null && !model.isEquipped && model.isActive)

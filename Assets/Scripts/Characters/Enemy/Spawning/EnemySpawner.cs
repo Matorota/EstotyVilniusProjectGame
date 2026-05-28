@@ -112,6 +112,12 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    public void SetPlayerTarget(Transform target)
+    {
+        playerTarget = target;
+        Debug.Log($"[EnemySpawner] Player target set to: {(target != null ? target.name : "NULL")}", this);
+    }
+
     private void ResolvePlayerTarget()
     {
         if (playerTarget != null && playerTarget.gameObject != null)
@@ -125,7 +131,6 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // Fallback: try to find inactive player (Unity 2022+)
         CharacterMovements[] allPlayers = FindObjectsByType<CharacterMovements>(FindObjectsSortMode.None);
         foreach (CharacterMovements p in allPlayers)
         {

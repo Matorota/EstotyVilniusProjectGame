@@ -13,17 +13,32 @@ public class CardInventoryUi : MonoBehaviour
 
     private void OnEnable()
     {
-        inventory.OnInventoryChanged += Refresh;
+        ResolveInventory();
+        if (inventory != null)
+            inventory.OnInventoryChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
-        inventory.OnInventoryChanged -= Refresh;
+        if (inventory != null)
+            inventory.OnInventoryChanged -= Refresh;
+    }
+
+    private void ResolveInventory()
+    {
+        if (inventory != null && inventory.gameObject != null)
+            return;
+
+        inventory = CardInventory.Instance;
     }
 
     private void Refresh()
     {
+        ResolveInventory();
+        if (inventory == null)
+            return;
+
         for (int i = cardsContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(cardsContainer.GetChild(i).gameObject);
