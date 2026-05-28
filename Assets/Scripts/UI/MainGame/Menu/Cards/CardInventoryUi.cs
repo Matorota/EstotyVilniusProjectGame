@@ -27,7 +27,7 @@ public class CardInventoryUi : MonoBehaviour
 
     private void ResolveInventory()
     {
-        if (inventory != null && inventory.gameObject != null)
+        if (inventory != null)
             return;
 
         inventory = CardInventory.Instance;

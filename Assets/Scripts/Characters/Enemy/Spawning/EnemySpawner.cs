@@ -39,7 +39,7 @@ public class EnemySpawner : MonoBehaviour
     }
     private void Awake()
     {
-        if (Instance == null || Instance.gameObject == null)
+        if (Instance == null)
             Instance = this;
         else if (Instance != this)
             Destroy(gameObject);
@@ -103,7 +103,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void ResolvePlayerTarget()
     {
-        if (playerTarget != null && playerTarget.gameObject != null)
+        if (playerTarget != null)
             return;
 
         if (PlayerLifecycle.Instance != null)

@@ -22,9 +22,6 @@ public class PlayerCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (player != null && player.gameObject == null)
-            player = null;
-
         if (player == null)
             ResolvePlayer();
 

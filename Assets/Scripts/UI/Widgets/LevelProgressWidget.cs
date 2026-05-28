@@ -19,7 +19,6 @@ namespace Widgets
         {
             if (questRunner == null)
             {
-                Debug.LogError("LevelProgressWidget: assign QuestRunner in Inspector.");
                 Setup(null);
                 return;
             }

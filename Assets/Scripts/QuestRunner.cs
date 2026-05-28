@@ -294,7 +294,7 @@ public class QuestRunner : MonoBehaviour
         var enemies = new List<Health>(trackedEnemies);
         foreach (Health enemy in enemies)
         {
-            if (enemy != null && enemy.gameObject != null)
+            if (enemy != null)
                 Destroy(enemy.gameObject);
         }
     }

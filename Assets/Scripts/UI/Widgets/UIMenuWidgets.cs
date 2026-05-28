@@ -14,33 +14,23 @@ namespace UI.Windows
         private void OnEnable()
         {
             backButton.onClick.AddListener(HandleResumeButtonClick);
-            settingsButton.onClick.AddListener(HandleSettingsButtonClick);
             quitButton.onClick.AddListener(HandleQuitButtonClick);
         }
 
         private void OnDisable()
         {
             backButton.onClick.RemoveListener(HandleResumeButtonClick);
-            settingsButton.onClick.RemoveListener(HandleSettingsButtonClick);
             quitButton.onClick.RemoveListener(HandleQuitButtonClick);
         }
         
         private void HandleResumeButtonClick()
         {
             if (menuWindow == null)
-            {
-                Debug.LogError("UIMenuWidgets: menuWindow not assigned in Inspector.");
                 return;
-            }
 
             menuWindow.Close();
         }
 
-        private void HandleSettingsButtonClick()
-        {
-            
-        }
-        
         private void HandleQuitButtonClick()
         {
             timeScaleManager?.Resume();

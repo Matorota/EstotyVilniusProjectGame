@@ -36,7 +36,7 @@ public class SelectedCardsManager : MonoBehaviour
 
     private void ResolveInventory()
     {
-        if (inventory != null && inventory.gameObject != null)
+        if (inventory != null)
             return;
 
         inventory = CardInventory.Instance;
@@ -44,7 +44,7 @@ public class SelectedCardsManager : MonoBehaviour
 
     private void ResolvePlayerStats()
     {
-        if (stats != null && stats.gameObject != null && stats.gameObject.activeInHierarchy)
+        if (stats != null && stats.gameObject.activeInHierarchy)
             return;
 
         stats = PlayerLifecycle.Instance != null
