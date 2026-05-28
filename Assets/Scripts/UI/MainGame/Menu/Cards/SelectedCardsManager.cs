@@ -47,16 +47,9 @@ public class SelectedCardsManager : MonoBehaviour
         if (stats != null && stats.gameObject != null && stats.gameObject.activeInHierarchy)
             return;
 
-        stats = null;
-        PlayerStats[] allStats = FindObjectsByType<PlayerStats>(FindObjectsSortMode.None);
-        foreach (PlayerStats s in allStats)
-        {
-            if (s != null && s.gameObject != null && s.gameObject.activeInHierarchy)
-            {
-                stats = s;
-                break;
-            }
-        }
+        stats = PlayerLifecycle.Instance != null
+            ? PlayerLifecycle.Instance.GetComponent<PlayerStats>()
+            : null;
     }
 
     public bool TryEquip(CardModel model)
@@ -110,10 +103,7 @@ public class SelectedCardsManager : MonoBehaviour
 
         ResolvePlayerStats();
         if (stats == null)
-        {
-            Debug.LogError("PlayerStats not assigned to SelectedCardsManager!");
             return false;
-        }
 
         stats.ApplyCardEffect(model.config);
         if (isActiveAndEnabled)

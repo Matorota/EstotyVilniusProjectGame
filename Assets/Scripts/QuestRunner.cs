@@ -78,12 +78,7 @@ public class QuestRunner : MonoBehaviour
     public void StartQuest(QuestConfig quest)
     {
         if (quest == null)
-        {
-            Debug.LogError("[QuestRunner] StartQuest called with null quest.");
             return;
-        }
-
-        Debug.Log($"[QuestRunner] StartQuest called: {quest.Name}, enemies={quest.EnemiesAmount}", this);
 
         CurrentQuest = quest;
         Status = QuestStatus.Active;
@@ -92,6 +87,7 @@ public class QuestRunner : MonoBehaviour
         AliveEnemies = 0;
         TotalEnemies = Mathf.Max(0, quest.EnemiesAmount);
 
+        DestroyAllCardPickups();
         ClearTrackedEnemies();
         SubscribeToEnemySpawner();
 
@@ -103,25 +99,20 @@ public class QuestRunner : MonoBehaviour
         enemySpawner ??= EnemySpawner.Instance;
         if (enemySpawner == null)
         {
-            Debug.LogError("[QuestRunner] enemySpawner is null. Cannot start quest.", this);
             AbortQuestStart();
             return;
         }
-        Debug.Log($"[QuestRunner] enemySpawner resolved: {enemySpawner.name}", this);
 
         if (TotalEnemies <= 0)
         {
-            Debug.Log("[QuestRunner] TotalEnemies <= 0, completing quest immediately.", this);
             CompleteQuest();
             return;
         }
 
         bool started = enemySpawner.SpawnEnemies(quest.EnemiesAmount);
-        Debug.Log($"[QuestRunner] SpawnEnemies returned: {started}", this);
 
         if (!started)
         {
-            Debug.LogError("[QuestRunner] enemySpawner.SpawnEnemies failed. Aborting quest start.", this);
             AbortQuestStart();
             return;
         }
@@ -129,7 +120,6 @@ public class QuestRunner : MonoBehaviour
         ResumeGame();
         EnablePlayerMovement();
 
-        Debug.Log("[QuestRunner] Quest started successfully. Firing events.", this);
         OnQuestStarted?.Invoke(quest);
         OnAliveCountChanged?.Invoke();
     }
@@ -146,10 +136,10 @@ public class QuestRunner : MonoBehaviour
         ClearTrackedEnemies();
         UnsubscribeFromPlayerDeath();
 
-        OnQuestEnded?.Invoke();
-
         CurrentQuest = null;
         Status = QuestStatus.None;
+
+        OnQuestEnded?.Invoke();
 
         spawnedEnemies = 0;
         AliveEnemies = 0;
@@ -158,6 +148,12 @@ public class QuestRunner : MonoBehaviour
         OnAliveCountChanged?.Invoke();
 
         PauseGame();
+    }
+
+    public void ResetQuestState()
+    {
+        CurrentQuest = null;
+        Status = QuestStatus.None;
     }
 
     private void HandleEnemySpawned(Health health)
@@ -219,10 +215,7 @@ public class QuestRunner : MonoBehaviour
             return;
 
         if (spawnedEnemies >= TotalEnemies && AliveEnemies <= 0)
-        {
-            Debug.Log($"[QuestRunner] Quest complete! spawned={spawnedEnemies} total={TotalEnemies} alive={AliveEnemies}");
             CompleteQuest();
-        }
     }
 
     private void CompleteQuest()
@@ -232,7 +225,6 @@ public class QuestRunner : MonoBehaviour
 
         Status = QuestStatus.Completed;
 
-        Debug.Log("[QuestRunner] Firing OnQuestWon event.");
         OnQuestWon?.Invoke();
 
         PauseGame();
@@ -254,7 +246,6 @@ public class QuestRunner : MonoBehaviour
         ClearTrackedEnemies();
         UnsubscribeFromPlayerDeath();
 
-        CurrentQuest = null;
         Status = QuestStatus.None;
 
         spawnedEnemies = 0;
@@ -297,7 +288,7 @@ public class QuestRunner : MonoBehaviour
         EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
     }
 
-    private void DestroyAllEnemies()
+    public void DestroyAllEnemies()
     {
         var enemies = new List<Health>(trackedEnemies);
         foreach (Health enemy in enemies)
@@ -322,27 +313,24 @@ public class QuestRunner : MonoBehaviour
     private void SpawnPlayer()
     {
         if (playerPrefab == null)
-        {
-            Debug.Log("[QuestRunner] playerPrefab not assigned. Using existing player in scene.", this);
             return;
-        }
 
         Vector3 spawnPos = playerSpawnPoint != null ? playerSpawnPoint.position : Vector3.zero;
         Quaternion spawnRot = playerSpawnPoint != null ? playerSpawnPoint.rotation : Quaternion.identity;
 
         spawnedPlayer = Instantiate(playerPrefab, spawnPos, spawnRot);
         spawnedPlayer.name = "Player";
-        Debug.Log($"[QuestRunner] Spawned player from prefab at {spawnPos}", this);
     }
 
     private void DestroyPlayer()
     {
         if (spawnedPlayer != null)
         {
-            Debug.Log("[QuestRunner] Destroying spawned player.", this);
             Destroy(spawnedPlayer);
             spawnedPlayer = null;
         }
+
+        PlayerLifecycle.ClearInstance();
     }
 
     private void UpdatePlayerReferences()
@@ -351,22 +339,10 @@ public class QuestRunner : MonoBehaviour
         playerHealth = Health.PlayerInstance;
 
         if (enemySpawner != null && playerLifecycle != null)
-        {
             enemySpawner.SetPlayerTarget(playerLifecycle.transform);
-            Debug.Log($"[QuestRunner] Updated enemySpawner playerTarget to {playerLifecycle.name}", this);
-        }
 
-        // Update camera to follow newly spawned player
-        PlayerCamera playerCamera = FindObjectOfType<PlayerCamera>();
-        if (playerCamera != null && playerLifecycle != null)
-        {
-            playerCamera.SetTarget(playerLifecycle.transform);
-        }
-
-        if (playerLifecycle != null)
-            Debug.Log($"[QuestRunner] Player references updated. playerLifecycle={playerLifecycle.name}", this);
-        else
-            Debug.LogWarning("[QuestRunner] playerLifecycle is null after spawning player.", this);
+        if (PlayerCamera.Instance != null && playerLifecycle != null)
+            PlayerCamera.Instance.SetTarget(playerLifecycle.transform);
     }
 
     private void HealPlayer()
@@ -384,10 +360,7 @@ public class QuestRunner : MonoBehaviour
 
     private void DestroyAllCardPickups()
     {
-        CardPickup[] pickups =
-            FindObjectsByType<CardPickup>(FindObjectsSortMode.None);
-
-        foreach (CardPickup pickup in pickups)
+        foreach (CardPickup pickup in CardPickup.GetActivePickups())
         {
             if (pickup != null)
                 Destroy(pickup.gameObject);
@@ -396,7 +369,6 @@ public class QuestRunner : MonoBehaviour
 
     private void ResumeGame()
     {
-        Debug.Log($"[QuestRunner] ResumeGame. timeScaleManager={(timeScaleManager != null ? "found" : "null")} Time.timeScale={Time.timeScale}", this);
         timeScaleManager?.Resume();
     }
 
@@ -408,15 +380,7 @@ public class QuestRunner : MonoBehaviour
     private void EnablePlayerMovement()
     {
         playerLifecycle ??= PlayerLifecycle.Instance;
-        if (playerLifecycle != null)
-        {
-            Debug.Log("[QuestRunner] Enabling player movement.", this);
-            playerLifecycle.EnableMovement();
-        }
-        else
-        {
-            Debug.LogError("[QuestRunner] playerLifecycle is null. Cannot enable movement.", this);
-        }
+        playerLifecycle?.EnableMovement();
     }
 
 }

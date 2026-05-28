@@ -11,7 +11,7 @@ namespace UI.Windows
         [SerializeField] private MenuWindow menuWindow;
         [SerializeField] private Button gameGubMenuWindowButton;
         [SerializeField] private QuestRunner questRunner;
-
+        
         private CanvasGroup canvasGroup;
 
         private void Awake()
@@ -69,7 +69,6 @@ namespace UI.Windows
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
-            Debug.Log("[GameHubWindow] Open called. HUD should be visible.", this);
         }
 
         public void Close()

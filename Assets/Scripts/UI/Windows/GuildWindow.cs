@@ -17,7 +17,7 @@ public class GuildWindow : MonoBehaviour
     private void Awake()
     {
         if (questRunner == null)
-            questRunner = FindObjectOfType<QuestRunner>();
+            questRunner = QuestRunner.Instance;
 
         HookQuestRunner();
     }
@@ -62,7 +62,7 @@ public class GuildWindow : MonoBehaviour
     private void HandleQuestClicked(QuestConfig quest)
     {
         if (questRunner == null)
-            questRunner = FindObjectOfType<QuestRunner>();
+            questRunner = QuestRunner.Instance;
 
         if (questRunner == null || questRunner.Status != QuestStatus.None)
             return;
@@ -87,36 +87,29 @@ public class GuildWindow : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    private void HandleQuestEnded()
+    private void HandleQuestWon()
     {
         if (questRunner == null || questRunner.CurrentQuest == null)
-        {
             return;
-        }
 
         RemoveQuest(questRunner.CurrentQuest);
     }
 
-
     private void HookQuestRunner()
     {
         if (isQuestRunnerHooked || questRunner == null)
-        {
             return;
-        }
 
-        questRunner.OnQuestEnded += HandleQuestEnded;
+        questRunner.OnQuestWon += HandleQuestWon;
         isQuestRunnerHooked = true;
     }
 
     private void UnhookQuestRunner()
     {
         if (!isQuestRunnerHooked || questRunner == null)
-        {
             return;
-        }
 
-        questRunner.OnQuestEnded -= HandleQuestEnded;
+        questRunner.OnQuestWon -= HandleQuestWon;
         isQuestRunnerHooked = false;
     }
 }

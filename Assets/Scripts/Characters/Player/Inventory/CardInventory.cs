@@ -8,7 +8,6 @@ public class CardInventory : MonoBehaviour
 {
     public static CardInventory Instance { get; private set; }
 
-    // Static data persists across player spawns/destroys
     private static readonly List<CardModel> collectedCards = new();
     private static readonly List<CardModel> equippedCards = new();
     private static readonly Dictionary<CardType, List<CardModel>> cardModelsByType = new();

@@ -75,7 +75,6 @@ public class DeathWindow : MonoBehaviour
 
     private void OnDestroy()
     {
-        // safety cleanup
         UnsubscribeFromPlayerLifecycle();
         restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
         guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
@@ -96,7 +95,6 @@ public class DeathWindow : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        // ensure parent gameobjects and canvas groups are visible and interactable
         Transform parent = screenRoot.transform.parent;
         while (parent != null)
         {
@@ -113,7 +111,7 @@ public class DeathWindow : MonoBehaviour
             parent = parent.parent;
         }
 
-        Time.timeScale = 0f;
+        timeScaleManager?.Pause();
     }
 
     public void HideWindow()
@@ -129,38 +127,28 @@ public class DeathWindow : MonoBehaviour
         if (screenRoot != gameObject)
             screenRoot.SetActive(false);
         
-        Time.timeScale = 1f;
+        timeScaleManager?.Resume();
     }
 
     public bool IsVisible => isVisible;
 
     private void HandleGuildButtonClick()
     {
-        guildWindowGameObject.SetActive(true);
+        questRunner?.EndQuest();
+        timeScaleManager?.Resume();
         HideWindow();
+        guildWindowGameObject?.SetActive(true);
     }
 
     private void HandleRestartButtonClick()
     {
-        if (playerLifecycle == null)
-        {
-            Debug.LogError("DeathWindow: playerLifecycle not assigned in Inspector.");
-            return;
-        }
-
-        playerLifecycle.Respawn(respawnLocationCube);
-
-        if (questRunner == null)
-        {
-            Debug.LogWarning("DeathWindow: questrunner not assigned in Inspector. Quest will not be explicitly ended.");
-        }
-        else
-        {
-            questRunner.EndQuest();
-        }
-
+        QuestConfig questToRestart = questRunner?.CurrentQuest;
+        CardInventory.ResetInventory();
         timeScaleManager?.Resume();
         HideWindow();
+
+        if (questToRestart != null)
+            questRunner?.StartQuest(questToRestart);
     }
 
     private void HandleQuitButtonClick()

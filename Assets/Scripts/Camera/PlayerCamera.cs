@@ -2,18 +2,26 @@ using UnityEngine;
 
 public class PlayerCamera : MonoBehaviour
 {
+    public static PlayerCamera Instance { get; private set; }
+
     [SerializeField] private Transform player;
     [SerializeField] private Vector3 offset = new Vector3(0f, 12f, -12f);
 
     private void Awake()
     {
+        Instance = this;
         if (player == null)
             ResolvePlayer();
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     private void LateUpdate()
     {
-        // If player reference is stale (destroyed), clear it
         if (player != null && player.gameObject == null)
             player = null;
 
@@ -34,33 +42,21 @@ public class PlayerCamera : MonoBehaviour
         player = target;
         if (player != null)
             enabled = true;
-        Debug.Log($"[PlayerCamera] Target set to: {(player != null ? player.name : "NULL")}", this);
     }
 
     private void ResolvePlayer()
     {
-        // Try to find player in the scene (from prefab spawn)
-        CharacterMovements cm = FindObjectOfType<CharacterMovements>();
-        if (cm != null && cm.gameObject != null && cm.gameObject.name == "Player")
+        if (PlayerLifecycle.Instance != null)
         {
-            player = cm.transform;
+            player = PlayerLifecycle.Instance.transform;
             enabled = true;
             return;
         }
 
-        // Fallback: any CharacterMovements
-        if (cm != null && cm.gameObject != null)
-        {
-            player = cm.transform;
-            enabled = true;
-            return;
-        }
-
-        // Fallback: check parent hierarchy (if camera is child of player)
         Transform current = transform.parent;
         while (current != null)
         {
-            cm = current.GetComponent<CharacterMovements>();
+            CharacterMovements cm = current.GetComponent<CharacterMovements>();
             if (cm != null)
             {
                 player = cm.transform;

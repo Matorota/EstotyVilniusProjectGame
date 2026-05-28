@@ -4,7 +4,7 @@ using Configs;
 
 public class PlayerStats : MonoBehaviour
 {
-    private float damageBonus = 0f; // flat add to melee damage
+    private float damageBonus = 0f;
     private float speedMultiplier = 1f;
     private Health health;
 
@@ -20,10 +20,7 @@ public class PlayerStats : MonoBehaviour
     {
         if (cfg == null) return;
         if (!gameObject.activeInHierarchy)
-        {
-            Debug.LogWarning($"[PlayerStats] Cannot apply card effect: {gameObject.name} is inactive.", this);
             return;
-        }
         StartCoroutine(ApplyTemporary(cfg));
     }
 

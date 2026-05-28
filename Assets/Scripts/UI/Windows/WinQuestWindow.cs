@@ -22,7 +22,6 @@ public class WinQuestWindow : MonoBehaviour
         questRunner ??= QuestRunner.Instance;
         EnsureInitialized();
         HideWindow();
-        Debug.Log($"[WinQuestWindow] Awake. questRunner={(questRunner != null ? "found" : "null")}", this);
     }
     private void OnEnable()
     {
@@ -60,7 +59,6 @@ public class WinQuestWindow : MonoBehaviour
         questRunner.OnQuestEnded += HandleQuestEnded;
         questRunner.OnQuestStarted += HandleQuestStarted;
         isSubscribed = true;
-        Debug.Log("[WinQuestWindow] Subscribed to QuestRunner events.", this);
     }
 
     private void UnsubscribeEvents()
@@ -76,7 +74,6 @@ public class WinQuestWindow : MonoBehaviour
 
     private void HandleQuestWon()
     {
-        Debug.Log("[WinQuestWindow] HandleQuestWon called!", this);
         ShowWindow();
     }
 
@@ -88,12 +85,7 @@ public class WinQuestWindow : MonoBehaviour
     public void ShowWindow()
     {
         if (questRunner == null || questRunner.Status != QuestStatus.Completed)
-        {
-            Debug.Log($"[WinQuestWindow] ShowWindow blocked. Status={questRunner?.Status}", this);
             return;
-        }
-
-        Debug.Log($"[WinQuestWindow] ShowWindow called. gameObject.activeSelf={gameObject.activeSelf} canvasGroup={(canvasGroup != null ? "ok" : "NULL")}", this);
 
         EnsureInitialized();
 
@@ -109,8 +101,6 @@ public class WinQuestWindow : MonoBehaviour
         isVisible = true;
 
         timeScaleManager?.Pause();
-
-        Debug.Log("[WinQuestWindow] ShowWindow finished. Window should be visible.", this);
     }
 
     public void HideWindow()
@@ -133,6 +123,7 @@ public class WinQuestWindow : MonoBehaviour
     {
         HideWindow();
         ResumeTime();
+        questRunner?.ResetQuestState();
 
         if (EndQuestWidget.Instance != null)
             EndQuestWidget.Instance.ShowButton();

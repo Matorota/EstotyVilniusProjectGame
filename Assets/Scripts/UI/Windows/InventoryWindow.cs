@@ -6,9 +6,11 @@ public class InventoryWindow : MonoBehaviour
     [SerializeField] private GameObject hudWindowGameObject;
     [SerializeField] private Button closeInventoryButton;
     [SerializeField] private UI.Windows.GameHubWindow hub;
+    [SerializeField] private TimeScale timeScaleManager;
 
     private void OnEnable()
     {
+        timeScaleManager?.Pause();
         hub.Close();
         if (hudWindowGameObject != null)
             hudWindowGameObject.SetActive(false);
@@ -17,6 +19,7 @@ public class InventoryWindow : MonoBehaviour
 
     private void OnDisable()
     {
+        timeScaleManager?.Resume();
         closeInventoryButton.onClick.RemoveListener(HandleCloseButtonClick);
     }
 

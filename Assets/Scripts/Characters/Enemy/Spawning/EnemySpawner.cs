@@ -18,36 +18,23 @@ public class EnemySpawner : MonoBehaviour
 
     public bool SpawnEnemies(int amount)
     {
-        Debug.Log($"[EnemySpawner] SpawnEnemies called. amount={amount} enemyPrefab={(enemyPrefab != null ? enemyPrefab.name : "NULL")} playerTarget={(playerTarget != null ? playerTarget.name : "NULL")}", this);
-
         if (enemyPrefab == null)
-        {
-            Debug.LogError("[EnemySpawner] enemyPrefab is null! Assign an enemy prefab in the Inspector.", this);
             return false;
-        }
 
         if (spawnPoints == null || spawnPoints.Count == 0)
             spawnPoints = new List<Transform> { transform };
 
         if (playerTarget == null)
         {
-            CharacterMovements player = FindObjectOfType<CharacterMovements>();
-            if (player != null)
-            {
-                playerTarget = player.transform;
-                Debug.Log($"[EnemySpawner] Found player: {playerTarget.name}", this);
-            }
+            if (PlayerLifecycle.Instance != null)
+                playerTarget = PlayerLifecycle.Instance.transform;
             else
-            {
-                Debug.LogError("[EnemySpawner] playerTarget is null and could not find CharacterMovements in scene. Is the player destroyed or inactive?", this);
                 return false;
-            }
         }
 
         enemiesToSpawn = amount;
         enemiesSpawned = 0;
         spawnTimer = 0f;
-        Debug.Log($"[EnemySpawner] SpawnEnemies setup complete. Will spawn {enemiesToSpawn} enemies.", this);
         return true;
     }
     private void Awake()
@@ -84,10 +71,7 @@ public class EnemySpawner : MonoBehaviour
         {
             ResolvePlayerTarget();
             if (playerTarget == null)
-            {
-                Debug.LogError("[EnemySpawner] Cannot spawn enemy: playerTarget is null.", this);
                 return;
-            }
         }
 
         Transform randomSpawnPoint = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Count)];
@@ -115,7 +99,6 @@ public class EnemySpawner : MonoBehaviour
     public void SetPlayerTarget(Transform target)
     {
         playerTarget = target;
-        Debug.Log($"[EnemySpawner] Player target set to: {(target != null ? target.name : "NULL")}", this);
     }
 
     private void ResolvePlayerTarget()
@@ -123,26 +106,11 @@ public class EnemySpawner : MonoBehaviour
         if (playerTarget != null && playerTarget.gameObject != null)
             return;
 
-        CharacterMovements player = FindObjectOfType<CharacterMovements>();
-        if (player != null)
+        if (PlayerLifecycle.Instance != null)
         {
-            playerTarget = player.transform;
-            Debug.Log($"[EnemySpawner] Resolved player target: {playerTarget.name}", this);
+            playerTarget = PlayerLifecycle.Instance.transform;
             return;
         }
-
-        CharacterMovements[] allPlayers = FindObjectsByType<CharacterMovements>(FindObjectsSortMode.None);
-        foreach (CharacterMovements p in allPlayers)
-        {
-            if (p != null && p.gameObject != null)
-            {
-                playerTarget = p.transform;
-                Debug.Log($"[EnemySpawner] Resolved player target (fallback): {playerTarget.name}", this);
-                return;
-            }
-        }
-
-        Debug.LogError("[EnemySpawner] Could not resolve playerTarget. Player may be destroyed or inactive.", this);
     }
 }
 
