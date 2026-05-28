@@ -1,10 +1,12 @@
-﻿﻿using UnityEngine;
+﻿using Configs;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Windows
 {
     public class EndQuestWidget : MonoBehaviour
     {
+        public static EndQuestWidget Instance { get; private set; }
         [SerializeField] private QuestRunner questRunner;
         [SerializeField] private Button endGameButton;
         [SerializeField] private GuildWindow guildWindow;
@@ -17,23 +19,51 @@ namespace UI.Windows
             ResolveEndGameButton();
             if (endGameButton != null)
                 endGameButton.onClick.AddListener(HandleEndGameButtonClick);
+
+            if (questRunner == null)
+                questRunner = QuestRunner.Instance;
+            
+            
+            if (questRunner != null)
+            {
+                questRunner.OnQuestStarted += HandleQuestStarted;
+                questRunner.OnQuestEnded += HandleQuestEnded;
+            }
         }
 
         private void OnDisable()
         {
             if (endGameButton != null)
                 endGameButton.onClick.RemoveListener(HandleEndGameButtonClick);
-        }
 
+            if (questRunner != null)
+            {
+                questRunner.OnQuestStarted -= HandleQuestStarted;
+                questRunner.OnQuestEnded -= HandleQuestEnded;
+            }
+        }
+        private void Awake()
+        {
+            Instance = this;
+            questRunner ??= QuestRunner.Instance; 
+        }
         private void HandleEndGameButtonClick()
         {
-            HideButton();
-
             if (questRunner != null)
                 questRunner.EndQuest();
 
             if (guildWindow != null)
                 guildWindow.gameObject.SetActive(true);
+        }
+
+        private void HandleQuestStarted(QuestConfig config)
+        {
+            HideButton();
+        }
+
+        private void HandleQuestEnded()
+        {
+            HideButton();
         }
 
         public void ShowButton()

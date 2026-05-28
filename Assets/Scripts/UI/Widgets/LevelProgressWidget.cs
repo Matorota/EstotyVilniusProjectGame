@@ -26,6 +26,7 @@ namespace Widgets
 
             questRunner.OnQuestStarted += HandleQuestStarted;
             questRunner.OnAliveCountChanged += HandleAliveCountChanged;
+            questRunner.OnQuestWon += HandleQuestWon;
             questRunner.OnQuestEnded += HandleQuestEnded;
             SyncToQuestRunner();
         }
@@ -36,6 +37,7 @@ namespace Widgets
             {
                 questRunner.OnQuestStarted -= HandleQuestStarted;
                 questRunner.OnAliveCountChanged -= HandleAliveCountChanged;
+                questRunner.OnQuestWon -= HandleQuestWon;
                 questRunner.OnQuestEnded -= HandleQuestEnded;
             }
         }
@@ -89,6 +91,11 @@ namespace Widgets
         private void HandleAliveCountChanged()
         {
             UpdateEnemiesText();
+        }
+
+        private void HandleQuestWon()
+        {
+            Setup(null);
         }
 
         private void HandleQuestEnded()

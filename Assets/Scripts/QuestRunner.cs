@@ -1,25 +1,22 @@
 using System;
 using System.Collections.Generic;
 using Configs;
-using UI.Windows;
 using UnityEngine;
 
 public class QuestRunner : MonoBehaviour
 {
+    public static QuestRunner Instance { get; private set; }
+
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private TimeScale timeScaleManager;
-    [SerializeField] private GameHubWindow hubWindow;
-    [SerializeField] private WinQuestWindow winQuestWindow;
-    [SerializeField] private EndQuestWidget endQuestWidget;
-    
+    [SerializeField] private PlayerLifecycle playerLifecycle;
+    [SerializeField] private Health playerHealth;
 
-    private readonly HashSet<Health> trackedEnemies = new HashSet<Health>();
-    private readonly Dictionary<Health, Action> enemyDeathHandlers = new Dictionary<Health, Action>();
+    private readonly HashSet<Health> trackedEnemies = new();
+    private readonly Dictionary<Health, Action> enemyDeathHandlers = new();
 
     private int spawnedEnemies;
-    private Health playerHealth;
-    private PlayerLifecycle playerLifecycle;
-    
+
     public QuestConfig CurrentQuest { get; private set; }
     public QuestStatus Status { get; private set; }
     public int AliveEnemies { get; private set; }
@@ -32,20 +29,20 @@ public class QuestRunner : MonoBehaviour
 
     private void Awake()
     {
-        if (playerLifecycle == null)
-            playerLifecycle = PlayerLifecycle.Instance;
-        
-        PauseGame();
-        playerLifecycle?.DisableMovement();
+        Instance = this;
 
-        HideEndQuestButton();
+        enemySpawner ??= EnemySpawner.Instance;
+        playerLifecycle ??= PlayerLifecycle.Instance;
+        playerHealth ??= Health.PlayerInstance;
+
+        PauseGame();
+
+        if (playerLifecycle != null)
+            playerLifecycle.DisableMovement();
     }
 
     private void OnEnable()
     {
-        if (playerLifecycle == null)
-            playerLifecycle = PlayerLifecycle.Instance;
-
         if (playerLifecycle != null)
             playerLifecycle.OnPlayerDied += HandlePlayerDied;
     }
@@ -57,33 +54,27 @@ public class QuestRunner : MonoBehaviour
 
         UnsubscribeFromEnemySpawner();
         ClearTrackedEnemies();
+
         CurrentQuest = null;
         Status = QuestStatus.None;
         spawnedEnemies = 0;
         AliveEnemies = 0;
         TotalEnemies = 0;
-    }
-
-    private void AbortQuestStart()
-    {
-        UnsubscribeFromEnemySpawner();
-        ClearTrackedEnemies();
-        HideEndQuestButton();
-        CurrentQuest = null;
-        Status = QuestStatus.None;
-        spawnedEnemies = 0;
-        AliveEnemies = 0;
-        TotalEnemies = 0;
-        OnAliveCountChanged?.Invoke();
-
-        PauseGame();
-        playerLifecycle?.DisableMovement();
     }
 
     public void StartQuest(QuestConfig quest)
     {
+        if (quest == null)
+        {
+            Debug.LogError("[QuestRunner] StartQuest called with null quest.");
+            return;
+        }
+
+        Debug.Log($"[QuestRunner] StartQuest called: {quest.Name}, enemies={quest.EnemiesAmount}", this);
+
         CurrentQuest = quest;
         Status = QuestStatus.Active;
+
         spawnedEnemies = 0;
         AliveEnemies = 0;
         TotalEnemies = Mathf.Max(0, quest.EnemiesAmount);
@@ -91,34 +82,36 @@ public class QuestRunner : MonoBehaviour
         ClearTrackedEnemies();
         SubscribeToEnemySpawner();
 
+        enemySpawner ??= EnemySpawner.Instance;
+        if (enemySpawner == null)
+        {
+            Debug.LogError("[QuestRunner] enemySpawner is null. Cannot start quest.", this);
+            AbortQuestStart();
+            return;
+        }
+        Debug.Log($"[QuestRunner] enemySpawner resolved: {enemySpawner.name}", this);
+
         if (TotalEnemies <= 0)
         {
+            Debug.Log("[QuestRunner] TotalEnemies <= 0, completing quest immediately.", this);
             CompleteQuest();
             return;
         }
 
-        if (enemySpawner == null)
-        {
-            enemySpawner = FindObjectOfType<EnemySpawner>();
-            if (enemySpawner == null)
-            {
-                AbortQuestStart();
-                return;
-            }
-        }
-
         bool started = enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+        Debug.Log($"[QuestRunner] SpawnEnemies returned: {started}", this);
+
         if (!started)
         {
+            Debug.LogError("[QuestRunner] enemySpawner.SpawnEnemies failed. Aborting quest start.", this);
             AbortQuestStart();
             return;
         }
 
         ResumeGame();
-        ShowHud();
-        HideEndQuestButton();
         EnablePlayerMovement();
 
+        Debug.Log("[QuestRunner] Quest started successfully. Firing events.", this);
         OnQuestStarted?.Invoke(quest);
         OnAliveCountChanged?.Invoke();
     }
@@ -126,72 +119,69 @@ public class QuestRunner : MonoBehaviour
     public void EndQuest()
     {
         HealPlayer();
+
         DestroyAllCardPickups();
-        ClearTrackedEnemies();
+        DestroyAllEnemies();
+
         UnsubscribeFromEnemySpawner();
+        ClearTrackedEnemies();
 
         OnQuestEnded?.Invoke();
 
         CurrentQuest = null;
         Status = QuestStatus.None;
+
         spawnedEnemies = 0;
         AliveEnemies = 0;
         TotalEnemies = 0;
+
         OnAliveCountChanged?.Invoke();
 
         PauseGame();
-        playerLifecycle?.DisableMovement();
-    }
 
-    private void DestroyAllCardPickups()
-    {
-        CardPickup[] allPickups = FindObjectsByType<CardPickup>(FindObjectsSortMode.None);
-        GameObject playerObj = playerLifecycle != null ? playerLifecycle.gameObject : null;
-
-        foreach (CardPickup pickup in allPickups)
-        {
-            if (pickup != null && pickup.gameObject != playerObj)
-            {
-                Destroy(pickup.gameObject);
-            }
-        }
+        if (playerLifecycle != null)
+            playerLifecycle.DisableMovement();
     }
 
     private void HandleEnemySpawned(Health health)
     {
-        if (Status != QuestStatus.Active || health == null || health.Team != Team.Enemy)
-        {
+        if (Status != QuestStatus.Active)
             return;
-        }
+
+        if (health == null)
+            return;
+
+        if (health.Team != Team.Enemy)
+            return;
 
         if (trackedEnemies.Contains(health))
-        {
             return;
-        }
 
         trackedEnemies.Add(health);
+
         spawnedEnemies++;
         AliveEnemies++;
 
         Action deathHandler = () => HandleEnemyDeath(health);
+
         enemyDeathHandlers[health] = deathHandler;
         health.OnDeath += deathHandler;
 
         OnAliveCountChanged?.Invoke();
+
         EvaluateQuestCompletion();
     }
 
     private void HandleEnemyDeath(Health health)
     {
-        if (Status != QuestStatus.Active || health == null)
-        {
+        if (Status != QuestStatus.Active)
             return;
-        }
+
+        if (health == null)
+            return;
 
         if (!trackedEnemies.Remove(health))
-        {
             return;
-        }
 
         if (enemyDeathHandlers.TryGetValue(health, out Action deathHandler))
         {
@@ -200,61 +190,54 @@ public class QuestRunner : MonoBehaviour
         }
 
         AliveEnemies = Mathf.Max(0, AliveEnemies - 1);
+
         OnAliveCountChanged?.Invoke();
+
         EvaluateQuestCompletion();
     }
 
     private void EvaluateQuestCompletion()
     {
         if (Status != QuestStatus.Active)
-        {
             return;
-        }
 
-        if (TotalEnemies > 0 && spawnedEnemies >= TotalEnemies && AliveEnemies <= 0)
+        if (spawnedEnemies >= TotalEnemies && AliveEnemies <= 0)
         {
+            Debug.Log($"[QuestRunner] Quest complete! spawned={spawnedEnemies} total={TotalEnemies} alive={AliveEnemies}");
             CompleteQuest();
         }
-    }
-
-    private void HandlePlayerDied()
-    {
-        if (Status != QuestStatus.Active)
-        {
-            return;
-        }
-
-        AbortQuest();
     }
 
     private void CompleteQuest()
     {
         if (Status != QuestStatus.Active)
-        {
             return;
-        }
 
         Status = QuestStatus.Completed;
-        HideEndQuestButton();
+
+        Debug.Log("[QuestRunner] Firing OnQuestWon event.");
         OnQuestWon?.Invoke();
-        
-        ShowWinQuestWindow();
+
         PauseGame();
+    }
+
+    private void HandlePlayerDied()
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        AbortQuest();
     }
 
     private void AbortQuest()
     {
-        if (Status != QuestStatus.Active)
-        {
-            return;
-        }
-
         UnsubscribeFromEnemySpawner();
+        DestroyAllEnemies();
         ClearTrackedEnemies();
-        HideEndQuestButton();
 
         CurrentQuest = null;
         Status = QuestStatus.None;
+
         spawnedEnemies = 0;
         AliveEnemies = 0;
         TotalEnemies = 0;
@@ -263,26 +246,29 @@ public class QuestRunner : MonoBehaviour
         OnQuestEnded?.Invoke();
 
         PauseGame();
-        playerLifecycle?.DisableMovement();
+
+        if (playerLifecycle != null)
+            playerLifecycle.DisableMovement();
     }
 
-    private void ShowWinQuestWindow()
+    private void AbortQuestStart()
     {
-        if (winQuestWindow == null)
-            winQuestWindow = ResolveWinQuestWindow();
+        UnsubscribeFromEnemySpawner();
+        ClearTrackedEnemies();
 
-        winQuestWindow?.ShowWindow();
-    }
+        CurrentQuest = null;
+        Status = QuestStatus.None;
 
-    private WinQuestWindow ResolveWinQuestWindow()
-    {
-        foreach (WinQuestWindow window in Resources.FindObjectsOfTypeAll<WinQuestWindow>())
-        {
-            if (window != null && window.gameObject.scene.IsValid())
-                return window;
-        }
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = 0;
 
-        return null;
+        OnAliveCountChanged?.Invoke();
+
+        PauseGame();
+
+        if (playerLifecycle != null)
+            playerLifecycle.DisableMovement();
     }
 
     private void SubscribeToEnemySpawner()
@@ -293,6 +279,16 @@ public class QuestRunner : MonoBehaviour
     private void UnsubscribeFromEnemySpawner()
     {
         EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
+    }
+
+    private void DestroyAllEnemies()
+    {
+        var enemies = new List<Health>(trackedEnemies);
+        foreach (Health enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject != null)
+                Destroy(enemy.gameObject);
+        }
     }
 
     private void ClearTrackedEnemies()
@@ -310,69 +306,50 @@ public class QuestRunner : MonoBehaviour
     private void HealPlayer()
     {
         if (playerHealth == null)
-        {
-            Health[] all = FindObjectsOfType<Health>();
-            foreach (Health h in all)
-            {
-                if (h != null && h.Team == Team.Player)
-                {
-                    playerHealth = h;
-                    break;
-                }
-            }
-        }
-
-        if (playerHealth == null)
             return;
 
-        float missing = playerHealth.MaxHealth - playerHealth.CurrentHealth;
-        if (missing > 0f)
-            playerHealth.Heal(missing);
+        float missingHealth =
+            playerHealth.MaxHealth - playerHealth.CurrentHealth;
+
+        if (missingHealth > 0f)
+            playerHealth.Heal(missingHealth);
+    }
+
+    private void DestroyAllCardPickups()
+    {
+        CardPickup[] pickups =
+            FindObjectsByType<CardPickup>(FindObjectsSortMode.None);
+
+        foreach (CardPickup pickup in pickups)
+        {
+            if (pickup != null)
+                Destroy(pickup.gameObject);
+        }
     }
 
     private void ResumeGame()
     {
-        if (timeScaleManager != null)
-            timeScaleManager.Resume();
-        else
-            Time.timeScale = 1f;
-    }
-
-    public void ShowHud()
-    {
-        if (hubWindow == null)
-            hubWindow = FindObjectOfType<GameHubWindow>();
-
-        hubWindow?.Open();
-    }
-
-    public void ShowEndQuestButton()
-    {
-        if (endQuestWidget == null)
-            endQuestWidget = FindObjectOfType<EndQuestWidget>();
-
-        endQuestWidget?.ShowButton();
-    }
-
-    private void HideEndQuestButton()
-    {
-        if (endQuestWidget == null)
-        {
-            endQuestWidget = FindObjectOfType<EndQuestWidget>();
-        }
-        endQuestWidget?.HideButton();
+        Debug.Log($"[QuestRunner] ResumeGame. timeScaleManager={(timeScaleManager != null ? "found" : "null")} Time.timeScale={Time.timeScale}", this);
+        timeScaleManager?.Resume();
     }
 
     private void PauseGame()
     {
-        if (timeScaleManager != null)
-            timeScaleManager.Pause();
-        else
-            Time.timeScale = 0f;
+        timeScaleManager?.Pause();
     }
 
     private void EnablePlayerMovement()
     {
-        playerLifecycle?.EnableMovement();
+        playerLifecycle ??= PlayerLifecycle.Instance;
+        if (playerLifecycle != null)
+        {
+            Debug.Log("[QuestRunner] Enabling player movement.", this);
+            playerLifecycle.EnableMovement();
+        }
+        else
+        {
+            Debug.LogError("[QuestRunner] playerLifecycle is null. Cannot enable movement.", this);
+        }
     }
+
 }

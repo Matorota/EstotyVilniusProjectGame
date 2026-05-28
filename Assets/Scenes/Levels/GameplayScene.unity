@@ -1408,10 +1408,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestRunner
   enemySpawner: {fileID: 262327338}
   timeScaleManager: {fileID: 463901196}
-  hubWindow: {fileID: 4502405758853742797}
-  playerHealth: {fileID: 1938720489}
   playerLifecycle: {fileID: 1938720493}
-  endQuestWidget: {fileID: 6792995631686690107}
+  playerHealth: {fileID: 1938720489}
 --- !u!4 &85753116 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -2857,7 +2855,6 @@ MonoBehaviour:
   timeScaleManager: {fileID: 463901196}
   winScreenGameObject: {fileID: 158442569}
   buttonContinue: {fileID: 4533689}
-  guildWindow: {fileID: 4518272968763509906}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38672,7 +38669,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5901610309034133237, guid: 29a08469218fc7d46a2fc2a34dadcbc6, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9181141459711578193, guid: 29a08469218fc7d46a2fc2a34dadcbc6, type: 3}
       propertyPath: targetDefense
@@ -39118,6 +39115,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UI.Windows.GameHubWindow
   menuWindow: {fileID: 2101639982}
   gameGubMenuWindowButton: {fileID: 2453834915924229019}
+  questRunner: {fileID: 81800372}
 --- !u!1001 &4518272968763509902
 PrefabInstance:
   m_ObjectHideFlags: 0

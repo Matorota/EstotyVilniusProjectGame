@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Health : MonoBehaviour, IDamageable
 {
+    public static Health PlayerInstance { get; private set; }
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private Team team;
 
@@ -18,6 +19,8 @@ public class Health : MonoBehaviour, IDamageable
     private void Awake()
     {
         currentHealth = maxHealth;
+        if (team == Team.Player)
+            PlayerInstance = this;
     }
 
     private void Start()
