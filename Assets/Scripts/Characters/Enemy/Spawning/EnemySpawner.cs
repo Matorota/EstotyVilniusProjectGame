@@ -14,27 +14,27 @@ public class EnemySpawner : MonoBehaviour
     private int enemiesToSpawn = 0;
     private int enemiesSpawned = 0;
 
-    public void SpawnEnemies(int amount)
+    public bool SpawnEnemies(int amount)
     {
-        if (spawnPoints.Count == 0)
-        {
-            return;
-        }
-
         if (enemyPrefab == null)
-        {
-            return;
-        }
+            return false;
+
+        if (spawnPoints == null || spawnPoints.Count == 0)
+            spawnPoints = new List<Transform> { transform };
 
         if (playerTarget == null)
         {
-            return;
+            CharacterMovements player = FindObjectOfType<CharacterMovements>();
+            if (player != null)
+                playerTarget = player.transform;
+            else
+                return false;
         }
 
         enemiesToSpawn = amount;
         enemiesSpawned = 0;
         spawnTimer = 0f;
-
+        return true;
     }
 
     private void Update()

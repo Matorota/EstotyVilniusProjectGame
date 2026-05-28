@@ -9,13 +9,13 @@ public class DeathWindow : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject guildWindowGameObject;
     [SerializeField] private PlayerLifecycle playerLifecycle;
+    [SerializeField] private QuestRunner questRunner;
     [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private TimeScale timeScaleManager;
 
     private CanvasGroup canvasGroup;
     private bool isVisible;
     private bool isInitialized;
-    private QuestRunner questRunner;
 
     private void Awake()
     {
@@ -26,8 +26,15 @@ public class DeathWindow : MonoBehaviour
     private void OnEnable()
     {
         EnsureInitialized();
-        ResolvePlayerLifecycle();
-        SubscribeToPlayerLifecycle();
+        if (playerLifecycle == null)
+        {
+            Debug.LogError("DeathWindow: playerLifecycle must be assigned in the Inspector.");
+        }
+        else
+        {
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
+        }
 
         restartButton?.onClick.AddListener(HandleRestartButtonClick);
         guildButton?.onClick.AddListener(HandleGuildButtonClick);
@@ -36,7 +43,12 @@ public class DeathWindow : MonoBehaviour
 
     private void OnDisable()
     {
-        UnsubscribeFromPlayerLifecycle();
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned -= HandlePlayerRespawned;
+        }
+
         restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
         guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
         quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
@@ -64,6 +76,24 @@ public class DeathWindow : MonoBehaviour
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
+
+        // ensure parent gameobjects and canvas groups are visible and interactable
+        Transform parent = screenRoot.transform.parent;
+        while (parent != null)
+        {
+            if (!parent.gameObject.activeSelf)
+                parent.gameObject.SetActive(true);
+
+            CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
+            if (parentCG != null)
+            {
+                parentCG.alpha = 1f;
+                parentCG.interactable = true;
+                parentCG.blocksRaycasts = true;
+            }
+            parent = parent.parent;
+        }
+
         Time.timeScale = 0f;
     }
 
@@ -93,11 +123,23 @@ public class DeathWindow : MonoBehaviour
 
     private void HandleRestartButtonClick()
     {
-        ResolvePlayerLifecycle();
-        ResolveQuestRunner();
+        if (playerLifecycle == null)
+        {
+            Debug.LogError("DeathWindow: playerLifecycle not assigned in Inspector.");
+            return;
+        }
 
-        playerLifecycle?.Respawn(respawnLocationCube);
-        questRunner?.EndQuest();
+        playerLifecycle.Respawn(respawnLocationCube);
+
+        if (questRunner == null)
+        {
+            Debug.LogWarning("DeathWindow: questrunner not assigned in Inspector. Quest will not be explicitly ended.");
+        }
+        else
+        {
+            questRunner.EndQuest();
+        }
+
         timeScaleManager?.Resume();
         HideWindow();
     }
@@ -129,53 +171,9 @@ public class DeathWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
-        ResolvePlayerLifecycle();
-
         isInitialized = true;
     }
 
-    private void ResolvePlayerLifecycle()
-    {
-        if (playerLifecycle != null)
-            return;
-
-        CharacterMovements charMovements = FindObjectOfType<CharacterMovements>();
-        playerLifecycle = charMovements?.GetComponent<PlayerLifecycle>();
-
-        if (playerLifecycle == null)
-        {
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            foreach (GameObject root in roots)
-            {
-                playerLifecycle = root.GetComponentInChildren<PlayerLifecycle>(true);
-                if (playerLifecycle != null)
-                    return;
-            }
-        }
-    }
-
-    private void ResolveQuestRunner()
-    {
-        if (questRunner != null)
-            return;
-
-        GameObject[] roots = gameObject.scene.GetRootGameObjects();
-        foreach (GameObject root in roots)
-        {
-            questRunner = root.GetComponentInChildren<QuestRunner>(true);
-            if (questRunner != null)
-                return;
-        }
-    }
-
-    private void SubscribeToPlayerLifecycle()
-    {
-        if (playerLifecycle != null)
-        {
-            playerLifecycle.OnPlayerDied += HandlePlayerDied;
-            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
-        }
-    }
 
     private void UnsubscribeFromPlayerLifecycle()
     {

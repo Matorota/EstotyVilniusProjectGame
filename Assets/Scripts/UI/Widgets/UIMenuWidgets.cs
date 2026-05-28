@@ -27,8 +27,13 @@ namespace UI.Windows
         
         private void HandleResumeButtonClick()
         {
-            ResolveMenuWindow();
-            menuWindow?.Close();
+            if (menuWindow == null)
+            {
+                Debug.LogError("UIMenuWidgets: menuWindow not assigned in Inspector.");
+                return;
+            }
+
+            menuWindow.Close();
         }
 
         private void HandleSettingsButtonClick()
@@ -42,18 +47,5 @@ namespace UI.Windows
             Application.Quit();
         }
 
-        private void ResolveMenuWindow()
-        {
-            if (menuWindow != null)
-                return;
-
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            foreach (GameObject root in roots)
-            {
-                menuWindow = root.GetComponentInChildren<MenuWindow>(true);
-                if (menuWindow != null)
-                    return;
-            }
-        }
     }
 }

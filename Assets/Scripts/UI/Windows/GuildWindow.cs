@@ -16,17 +16,17 @@ public class GuildWindow : MonoBehaviour
 
     private void Awake()
     {
-        ResolveQuestRunner();
+        if (questRunner == null)
+            questRunner = FindObjectOfType<QuestRunner>();
+
         HookQuestRunner();
     }
 
     private void OnEnable()
     {
-        ResolveQuestRunner();
         HookQuestRunner();
         openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
         Refresh();
-
     }
 
     public void Refresh()
@@ -62,21 +62,10 @@ public class GuildWindow : MonoBehaviour
     private void HandleQuestClicked(QuestConfig quest)
     {
         if (questRunner == null)
-        {
-            ResolveQuestRunner();
-        }
+            questRunner = FindObjectOfType<QuestRunner>();
 
-        if (questRunner == null)
-        {
-            Debug.LogError("GuildWindow requires a QuestRunner to start quests.");
+        if (questRunner == null || questRunner.Status != QuestStatus.None)
             return;
-        }
-
-        if (questRunner.Status != QuestStatus.None)
-        {
-            Debug.LogWarning("GuildWindow tried to start a quest while another quest is already in progress.");
-            return;
-        }
 
         questRunner.StartQuest(quest);
         gameObject.SetActive(false);
@@ -108,23 +97,6 @@ public class GuildWindow : MonoBehaviour
         RemoveQuest(questRunner.CurrentQuest);
     }
 
-    private void ResolveQuestRunner()
-    {
-        if (questRunner != null)
-        {
-            return;
-        }
-
-        GameObject[] roots = gameObject.scene.GetRootGameObjects();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            questRunner = roots[r].GetComponentInChildren<QuestRunner>(true);
-            if (questRunner != null)
-            {
-                return;
-            }
-        }
-    }
 
     private void HookQuestRunner()
     {

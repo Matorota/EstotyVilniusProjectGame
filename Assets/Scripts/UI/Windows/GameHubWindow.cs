@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Windows
@@ -20,8 +20,10 @@ namespace UI.Windows
         
         private void HandleMenuButtonClicked()
         {
-            ResolveMenuWindow();
-            menuWindow?.Open();
+            if (menuWindow == null)
+                return;
+
+            menuWindow.Open();
             gameObject.SetActive(false);
         }
 
@@ -37,18 +39,5 @@ namespace UI.Windows
 
         public bool IsOpen => gameObject.activeSelf;
 
-        private void ResolveMenuWindow()
-        {
-            if (menuWindow != null)
-                return;
-
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            foreach (GameObject root in roots)
-            {
-                menuWindow = root.GetComponentInChildren<MenuWindow>(true);
-                if (menuWindow != null)
-                    return;
-            }
-        }
     }
 }

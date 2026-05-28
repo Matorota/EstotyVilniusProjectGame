@@ -7,21 +7,40 @@ public class WinQuestWindow : MonoBehaviour
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private GameObject winScreenGameObject;
     [SerializeField] private Button buttonContinue;
+    [SerializeField] private GuildWindow guildWindow;
 
     private CanvasGroup canvasGroup;
     private bool isVisible;
     private bool isInitialized;
+    private bool isQuestRunnerHooked = false;
 
     private void Awake()
     {
         EnsureInitialized();
+        if (questRunner == null)
+            questRunner = FindObjectOfType<QuestRunner>();
+        if (questRunner != null && !isQuestRunnerHooked)
+        {
+            questRunner.OnQuestWon += HandleQuestWon;
+            questRunner.OnQuestEnded += HandleQuestEnded;
+            isQuestRunnerHooked = true;
+        }
+
         HideWindow();
     }
 
     private void OnEnable()
     {
         EnsureInitialized();
-        ResolveQuestRunner();
+        if (questRunner == null) questRunner = FindObjectOfType<QuestRunner>();
+        if (questRunner != null && !isQuestRunnerHooked)
+        {
+            questRunner.OnQuestWon += HandleQuestWon;
+            questRunner.OnQuestEnded += HandleQuestEnded;
+            isQuestRunnerHooked = true;
+        }
+        if (buttonContinue != null)
+            buttonContinue.onClick.AddListener(HandleContinueButtonClick);
     }
 
     private void OnDisable()
@@ -29,16 +48,16 @@ public class WinQuestWindow : MonoBehaviour
         if (buttonContinue != null)
             buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
 
-        if (questRunner != null)
+        if (questRunner != null && isQuestRunnerHooked)
         {
             questRunner.OnQuestWon -= HandleQuestWon;
             questRunner.OnQuestEnded -= HandleQuestEnded;
+            isQuestRunnerHooked = false;
         }
     }
 
     private void OnDestroy()
     {
-        // just in case
         if (buttonContinue != null)
             buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
 
@@ -53,21 +72,10 @@ public class WinQuestWindow : MonoBehaviour
     {
         EnsureInitialized();
 
-        // ensure listeners exist even if window was previously inactive
-        ResolveQuestRunner();
         if (buttonContinue != null)
         {
             buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
             buttonContinue.onClick.AddListener(HandleContinueButtonClick);
-        }
-
-        if (questRunner != null)
-        {
-            // ensure events are hooked so HideWindow will run when quest ends
-            questRunner.OnQuestWon -= HandleQuestWon;
-            questRunner.OnQuestEnded -= HandleQuestEnded;
-            questRunner.OnQuestWon += HandleQuestWon;
-            questRunner.OnQuestEnded += HandleQuestEnded;
         }
 
         GameObject screenRoot = GetScreenRoot();
@@ -78,6 +86,22 @@ public class WinQuestWindow : MonoBehaviour
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
+
+        Transform parent = screenRoot.transform.parent;
+        while (parent != null)
+        {
+            if (!parent.gameObject.activeSelf)
+                parent.gameObject.SetActive(true);
+
+            CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
+            if (parentCG != null)
+            {
+                parentCG.alpha = 1f;
+                parentCG.interactable = true;
+                parentCG.blocksRaycasts = true;
+            }
+            parent = parent.parent;
+        }
 
         if (timeScaleManager != null)
             timeScaleManager.Pause();
@@ -103,9 +127,16 @@ public class WinQuestWindow : MonoBehaviour
 
     private void HandleContinueButtonClick()
     {
-        questRunner.EndQuest();
+        questRunner?.EndQuest();
+        HideWindow();
+        
+        if (guildWindow == null)
+            guildWindow = ResolveGuildWindow();
+        
+        if (guildWindow != null)
+            guildWindow.gameObject.SetActive(true);
     }
-
+    
     private void HandleQuestWon()
     {
         ShowWindow();
@@ -129,28 +160,24 @@ public class WinQuestWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
-        ResolveQuestRunner();
-
         isInitialized = true;
     }
 
-    private void ResolveQuestRunner()
-    {
-        if (questRunner != null)
-            return;
 
-        GameObject[] roots = gameObject.scene.GetRootGameObjects();
-        foreach (GameObject root in roots)
-        {
-            questRunner = root.GetComponentInChildren<QuestRunner>(true);
-            if (questRunner != null)
-                return;
-        }
-    }
 
     private GameObject GetScreenRoot()
     {
-        
         return winScreenGameObject != null ? winScreenGameObject : gameObject;
+    }
+
+    private GuildWindow ResolveGuildWindow()
+    {
+        foreach (GuildWindow window in Resources.FindObjectsOfTypeAll<GuildWindow>())
+        {
+            if (window != null && window.gameObject.scene.IsValid())
+                return window;
+        }
+
+        return null;
     }
 }

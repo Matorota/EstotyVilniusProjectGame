@@ -52,22 +52,9 @@ public class QuestWidget : MonoBehaviour, IPointerClickHandler
     }
 
     private void EnsureBindings()
-    {
-        TMP_Text[] texts = GetComponentsInChildren<TMP_Text>(true);
-        if (nameText == null)
+    {            if (nameText == null || descriptionText == null || iconImage == null)
         {
-            nameText = FindTextByName(texts, "name", "title") ?? (texts.Length > 0 ? texts[0] : null);
-        }
-
-        if (descriptionText == null)
-        {
-            descriptionText = FindTextByName(texts, "description", "desc") ?? (texts.Length > 1 ? texts[1] : null);
-        }
-
-        if (iconImage == null)
-        {
-            Image[] images = GetComponentsInChildren<Image>(true);
-            iconImage = FindImageByName(images, "icon") ?? (images.Length > 0 ? images[0] : null);
+            Debug.LogError($"{nameof(QuestWidget)} on '{gameObject.name}' requires nameText, descriptionText and iconImage assigned in the Inspector.");
         }
     }
 

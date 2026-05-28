@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerLifecycle : MonoBehaviour
 {
+    public static PlayerLifecycle Instance { get; private set; }
+
     [SerializeField] private Health health;
     [SerializeField] private MonoBehaviour[] componentsToDisableOnDeath;
 
@@ -19,6 +21,13 @@ public class PlayerLifecycle : MonoBehaviour
             health.OnDeath += HandleDeath;
     }
 
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+        else
+            Destroy(gameObject);
+    }
     private void ResolveHealth()
     {
         if (health != null)
@@ -42,8 +51,8 @@ public class PlayerLifecycle : MonoBehaviour
 
         isDead = true;
         DisableComponents();
-        DestroyAllEnemies();
         OnPlayerDied?.Invoke();
+        DestroyAllEnemies();
     }
 
     public void Respawn(Transform respawnLocation)
@@ -128,4 +137,3 @@ public class PlayerLifecycle : MonoBehaviour
         }
     }
 }
-

@@ -147,6 +147,7 @@ MonoBehaviour:
   quitButton: {fileID: 2091863900}
   guildWindowGameObject: {fileID: 488929854}
   playerLifecycle: {fileID: 1938720493}
+  questRunner: {fileID: 81800372}
   respawnLocationCube: {fileID: 1227685225}
   timeScaleManager: {fileID: 463901196}
 --- !u!114 &4533689 stripped
@@ -1408,6 +1409,9 @@ MonoBehaviour:
   enemySpawner: {fileID: 262327338}
   timeScaleManager: {fileID: 463901196}
   hubWindow: {fileID: 4502405758853742797}
+  playerHealth: {fileID: 1938720489}
+  playerLifecycle: {fileID: 1938720493}
+  endQuestWidget: {fileID: 6792995631686690107}
 --- !u!4 &85753116 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -2853,6 +2857,7 @@ MonoBehaviour:
   timeScaleManager: {fileID: 463901196}
   winScreenGameObject: {fileID: 158442569}
   buttonContinue: {fileID: 4533689}
+  guildWindow: {fileID: 4518272968763509906}
 --- !u!1001 &159317987
 PrefabInstance:
   m_ObjectHideFlags: 0

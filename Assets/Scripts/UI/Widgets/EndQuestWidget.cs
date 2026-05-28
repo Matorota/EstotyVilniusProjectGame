@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace UI.Windows
@@ -14,8 +14,6 @@ namespace UI.Windows
 
         private void OnEnable()
         {
-            ResolveQuestRunner();
-            ResolveGuildWindow();
             ResolveEndGameButton();
             if (endGameButton != null)
                 endGameButton.onClick.AddListener(HandleEndGameButtonClick);
@@ -30,10 +28,12 @@ namespace UI.Windows
         private void HandleEndGameButtonClick()
         {
             HideButton();
-            DestroyAllCardPickups();
-            DisablePlayerMovement();
-            questRunner.EndQuest();
-            guildWindow.gameObject.SetActive(true);
+
+            if (questRunner != null)
+                questRunner.EndQuest();
+
+            if (guildWindow != null)
+                guildWindow.gameObject.SetActive(true);
         }
 
         public void ShowButton()
@@ -48,6 +48,9 @@ namespace UI.Windows
             Transform parent = endGameButton.transform.parent;
             while (parent != null)
             {
+                if (!parent.gameObject.activeSelf)
+                    parent.gameObject.SetActive(true);
+
                 CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
                 if (parentCG != null)
                 {
@@ -86,63 +89,6 @@ namespace UI.Windows
             if (endGameButton != null)
                 return;
             endGameButton = GetComponentInChildren<Button>(true);
-        }
-
-        private void ResolveGuildWindow()
-        {
-            if (guildWindow != null)
-                return;
-
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            foreach (GameObject root in roots)
-            {
-                guildWindow = root.GetComponentInChildren<GuildWindow>(true);
-                if (guildWindow != null)
-                    return;
-            }
-        }
-
-        private void DestroyAllCardPickups()
-        {
-            CardPickup[] allPickups = FindObjectsByType<CardPickup>(FindObjectsSortMode.None);
-            CharacterMovements player = FindObjectOfType<CharacterMovements>();
-            
-            foreach (CardPickup pickup in allPickups)
-            {
-                if (pickup != null && pickup.gameObject != player?.gameObject)
-                {
-                    Destroy(pickup.gameObject);
-                }
-            }
-        }
-
-        private void ResolveQuestRunner()
-        {
-            if (questRunner != null)
-                return;
-
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            foreach (GameObject root in roots)
-            {
-                questRunner = root.GetComponentInChildren<QuestRunner>(true);
-                if (questRunner != null)
-                    return;
-            }
-        }
-
-        private void DisablePlayerMovement()
-        {
-            ResolvePlayerLifecycle();
-            playerLifecycle?.DisableMovement();
-        }
-
-        private void ResolvePlayerLifecycle()
-        {
-            if (playerLifecycle != null)
-                return;
-
-            CharacterMovements charMovements = FindObjectOfType<CharacterMovements>();
-            playerLifecycle = charMovements?.GetComponent<PlayerLifecycle>();
         }
     }
 }

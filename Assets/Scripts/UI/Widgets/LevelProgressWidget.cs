@@ -17,17 +17,17 @@ namespace Widgets
 
         private void OnEnable()
         {
-            ResolveQuestRunner();
-            if (questRunner != null)
+            if (questRunner == null)
             {
-                questRunner.OnQuestStarted += HandleQuestStarted;
-                questRunner.OnAliveCountChanged += HandleAliveCountChanged;
-                questRunner.OnQuestEnded += HandleQuestEnded;
-                SyncToQuestRunner();
+                Debug.LogError("LevelProgressWidget: assign QuestRunner in Inspector.");
+                Setup(null);
                 return;
             }
 
-            Setup(null);
+            questRunner.OnQuestStarted += HandleQuestStarted;
+            questRunner.OnAliveCountChanged += HandleAliveCountChanged;
+            questRunner.OnQuestEnded += HandleQuestEnded;
+            SyncToQuestRunner();
         }
 
         private void OnDisable()
@@ -144,22 +144,5 @@ namespace Widgets
             component.blocksRaycasts = visible;
         }
 
-        private void ResolveQuestRunner()
-        {
-            if (questRunner != null)
-            {
-                return;
-            }
-
-            GameObject[] roots = gameObject.scene.GetRootGameObjects();
-            for (int r = 0; r < roots.Length; r++)
-            {
-                questRunner = roots[r].GetComponentInChildren<QuestRunner>(true);
-                if (questRunner != null)
-                {
-                    return;
-                }
-            }
-        }
     }
 }
