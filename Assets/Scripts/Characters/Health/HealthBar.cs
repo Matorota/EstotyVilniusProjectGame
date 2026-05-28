@@ -12,7 +12,6 @@ public class HealthBar : MonoBehaviour
         health = GetComponent<IDamageable>();
         if (health == null || healthFillImage == null)
         {
-            Debug.LogWarning($"{nameof(HealthBar)} on {name} is missing references.");
             enabled = false;
             return;
         }

@@ -9,27 +9,36 @@ public class CardInventoryUi : MonoBehaviour
     [SerializeField] private SelectedCardsManager selectedCardsManager;
     [SerializeField] private Transform cardsContainer;
     [SerializeField] private CardWidget cardPrefab;
-    [SerializeField] private Button reOpenQuestButton;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private GameObject hudWindowRoot;
 
     private void OnEnable()
     {
-        if (reOpenQuestButton != null)
-            reOpenQuestButton.onClick.AddListener(HandleReOpenQuestButtonClicked);
-        inventory.OnInventoryChanged += Refresh;
+        ResolveInventory();
+        if (inventory != null)
+            inventory.OnInventoryChanged += Refresh;
         Refresh();
     }
 
     private void OnDisable()
     {
-        if (reOpenQuestButton != null)
-            reOpenQuestButton.onClick.RemoveListener(HandleReOpenQuestButtonClicked);
-        inventory.OnInventoryChanged -= Refresh;
+        if (inventory != null)
+            inventory.OnInventoryChanged -= Refresh;
+    }
+
+    private void ResolveInventory()
+    {
+        if (inventory != null)
+            return;
+
+        inventory = CardInventory.Instance;
     }
 
     private void Refresh()
     {
+        ResolveInventory();
+        if (inventory == null)
+            return;
+
         for (int i = cardsContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(cardsContainer.GetChild(i).gameObject);
@@ -46,20 +55,6 @@ public class CardInventoryUi : MonoBehaviour
     private void HandleCardClick(CardModel model)
     {
         selectedCardsManager.TryEquip(model);
-    }
-    
-
-    private void HandleOpenQuestButtonClicked()
-    {
-        gameUIController.OpenAdditionalPanel();
-        gameObject.SetActive(false);
-    }
-    
-    private void HandleReOpenQuestButtonClicked()
-    {
-        gameUIController.CloseAdditionalPanel();
-        gameUIController.Resume();
-        gameObject.SetActive(false);
     }
 }
 

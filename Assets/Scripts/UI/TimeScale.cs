@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class TimeScale : MonoBehaviour
 {
-    public void SetTimeScale(float timeScale)
-    {
-        Time.timeScale = timeScale;
-    }
+    private int _pauseCount;
 
     public void Pause()
     {
-        SetTimeScale(0f);
+        _pauseCount++;
+        Time.timeScale = 0f;
     }
 
     public void Resume()
     {
-        SetTimeScale(1f);
+        _pauseCount = Mathf.Max(0, _pauseCount - 1);
+        if (_pauseCount == 0)
+            Time.timeScale = 1f;
     }
 }

@@ -7,13 +7,14 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Collider))]
 public class CardPickup : MonoBehaviour
 {
-    private static  HashSet<CardPickup> ActivePickups = new(); // I need to do static without it i need to use FindObjectsOfType so one or the other i do not know witch is the better option
+    private static HashSet<CardPickup> ActivePickups = new();
 
-     private CardConfig cardConfig;
-     private CardWidget cardWidget;
-     private RawImage worldIconRawImage;
+    private CardConfig cardConfig;
+    private CardWidget cardWidget;
+    private RawImage worldIconRawImage;
 
     private CardWidget[] widgets;
+    private bool canBePickedUp;
 
     public static List<CardPickup> GetActivePickups()
     {
@@ -37,6 +38,13 @@ public class CardPickup : MonoBehaviour
     private void OnEnable()
     {
         ActivePickups.Add(this);
+        canBePickedUp = false;
+        Invoke(nameof(EnablePickup), 0.3f);
+    }
+
+    private void EnablePickup()
+    {
+        canBePickedUp = true;
     }
 
     private void OnDisable()
@@ -46,6 +54,9 @@ public class CardPickup : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!canBePickedUp)
+            return;
+
         CardInventory inventory =
             other.GetComponent<CardInventory>() ??
             other.GetComponentInParent<CardInventory>();
@@ -79,35 +90,39 @@ public class CardPickup : MonoBehaviour
     private void ApplyConfigToVisuals()
     {
         if (cardConfig == null)
-        {
             return;
-        }
+
+        Canvas canvas = GetComponentInParent<Canvas>();
 
         if (cardWidget != null)
-        {
             cardWidget.Setup(cardConfig);
-        }
 
-        if (widgets == null)
+        if (widgets != null)
         {
-            return;
-        }
-
-        for (int i = 0; i < widgets.Length; i++)
-        {
-            CardWidget widget = widgets[i];
-            if (widget != null)
+            for (int i = 0; i < widgets.Length; i++)
             {
-                widget.Setup(cardConfig);
+                CardWidget widget = widgets[i];
+                if (widget != null)
+                    widget.Setup(cardConfig);
             }
         }
 
         if (cardConfig.Image != null)
         {
             if (worldIconRawImage != null)
-            {
                 worldIconRawImage.texture = cardConfig.Image.texture;
-            }
+
+            if (worldIconRawImage == null || canvas == null || canvas.renderMode != RenderMode.WorldSpace)
+                EnsureSpriteRendererFallback(cardConfig.Image);
         }
+    }
+
+    private void EnsureSpriteRendererFallback(Sprite sprite)
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr == null)
+            sr = gameObject.AddComponent<SpriteRenderer>();
+        sr.sprite = sprite;
+        sr.sortingOrder = 100;
     }
 }

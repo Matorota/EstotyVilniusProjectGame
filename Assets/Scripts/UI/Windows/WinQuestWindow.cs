@@ -1,273 +1,159 @@
-using System.Collections.Generic;
+using System;
+using Configs;
 using UnityEngine;
 using UnityEngine.UI;
+using UI.Windows;
 
 public class WinQuestWindow : MonoBehaviour
 {
-    [SerializeField] private GameUIController gameUIController;
+    public static WinQuestWindow Instance { get; private set; }
+
+    [SerializeField] private QuestRunner questRunner;
     [SerializeField] private TimeScale timeScaleManager;
-    [SerializeField] private GameObject winScreenGameObject;
     [SerializeField] private Button buttonContinue;
-    [SerializeField] private GameObject hudWindowGameObject;
-    [SerializeField] private Button endQuestButton;
-    [SerializeField] private GuildWindow guildWindowRef;
-    [SerializeField] private GameObject guildWindowGameObject;
-    private GameObject menuUIGameObject;
 
     private CanvasGroup canvasGroup;
-    private Health playerHealth;
-    private readonly HashSet<Health> trackedEnemies = new HashSet<Health>();
     private bool isVisible;
-    private bool isDismissed;
-    private bool hasWon;
-    private bool hasSeenLivingEnemy;
-    private bool isInitialized;
+    private bool isSubscribed;
 
     private void Awake()
     {
+        Instance = this;
+        questRunner ??= QuestRunner.Instance;
         EnsureInitialized();
-        ResetState();
+        HideWindow();
+    }
+    private void OnEnable()
+    {
+        if (questRunner == null)
+            questRunner = QuestRunner.Instance;
+
+        SubscribeEvents();
+
+        if (buttonContinue != null)
+            buttonContinue.onClick.AddListener(HandleContinueButtonClick);
     }
 
-    private void OnDestroy()
+    private void Start()
     {
-        if (!isInitialized)
-            return;
+        if (questRunner == null)
+            questRunner = QuestRunner.Instance;
 
-        buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
-        endQuestButton.onClick.RemoveListener(HandleEndQuestButtonClick);
-
-        EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
-        ClearTrackedEnemies();
+        SubscribeEvents();
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if (isVisible && gameUIController.IsOpen)
-            gameUIController.CloseMenu();
+        UnsubscribeEvents();
 
-        RefreshPlayerHealth();
+        if (buttonContinue != null)
+            buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
+    }
 
-        if (playerHealth == null || playerHealth.CurrentHealth <= 0f)
+    private void SubscribeEvents()
+    {
+        if (questRunner == null || isSubscribed)
             return;
 
-        EvaluateWinCondition();
+        questRunner.OnQuestWon += HandleQuestWon;
+        questRunner.OnQuestEnded += HandleQuestEnded;
+        questRunner.OnQuestStarted += HandleQuestStarted;
+        isSubscribed = true;
+    }
+
+    private void UnsubscribeEvents()
+    {
+        if (questRunner == null || !isSubscribed)
+            return;
+
+        questRunner.OnQuestWon -= HandleQuestWon;
+        questRunner.OnQuestEnded -= HandleQuestEnded;
+        questRunner.OnQuestStarted -= HandleQuestStarted;
+        isSubscribed = false;
+    }
+
+    private void HandleQuestWon()
+    {
+        ShowWindow();
+    }
+
+    private void HandleQuestEnded()
+    {
+        HideWindow();
     }
 
     public void ShowWindow()
     {
+        if (questRunner == null || questRunner.Status != QuestStatus.Completed)
+            return;
+
         EnsureInitialized();
 
-        if (gameUIController.IsOpen)
-            gameUIController.CloseMenu();
+        gameObject.SetActive(true);
+        transform.SetAsLastSibling();
 
-        GameObject screenRoot = GetScreenRoot();
-        if (!screenRoot.activeSelf)
-            screenRoot.SetActive(true);
+        EnsureParentsActive();
 
-        screenRoot.transform.SetAsLastSibling();
-        isVisible = true;
-        hasWon = true;
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        if (timeScaleManager != null)
-            timeScaleManager.Pause();
-        else
-            Time.timeScale = 0f;
+        isVisible = true;
 
-        if (menuUIGameObject != null)
-            menuUIGameObject.SetActive(false);
-
-        if (endQuestButton != null)
-            endQuestButton.gameObject.SetActive(false);
     }
 
     public void HideWindow()
     {
         EnsureInitialized();
 
-        GameObject screenRoot = GetScreenRoot();
-        isVisible = false;
         canvasGroup.alpha = 0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
 
-        if (screenRoot != gameObject)
-            screenRoot.SetActive(false);
+        isVisible = false;
     }
 
-    public bool IsVisible => isVisible;
-
-    public void ResetState()
+    private void HandleQuestStarted(QuestConfig config)
     {
-        EnsureInitialized();
-        ClearTrackedEnemies();
-        hasSeenLivingEnemy = false;
-        isDismissed = false;
-        hasWon = false;
-        RegisterExistingEnemies();
         HideWindow();
-    }
-
-    private void RefreshPlayerHealth()
-    {
-        if (playerHealth == null)
-            playerHealth = gameUIController.GetPlayerHealth();
-    }
-
-    private void EvaluateWinCondition()
-    {
-        if (isDismissed || hasWon)
-            return;
-
-        if (!hasSeenLivingEnemy)
-            return;
-
-        if (playerHealth == null || playerHealth.CurrentHealth <= 0f)
-            return;
-
-        if (CountAliveTrackedEnemies() == 0)
-            ShowWindow();
-    }
-
-    private void RegisterExistingEnemies()
-    {
-        GameObject[] roots = gameUIController.GetSceneRoots();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            Health[] found = roots[r].GetComponentsInChildren<Health>(true);
-            for (int i = 0; i < found.Length; i++)
-                RegisterEnemy(found[i]);
-        }
-    }
-
-    private void RegisterEnemy(Health health)
-    {
-        if (health == null || health.Team != Team.Enemy || trackedEnemies.Contains(health))
-            return;
-
-        trackedEnemies.Add(health);
-        health.OnDeath += HandleTrackedEnemyDeath;
-
-        if (health.CurrentHealth > 0f)
-            hasSeenLivingEnemy = true;
-    }
-
-    private void ClearTrackedEnemies()
-    {
-        foreach (Health health in trackedEnemies)
-        {
-            if (health != null)
-                health.OnDeath -= HandleTrackedEnemyDeath;
-        }
-
-        trackedEnemies.Clear();
-    }
-
-    private int CountAliveTrackedEnemies()
-    {
-        int aliveEnemyCount = 0;
-
-        foreach (Health health in trackedEnemies)
-        {
-            if (health != null && health.gameObject.activeInHierarchy && health.CurrentHealth > 0f)
-                aliveEnemyCount++;
-        }
-
-        return aliveEnemyCount;
-    }
-
-    private void HandleEnemySpawned(Health health)
-    {
-        RegisterEnemy(health);
-        EvaluateWinCondition();
-    }
-
-    private void HandleTrackedEnemyDeath()
-    {
-        EvaluateWinCondition();
     }
 
     private void HandleContinueButtonClick()
     {
-        isDismissed = true;
-
-        if (timeScaleManager != null)
-            timeScaleManager.Resume();
-        else
-            Time.timeScale = 1f;
-
-        if (menuUIGameObject != null)
-            menuUIGameObject.SetActive(true);
-
-        if (endQuestButton != null)
-            endQuestButton.gameObject.SetActive(true);
-
         HideWindow();
-    }
+        questRunner?.ResetQuestState();
 
-    private void HandleEndQuestButtonClick()
-    {
-        ResetState();
-
-        Health healthComp = gameUIController.GetPlayerHealth();
-        if (healthComp != null)
-        {
-            float missing = healthComp.MaxHealth - healthComp.CurrentHealth;
-            if (missing > 0f)
-                healthComp.Heal(missing);
-        }
-
-        GameObject[] roots = gameUIController.GetSceneRoots();
-        var cardsList = new System.Collections.Generic.List<CardPickup>();
-        for (int r = 0; r < roots.Length; r++)
-        {
-            CardPickup[] found = roots[r].GetComponentsInChildren<CardPickup>(true);
-            for (int j = 0; j < found.Length; j++)
-                cardsList.Add(found[j]);
-        }
-
-        CharacterMovements mainCharacter = gameUIController.GetMainCharacter();
-        for (int i = 0; i < cardsList.Count; i++)
-        {
-            CardPickup cp = cardsList[i];
-            if (cp != null && cp.gameObject != mainCharacter?.gameObject)
-                Destroy(cp.gameObject);
-        }
-
-        guildWindowRef.RemoveQuest(guildWindowRef.CurrentQuest);
-
-        guildWindowRef.EndQuest();
-
-        guildWindowGameObject.SetActive(true);
-
-        HideWindow();
+        if (EndQuestWidget.Instance != null)
+            EndQuestWidget.Instance.ShowButton();
     }
 
     private void EnsureInitialized()
     {
-        if (isInitialized)
-            return;
+        if (canvasGroup != null) return;
 
-        GameObject screenRoot = GetScreenRoot();
-
-        canvasGroup = screenRoot.GetComponent<CanvasGroup>();
+        canvasGroup = gameObject.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
-            canvasGroup = screenRoot.AddComponent<CanvasGroup>();
-
-        RefreshPlayerHealth();
-
-        buttonContinue.onClick.AddListener(HandleContinueButtonClick);
-        endQuestButton.onClick.AddListener(HandleEndQuestButtonClick);
-
-        EnemySpawner.OnEnemySpawned += HandleEnemySpawned;
-        isInitialized = true;
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
 
-    private GameObject GetScreenRoot()
+    private void EnsureParentsActive()
     {
-        return winScreenGameObject != null ? winScreenGameObject : gameObject;
+        Transform current = transform.parent;
+        while (current != null)
+        {
+            if (!current.gameObject.activeSelf)
+                current.gameObject.SetActive(true);
+
+            CanvasGroup parentCG = current.GetComponent<CanvasGroup>();
+            if (parentCG != null)
+            {
+                parentCG.alpha = 1f;
+                parentCG.interactable = true;
+                parentCG.blocksRaycasts = true;
+            }
+
+            current = current.parent;
+        }
     }
+
 }

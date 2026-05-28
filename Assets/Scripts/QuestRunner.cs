@@ -1,0 +1,387 @@
+using System;
+using System.Collections.Generic;
+using Configs;
+using UnityEngine;
+
+public class QuestRunner : MonoBehaviour
+{
+    public static QuestRunner Instance { get; private set; }
+
+    [SerializeField] private EnemySpawner enemySpawner;
+    [SerializeField] private TimeScale timeScaleManager;
+    [SerializeField] private PlayerLifecycle playerLifecycle;
+    [SerializeField] private Health playerHealth;
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Transform playerSpawnPoint;
+
+    private readonly HashSet<Health> trackedEnemies = new();
+    private readonly Dictionary<Health, Action> enemyDeathHandlers = new();
+
+    private int spawnedEnemies;
+    private GameObject spawnedPlayer;
+
+    public QuestConfig CurrentQuest { get; private set; }
+    public QuestStatus Status { get; private set; }
+    public int AliveEnemies { get; private set; }
+    public int TotalEnemies { get; private set; }
+
+    public event Action<QuestConfig> OnQuestStarted;
+    public event Action OnQuestWon;
+    public event Action OnQuestEnded;
+    public event Action OnAliveCountChanged;
+
+    private void Awake()
+    {
+        Instance = this;
+
+        enemySpawner ??= EnemySpawner.Instance;
+        playerLifecycle ??= PlayerLifecycle.Instance;
+        playerHealth ??= Health.PlayerInstance;
+
+        PauseGame();
+
+        if (playerLifecycle != null)
+            playerLifecycle.DisableMovement();
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToPlayerDeath();
+    }
+
+    private void OnDisable()
+    {
+        UnsubscribeFromPlayerDeath();
+        UnsubscribeFromEnemySpawner();
+        ClearTrackedEnemies();
+        DestroyPlayer();
+
+        CurrentQuest = null;
+        Status = QuestStatus.None;
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = 0;
+    }
+
+    private void SubscribeToPlayerDeath()
+    {
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+    }
+
+    private void UnsubscribeFromPlayerDeath()
+    {
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+    }
+
+    public void StartQuest(QuestConfig quest)
+    {
+        if (quest == null)
+            return;
+
+        CurrentQuest = quest;
+        Status = QuestStatus.Active;
+
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = Mathf.Max(0, quest.EnemiesAmount);
+
+        DestroyAllCardPickups();
+        ClearTrackedEnemies();
+        SubscribeToEnemySpawner();
+
+        DestroyPlayer();
+        SpawnPlayer();
+        UpdatePlayerReferences();
+        SubscribeToPlayerDeath();
+
+        enemySpawner ??= EnemySpawner.Instance;
+        if (enemySpawner == null)
+        {
+            AbortQuestStart();
+            return;
+        }
+
+        if (TotalEnemies <= 0)
+        {
+            CompleteQuest();
+            return;
+        }
+
+        bool started = enemySpawner.SpawnEnemies(quest.EnemiesAmount);
+
+        if (!started)
+        {
+            AbortQuestStart();
+            return;
+        }
+
+        ResumeGame();
+        EnablePlayerMovement();
+
+        OnQuestStarted?.Invoke(quest);
+        OnAliveCountChanged?.Invoke();
+    }
+
+    public void EndQuest()
+    {
+        HealPlayer();
+
+        DestroyAllCardPickups();
+        DestroyAllEnemies();
+        DestroyPlayer();
+
+        UnsubscribeFromEnemySpawner();
+        ClearTrackedEnemies();
+        UnsubscribeFromPlayerDeath();
+
+        CurrentQuest = null;
+        Status = QuestStatus.None;
+
+        OnQuestEnded?.Invoke();
+
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = 0;
+
+        OnAliveCountChanged?.Invoke();
+
+        PauseGame();
+    }
+
+    public void ResetQuestState()
+    {
+        CurrentQuest = null;
+        Status = QuestStatus.None;
+        ResumeGame();
+    }
+
+    private void HandleEnemySpawned(Health health)
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        if (health == null)
+            return;
+
+        if (health.Team != Team.Enemy)
+            return;
+
+        if (trackedEnemies.Contains(health))
+            return;
+
+        trackedEnemies.Add(health);
+
+        spawnedEnemies++;
+        AliveEnemies++;
+
+        Action deathHandler = () => HandleEnemyDeath(health);
+
+        enemyDeathHandlers[health] = deathHandler;
+        health.OnDeath += deathHandler;
+
+        OnAliveCountChanged?.Invoke();
+
+        EvaluateQuestCompletion();
+    }
+
+    private void HandleEnemyDeath(Health health)
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        if (health == null)
+            return;
+
+        if (!trackedEnemies.Remove(health))
+            return;
+
+        if (enemyDeathHandlers.TryGetValue(health, out Action deathHandler))
+        {
+            health.OnDeath -= deathHandler;
+            enemyDeathHandlers.Remove(health);
+        }
+
+        AliveEnemies = Mathf.Max(0, AliveEnemies - 1);
+
+        OnAliveCountChanged?.Invoke();
+
+        EvaluateQuestCompletion();
+    }
+
+    private void EvaluateQuestCompletion()
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        if (spawnedEnemies >= TotalEnemies && AliveEnemies <= 0)
+            CompleteQuest();
+    }
+
+    private void CompleteQuest()
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        Status = QuestStatus.Completed;
+
+        OnQuestWon?.Invoke();
+
+        PauseGame();
+    }
+
+    private void HandlePlayerDied()
+    {
+        if (Status != QuestStatus.Active)
+            return;
+
+        AbortQuest();
+    }
+
+    private void AbortQuest()
+    {
+        UnsubscribeFromEnemySpawner();
+        DestroyAllEnemies();
+        DestroyPlayer();
+        ClearTrackedEnemies();
+        UnsubscribeFromPlayerDeath();
+
+        Status = QuestStatus.None;
+
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = 0;
+
+        OnAliveCountChanged?.Invoke();
+        OnQuestEnded?.Invoke();
+
+        PauseGame();
+    }
+
+    private void AbortQuestStart()
+    {
+        UnsubscribeFromEnemySpawner();
+        DestroyAllEnemies();
+        DestroyPlayer();
+        ClearTrackedEnemies();
+        UnsubscribeFromPlayerDeath();
+
+        CurrentQuest = null;
+        Status = QuestStatus.None;
+
+        spawnedEnemies = 0;
+        AliveEnemies = 0;
+        TotalEnemies = 0;
+
+        OnAliveCountChanged?.Invoke();
+
+        PauseGame();
+    }
+
+    private void SubscribeToEnemySpawner()
+    {
+        EnemySpawner.OnEnemySpawned += HandleEnemySpawned;
+    }
+
+    private void UnsubscribeFromEnemySpawner()
+    {
+        EnemySpawner.OnEnemySpawned -= HandleEnemySpawned;
+    }
+
+    public void DestroyAllEnemies()
+    {
+        var enemies = new List<Health>(trackedEnemies);
+        foreach (Health enemy in enemies)
+        {
+            if (enemy != null)
+                Destroy(enemy.gameObject);
+        }
+    }
+
+    private void ClearTrackedEnemies()
+    {
+        foreach (KeyValuePair<Health, Action> entry in enemyDeathHandlers)
+        {
+            if (entry.Key != null)
+                entry.Key.OnDeath -= entry.Value;
+        }
+
+        enemyDeathHandlers.Clear();
+        trackedEnemies.Clear();
+    }
+
+    private void SpawnPlayer()
+    {
+        if (playerPrefab == null)
+            return;
+
+        Vector3 spawnPos = playerSpawnPoint != null ? playerSpawnPoint.position : Vector3.zero;
+        Quaternion spawnRot = playerSpawnPoint != null ? playerSpawnPoint.rotation : Quaternion.identity;
+
+        spawnedPlayer = Instantiate(playerPrefab, spawnPos, spawnRot);
+        spawnedPlayer.name = "Player";
+    }
+
+    private void DestroyPlayer()
+    {
+        if (spawnedPlayer != null)
+        {
+            Destroy(spawnedPlayer);
+            spawnedPlayer = null;
+        }
+
+        PlayerLifecycle.ClearInstance();
+    }
+
+    private void UpdatePlayerReferences()
+    {
+        playerLifecycle = PlayerLifecycle.Instance;
+        playerHealth = Health.PlayerInstance;
+
+        if (enemySpawner != null && playerLifecycle != null)
+            enemySpawner.SetPlayerTarget(playerLifecycle.transform);
+
+        if (PlayerCamera.Instance != null && playerLifecycle != null)
+            PlayerCamera.Instance.SetTarget(playerLifecycle.transform);
+    }
+
+    private void HealPlayer()
+    {
+        playerHealth ??= Health.PlayerInstance;
+        if (playerHealth == null)
+            return;
+
+        float missingHealth =
+            playerHealth.MaxHealth - playerHealth.CurrentHealth;
+
+        if (missingHealth > 0f)
+            playerHealth.Heal(missingHealth);
+    }
+
+    private void DestroyAllCardPickups()
+    {
+        foreach (CardPickup pickup in CardPickup.GetActivePickups())
+        {
+            if (pickup != null)
+                Destroy(pickup.gameObject);
+        }
+    }
+
+    private void ResumeGame()
+    {
+        timeScaleManager?.Resume();
+    }
+
+    private void PauseGame()
+    {
+        timeScaleManager?.Pause();
+    }
+
+    private void EnablePlayerMovement()
+    {
+        playerLifecycle ??= PlayerLifecycle.Instance;
+        playerLifecycle?.EnableMovement();
+    }
+
+}

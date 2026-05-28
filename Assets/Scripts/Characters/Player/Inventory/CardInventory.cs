@@ -6,11 +6,32 @@ using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    private List<CardModel> collectedCards = new();
-    private List<CardModel> equippedCards = new();
-    private Dictionary<CardType, List<CardModel>> cardModelsByType = new();
+    public static CardInventory Instance { get; private set; }
+
+    private static readonly List<CardModel> collectedCards = new();
+    private static readonly List<CardModel> equippedCards = new();
+    private static readonly Dictionary<CardType, List<CardModel>> cardModelsByType = new();
 
     public event Action OnInventoryChanged;
+
+    private void Awake()
+    {
+        if (Instance == null)
+            Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
+    public static void ResetInventory()
+    {
+        collectedCards.Clear();
+        equippedCards.Clear();
+        cardModelsByType.Clear();
+    }
 
     public bool Collect(CardModel model)
     {

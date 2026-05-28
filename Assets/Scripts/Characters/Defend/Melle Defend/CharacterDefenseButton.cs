@@ -3,20 +3,25 @@ using UnityEngine.EventSystems;
 
 public class CharacterDefenseButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    [SerializeField] private CharacterDefense defense;
-
     public void OnPointerDown(PointerEventData eventData)
     {
-        defense?.SetUiDefense(true);
+        ResolveDefense()?.SetUiDefense(true);
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        defense?.SetUiDefense(false);
+        ResolveDefense()?.SetUiDefense(false);
     }
 
     private void OnDisable()
     {
-        defense?.SetUiDefense(false);
+        ResolveDefense()?.SetUiDefense(false);
+    }
+
+    private CharacterDefense ResolveDefense()
+    {
+        if (PlayerLifecycle.Instance == null)
+            return null;
+        return PlayerLifecycle.Instance.GetComponent<CharacterDefense>();
     }
 }

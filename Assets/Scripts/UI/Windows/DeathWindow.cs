@@ -1,20 +1,21 @@
+using Configs;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DeathWindow : MonoBehaviour
 {
-    [SerializeField] private CharacterMovements mainCharacter;
-    [SerializeField] private GameUIController gameUIController;
     [SerializeField] private GameObject deathScreenGameObject;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button guildButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject guildWindowGameObject;
+    [SerializeField] private PlayerLifecycle playerLifecycle;
+    [SerializeField] private QuestRunner questRunner;
+    [SerializeField] private Transform respawnLocationCube;
+    [SerializeField] private TimeScale timeScaleManager;
 
     private CanvasGroup canvasGroup;
-    private Health playerHealth;
     private bool isVisible;
-    private bool isDismissed;
     private bool isInitialized;
 
     private void Awake()
@@ -23,45 +24,66 @@ public class DeathWindow : MonoBehaviour
         HideWindow();
     }
 
-    private void Update()
+    private void OnEnable()
     {
         EnsureInitialized();
+        ResolvePlayerLifecycle();
 
-        if (playerHealth == null)
-            return;
+        if (questRunner == null)
+            questRunner = QuestRunner.Instance;
+        if (questRunner != null)
+            questRunner.OnQuestStarted += HandleQuestStarted;
 
-        if (isVisible && gameUIController.IsOpen)
-            gameUIController.CloseMenu();
+        restartButton?.onClick.AddListener(HandleRestartButtonClick);
+        guildButton?.onClick.AddListener(HandleGuildButtonClick);
+        quitButton?.onClick.AddListener(HandleQuitButtonClick);
+    }
 
-        bool isDead = playerHealth.CurrentHealth <= 0f;
-        if (!isDead)
+    private void OnDisable()
+    {
+        UnsubscribeFromPlayerLifecycle();
+
+        if (questRunner != null)
+            questRunner.OnQuestStarted -= HandleQuestStarted;
+
+        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
+    }
+
+    private void HandleQuestStarted(QuestConfig config)
+    {
+        ResolvePlayerLifecycle();
+    }
+
+    private void ResolvePlayerLifecycle()
+    {
+        // Always unsubscribe from old to prevent double-subscription or stale references
+        if (playerLifecycle != null)
         {
-            isDismissed = false;
-            if (isVisible)
-                HideWindow();
-            return;
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned -= HandlePlayerRespawned;
         }
 
-        if (!isDismissed && !isVisible)
-            ShowWindow();
+        playerLifecycle = PlayerLifecycle.Instance;
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned += HandlePlayerRespawned;
+        }
     }
 
     private void OnDestroy()
     {
-        if (!isInitialized)
-            return;
-
-        restartButton.onClick.RemoveListener(HandleRestartButtonClick);
-        guildButton.onClick.RemoveListener(HandleGuildButtonClick);
-        quitButton.onClick.RemoveListener(HandleQuitButtonClick);
+        UnsubscribeFromPlayerLifecycle();
+        restartButton?.onClick.RemoveListener(HandleRestartButtonClick);
+        guildButton?.onClick.RemoveListener(HandleGuildButtonClick);
+        quitButton?.onClick.RemoveListener(HandleQuitButtonClick);
     }
 
     public void ShowWindow()
     {
         EnsureInitialized();
-
-        if (gameUIController.IsOpen)
-            gameUIController.CloseMenu();
 
         GameObject screenRoot = GetScreenRoot();
         if (!screenRoot.activeSelf)
@@ -72,12 +94,29 @@ public class DeathWindow : MonoBehaviour
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
-        Time.timeScale = 0f;
+
+        Transform parent = screenRoot.transform.parent;
+        while (parent != null)
+        {
+            if (!parent.gameObject.activeSelf)
+                parent.gameObject.SetActive(true);
+
+            CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
+            if (parentCG != null)
+            {
+                parentCG.alpha = 1f;
+                parentCG.interactable = true;
+                parentCG.blocksRaycasts = true;
+            }
+            parent = parent.parent;
+        }
+
     }
 
     public void HideWindow()
     {
         EnsureInitialized();
+
         GameObject screenRoot = GetScreenRoot();
         isVisible = false;
         canvasGroup.alpha = 0f;
@@ -86,34 +125,44 @@ public class DeathWindow : MonoBehaviour
 
         if (screenRoot != gameObject)
             screenRoot.SetActive(false);
+        
+        timeScaleManager?.Resume();
     }
 
     public bool IsVisible => isVisible;
 
     private void HandleGuildButtonClick()
     {
-        isDismissed = true;
-
-        guildWindowGameObject.SetActive(true);
-
+        questRunner?.EndQuest();
+        timeScaleManager?.Resume();
         HideWindow();
+        guildWindowGameObject?.SetActive(true);
     }
 
     private void HandleRestartButtonClick()
     {
-        isDismissed = true;
-
-        gameUIController.RestartCurrentLevel();
-
+        QuestConfig questToRestart = questRunner?.CurrentQuest;
+        CardInventory.ResetInventory();
+        timeScaleManager?.Resume();
         HideWindow();
+
+        if (questToRestart != null)
+            questRunner?.StartQuest(questToRestart);
     }
 
     private void HandleQuitButtonClick()
     {
-        isDismissed = true;
+        timeScaleManager?.Resume();
+        Application.Quit();
+    }
 
-        gameUIController.ContinueAndOpenQuitPopup();
+    private void HandlePlayerDied()
+    {
+        ShowWindow();
+    }
 
+    private void HandlePlayerRespawned()
+    {
         HideWindow();
     }
 
@@ -128,13 +177,17 @@ public class DeathWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = screenRoot.AddComponent<CanvasGroup>();
 
-        playerHealth = gameUIController.GetPlayerHealth();
-
-        restartButton.onClick.AddListener(HandleRestartButtonClick);
-        guildButton.onClick.AddListener(HandleGuildButtonClick);
-        quitButton.onClick.AddListener(HandleQuitButtonClick);
-
         isInitialized = true;
+    }
+
+
+    private void UnsubscribeFromPlayerLifecycle()
+    {
+        if (playerLifecycle != null)
+        {
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+            playerLifecycle.OnPlayerRespawned -= HandlePlayerRespawned;
+        }
     }
 
     private GameObject GetScreenRoot()
@@ -142,3 +195,4 @@ public class DeathWindow : MonoBehaviour
         return deathScreenGameObject != null ? deathScreenGameObject : gameObject;
     }
 }
+

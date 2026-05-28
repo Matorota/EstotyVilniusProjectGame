@@ -4,7 +4,7 @@ using Configs;
 
 public class PlayerStats : MonoBehaviour
 {
-    private float damageBonus = 0f; // flat add to melee damage
+    private float damageBonus = 0f;
     private float speedMultiplier = 1f;
     private Health health;
 
@@ -19,6 +19,8 @@ public class PlayerStats : MonoBehaviour
     public void ApplyCardEffect(CardConfig cfg)
     {
         if (cfg == null) return;
+        if (!gameObject.activeInHierarchy)
+            return;
         StartCoroutine(ApplyTemporary(cfg));
     }
 

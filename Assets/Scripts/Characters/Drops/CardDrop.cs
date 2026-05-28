@@ -18,6 +18,10 @@ public class CardDrop : MonoBehaviour
     private void Awake()
     {
         health = GetComponent<IDamageable>();
+
+        if (dropCycleState == null)
+            dropCycleState = CardDropCycleState.Instance;
+
         if (dropCycleState == null)
         {
             GameObject stateObject = new GameObject("CardDropCycleState");
@@ -25,10 +29,7 @@ public class CardDrop : MonoBehaviour
         }
 
         if (health == null)
-        {
-            Debug.LogWarning($"{nameof(CardDrop)} on {name} is missing IDamageable.");
             enabled = false;
-        }
     }
 
     private void OnEnable()
@@ -44,18 +45,22 @@ public class CardDrop : MonoBehaviour
     private void OnDeath()
     {
         if (hasDropped)
-        {
             return;
-        }
+
+        if (cardDropPrefab == null)
+            return;
 
         if (!TrySelectConfig(out CardConfig selectedConfig))
-        {
             return;
-        }
 
         hasDropped = true;
         Vector3 spawnPosition = transform.position;
         spawnPosition.y = CardDropWorldY;
+
+        Vector2 randomOffset = Random.insideUnitCircle * 1.5f;
+        spawnPosition.x += randomOffset.x;
+        spawnPosition.z += randomOffset.y;
+
         CardPickup droppedCard = Instantiate(cardDropPrefab, spawnPosition, Quaternion.identity);
         droppedCard.Initialize(selectedConfig);
     }

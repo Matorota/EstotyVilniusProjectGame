@@ -4,24 +4,9 @@ public class RespawnPlayer : MonoBehaviour
 {
     public bool RespawnMainCharacter(CharacterMovements mainCharacter, Transform respawnLocationCube)
     {
-        if (mainCharacter == null)
-        {
-            Debug.LogError("Main character is not assigned.");
-            return false;
-        }
-
-        if (respawnLocationCube == null)
-        {
-            Debug.LogError("Respawn location cube is not assigned.");
-            return false;
-        }
 
         Health healthComp = mainCharacter.GetComponent<Health>();
-        if (healthComp == null)
-        {
-            Debug.LogError("Main character is missing Health.");
-            return false;
-        }
+
 
         CharacterController controller = mainCharacter.GetComponent<CharacterController>();
         if (controller != null)

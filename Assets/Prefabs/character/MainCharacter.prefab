@@ -477,6 +477,10 @@ GameObject:
   - component: {fileID: 8728970898997447727}
   - component: {fileID: 5690619440293987064}
   - component: {fileID: 8621980597508636931}
+  - component: {fileID: 7625938296115209037}
+  - component: {fileID: 686287150409837598}
+  - component: {fileID: 4161075005160694554}
+  - component: {fileID: 438775823087481737}
   m_Layer: 0
   m_Name: MainCharacter
   m_TagString: Player
@@ -492,8 +496,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6708540197888594989}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 1.6, z: 10}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 9.51219, y: 0.9, z: 9.88286}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -578,7 +582,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6708540197888594989}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93f5b325e4eddbe4e92cc2aeaf02367b, type: 3}
   m_Name: 
@@ -760,6 +764,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Combat.Combat
   targetDefense: {fileID: 0}
+--- !u!114 &7625938296115209037
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6708540197888594989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee03c8cea79e1c740b054f06a61c1841, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardPickup
+--- !u!114 &686287150409837598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6708540197888594989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e851e7f60d9d14a4d9a96b4402aad996, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+--- !u!114 &4161075005160694554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6708540197888594989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8c93723ff6ffea47a88cb72123f88b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedCardsManager
+  inventory: {fileID: 556427796962726719}
+  stats: {fileID: 686287150409837598}
+  maxSelected: 3
+--- !u!114 &438775823087481737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6708540197888594989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d40f88b50d2e1940b661bbb0652194b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLifecycle
+  health: {fileID: 1499086799194934694}
+  componentsToDisableOnDeath:
+  - {fileID: 2281658734349838882}
+  - {fileID: 5937334990287686673}
+  - {fileID: 9137006019504338273}
+  - {fileID: 5690619440293987064}
 --- !u!1 &7529328012553121992
 GameObject:
   m_ObjectHideFlags: 0

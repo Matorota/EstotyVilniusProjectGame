@@ -5,24 +5,39 @@ using UnityEngine.InputSystem;
 [DefaultExecutionOrder(-100)]
 public class CharacterInputReader : MonoBehaviour
 {
-    [SerializeField] private VirtualJoystick joystick;
     [SerializeField] private bool useJoystick = true;
 
+    private VirtualJoystick joystick;
     private Vector2 movementInput;
     private bool uiDefenseHeld;
 
     public Vector2 MovementInput => movementInput;
     public bool WantsDefense => uiDefenseHeld || Mouse.current != null && Mouse.current.rightButton.isPressed;
-    
+
+    private void Start()
+    {
+        ResolveJoystick();
+    }
+
     private void Update()
     {
-        if (useJoystick && joystick == null) useJoystick = false;
+        if (useJoystick && joystick == null)
+            ResolveJoystick();
+
         movementInput = ReadMovementInput();
     }
 
     public void SetUiDefense(bool value)
     {
         uiDefenseHeld = value;
+    }
+
+    private void ResolveJoystick()
+    {
+        if (!useJoystick)
+            return;
+
+        joystick = FindObjectOfType<VirtualJoystick>();  // using because prefab cannot drag the joystick
     }
 
     private Vector2 ReadMovementInput()
@@ -32,17 +47,12 @@ public class CharacterInputReader : MonoBehaviour
             Vector2 joystickInput = Vector2.ClampMagnitude(joystick.GetAxis(), 1f);
 
             if (joystickInput.sqrMagnitude > 0.0001f)
-            {
                 return joystickInput;
-            }
         }
 
         Keyboard keyboard = Keyboard.current;
-
         if (keyboard == null)
-        {
             return Vector2.zero;
-        }
 
         Vector2 input = Vector2.zero;
 
