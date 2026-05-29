@@ -15,5 +15,5 @@ MonoBehaviour:
   title: New Adventure
   body: "A new quest appeared on the board:\n\u201CExplore the forgotten dungeon.\u201D\n\nJohn
     smiled and accepted immediately."
-  sprite: {fileID: 21300000, guid: 7e9a851345c114e4ebd49122bc024cda, type: 3}
+  sprite: {fileID: 21300000, guid: a11e87f34dd1dc54eaaa0bce5c713ac4, type: 3}
   speaker: 'John:'

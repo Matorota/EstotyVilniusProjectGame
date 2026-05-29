@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Story_Page_4
   m_EditorClassIdentifier: Assembly-CSharp::Configs.StoryConfig
   title: Guild Hall
-  body: "\u201CClear the wolves near Riverwood.\u201D\nSimple enough... at least
+  body: "\u201CClear the goblins near Riverwood.\u201D\nSimple enough... at least
     that\u2019s what John thought."
-  sprite: {fileID: 21300000, guid: 7211dfc4e90c5974d9561fee1109537f, type: 3}
+  sprite: {fileID: 21300000, guid: a11e87f34dd1dc54eaaa0bce5c713ac4, type: 3}
   speaker: 'Guild Master:'

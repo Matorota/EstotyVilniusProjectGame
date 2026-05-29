@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Strange Card
   body: Near the dead body, John discovered a glowing magical card left behind by
     the monsters.
-  sprite: {fileID: 21300000, guid: e29d359d01c8bc44a9b48d2d3407de6d, type: 3}
+  sprite: {fileID: 21300000, guid: 954584f90b3806547b85280acc969873, type: 3}
   speaker: 'Narrator:'

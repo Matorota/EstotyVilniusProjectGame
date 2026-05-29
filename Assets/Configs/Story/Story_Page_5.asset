@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Dark Forest
   body: The forest was colder than expected. Every sound between the trees made John
     grip his sword tighter.
-  sprite: {fileID: 21300000, guid: b4bd5646abae1d54d85f1ac992a1fbbc, type: 3}
+  sprite: {fileID: 21300000, guid: 5abbb51934607c142a0151aa2d6b6e32, type: 3}
   speaker: 'Narrator:'

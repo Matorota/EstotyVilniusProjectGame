@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Beginning
   body: John packed up his stuff and left home for the first time. The road ahead
     felt exciting... and terrifying.
-  sprite: {fileID: 21300000, guid: 5088b09ee89bd544a9ae14112ac7f6cf, type: 3}
+  sprite: {fileID: 21300000, guid: 2e155bae696019742a94d47fddfdba86, type: 3}
   speaker: 'Narrator:'

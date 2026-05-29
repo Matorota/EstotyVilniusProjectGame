@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Return Home
   body: Back at the guild, the quest was complete. But John knew this was only the
     beginning of his journey.
-  sprite: {fileID: 21300000, guid: 7211dfc4e90c5974d9561fee1109537f, type: 3}
+  sprite: {fileID: 21300000, guid: 006a0f0b281309b4d9e0d4b4a3bca255, type: 3}
   speaker: 'Guild Master:'

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Configs.QuestConfig
   name: 'Kill Remaining Goblins '
   description: Kill Remaining Goblins in the lower levels
-  image: {fileID: 21300000, guid: 94195d35967b52047936bc6b59786ce9, type: 3}
+  image: {fileID: 21300000, guid: 5ac67c53f7730a24fb4936f67fc301bd, type: 3}
   enemiesAmount: 3
   isCompletedText: Completed!

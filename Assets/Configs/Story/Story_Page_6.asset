@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Dark Forest
   body: A goblin jumped from the bushes! John barely blocked the attack before striking
     back with all his strength.
-  sprite: {fileID: 21300000, guid: 6e992a1d33701a544954e0d675626b60, type: 3}
+  sprite: {fileID: 21300000, guid: d4d9968f469a8344292333e739628bf7, type: 3}
   speaker: 'Narrator:'
