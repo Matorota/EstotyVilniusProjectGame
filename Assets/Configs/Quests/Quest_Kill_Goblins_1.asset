@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3dd6f4788c04546b5ee449c4a4d3fb7, type: 3}
-  m_Name: Quest_Kill_Enemies
+  m_Name: Quest_Kill_Goblins_1
   m_EditorClassIdentifier: Assembly-CSharp::Configs.QuestConfig
-  name: Killing Goblins
-  description: Kill all the goblins
+  name: 'Kill Remaining Goblins '
+  description: Kill Remaining Goblins in the lower levels
   image: {fileID: 21300000, guid: 94195d35967b52047936bc6b59786ce9, type: 3}
   enemiesAmount: 3
+  isCompletedText: Completed!

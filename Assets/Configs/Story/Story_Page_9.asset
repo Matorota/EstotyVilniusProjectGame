@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: db26d2e68e9a4680b2b67f32a970e8a8, type: 3}
-  m_Name: Story_Page_1
+  m_Name: Story_Page_9
   m_EditorClassIdentifier: Assembly-CSharp::Configs.StoryConfig
-  title: Beginning
-  body: Another boring day in the village... until the guild bell rang. Adventurers
-    were needed near the old forest.
-  sprite: {fileID: 21300000, guid: 29d03d5126fb05e4a8ad4e1717e03125, type: 3}
-  speaker: 'John:'
+  title: Return Home
+  body: Back at the guild, the quest was complete. But John knew this was only the
+    beginning of his journey.
+  sprite: {fileID: 21300000, guid: 7211dfc4e90c5974d9561fee1109537f, type: 3}
+  speaker: 'Guild Master:'

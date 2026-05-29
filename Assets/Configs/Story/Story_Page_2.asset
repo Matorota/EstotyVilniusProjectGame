@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db26d2e68e9a4680b2b67f32a970e8a8, type: 3}
   m_Name: Story_Page_2
   m_EditorClassIdentifier: Assembly-CSharp::Configs.StoryConfig
-  title: BEGGINING
-  body: 'Why are we here only just to supper ?!?!?!?!?!?
-
-    NUAY BUAY BYA'
-  sprite: {fileID: 21300000, guid: de7868f0eb42ce24c9ab455487966fe3, type: 3}
-  speaker: 'John:'
+  title: Beginning
+  body: John packed up his stuff and left home for the first time. The road ahead
+    felt exciting... and terrifying.
+  sprite: {fileID: 21300000, guid: 5088b09ee89bd544a9ae14112ac7f6cf, type: 3}
+  speaker: 'Narrator:'
