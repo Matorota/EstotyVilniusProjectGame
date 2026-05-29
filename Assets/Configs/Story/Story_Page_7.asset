@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Dark Forest
   body: The goblin died after the fight. John was exhausted, but for the first time,
     he truly felt like an adventurer.
-  sprite: {fileID: 21300000, guid: 6e992a1d33701a544954e0d675626b60, type: 3}
+  sprite: {fileID: 21300000, guid: d4d9968f469a8344292333e739628bf7, type: 3}
   speaker: 'John:'

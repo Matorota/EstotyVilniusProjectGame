@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Quest_Kill_Goblins_2 1
   m_EditorClassIdentifier: Assembly-CSharp::Configs.QuestConfig
   name: 'Kill Remaining Goblins '
-  description: Kill Remaining Goblins in the mid levels
+  description: Kill Remaining Goblins in the Upper levels
   image: {fileID: 21300000, guid: 9e955848950f9ac4d9ca0a77ec98aeac, type: 3}
-  enemiesAmount: 5
+  enemiesAmount: 10
   isCompletedText: Completed!

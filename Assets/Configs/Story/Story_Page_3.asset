@@ -15,5 +15,5 @@ MonoBehaviour:
   title: Guild Hall
   body: Inside the guild, warriors laughed while new adventurers waited nervously.
     John grabbed the easiest quest he could find.
-  sprite: {fileID: 21300000, guid: 7211dfc4e90c5974d9561fee1109537f, type: 3}
+  sprite: {fileID: 21300000, guid: 006a0f0b281309b4d9e0d4b4a3bca255, type: 3}
   speaker: 'Narrator:'
