@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c3dd6f4788c04546b5ee449c4a4d3fb7, type: 3}
-  m_Name: Quest_Kill_Goblins_1
+  m_Name: Quest_Kill_Goblins_2 3
   m_EditorClassIdentifier: Assembly-CSharp::Configs.QuestConfig
   name: 'Kill Remaining Goblins '
-  description: Kill Remaining Goblins in the lower levels
-  image: {fileID: 21300000, guid: 5ac67c53f7730a24fb4936f67fc301bd, type: 3}
-  enemiesAmount: 3
+  description: Survive the waves easy
+  image: {fileID: 21300000, guid: 7b1c229dad1e9814186d7da6cd49ba98, type: 3}
+  enemiesAmount: 10
   isCompletedText: Completed!
