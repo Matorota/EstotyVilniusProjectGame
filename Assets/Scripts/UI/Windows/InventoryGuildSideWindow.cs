@@ -9,9 +9,18 @@ public class InventoryGuildSideWindow : MonoBehaviour
     [SerializeField] private GameObject guildWindowGameObject;
     [SerializeField] private SelectedAbilitiesUi selectedAbilitiesUi;
     [SerializeField] private TimeScale timeScaleManager;
+    [SerializeField] private QuestRunner questRunner;
 
     private void OnEnable()
     {
+        if (questRunner == null)
+            questRunner = QuestRunner.Instance;
+
+        if (questRunner != null)
+        {
+            questRunner.OnQuestStarted += HandleQuestStarted;
+        }
+
         timeScaleManager?.Pause();
         menuButton.onClick.AddListener(HandleMenuButtonClick);
         openGuildButton.onClick.AddListener(HandleOpenGuildButtonClicked);
@@ -21,9 +30,21 @@ public class InventoryGuildSideWindow : MonoBehaviour
 
     private void OnDisable()
     {
+        if (questRunner != null)
+        {
+            questRunner.OnQuestStarted -= HandleQuestStarted;
+        }
+
         menuButton.onClick.RemoveListener(HandleMenuButtonClick);
         openGuildButton.onClick.RemoveListener(HandleOpenGuildButtonClicked);
         selectedAbilitiesUi?.gameObject.SetActive(false);
+        timeScaleManager?.Resume();
+    }
+
+    private void HandleQuestStarted(Configs.QuestConfig config)
+    {
+        gameObject.SetActive(false);
+        timeScaleManager?.Resume();
     }
 
     private void HandleMenuButtonClick()
@@ -35,7 +56,6 @@ public class InventoryGuildSideWindow : MonoBehaviour
 
     private void HandleOpenGuildButtonClicked()
     {
-        timeScaleManager?.Pause();
         guildWindowGameObject.SetActive(true);
         gameObject.SetActive(false);
     }

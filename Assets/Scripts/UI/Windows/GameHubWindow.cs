@@ -64,6 +64,7 @@ namespace UI.Windows
 
         public void Open(bool forceShowHud = false)
         {
+            gameObject.SetActive(true);
             EnsureCanvasGroup();
             EnsureParentsActive();
             canvasGroup.alpha = 1f;
