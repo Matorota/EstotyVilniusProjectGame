@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Configs.CardConfig
   name: Card Holy Bulwark
   description: Gives +10 Health
-  image: {fileID: 21300000, guid: 060091e770118de4ea9abd0537160e81, type: 3}
+  image: {fileID: 21300000, guid: e76bf031cc3e0e743a21dfc03e9a2a66, type: 3}
   type: 2
   value: 5
   duration: 5

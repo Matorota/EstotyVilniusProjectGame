@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Configs.CardConfig
   name: Linch Speed
   description: Gives +30 Speed
-  image: {fileID: 21300000, guid: 060091e770118de4ea9abd0537160e81, type: 3}
+  image: {fileID: 21300000, guid: 7a4c09cac98550541b258d9dcac99b22, type: 3}
   type: 0
   value: 3
   duration: 5
