@@ -1,9 +1,11 @@
+using Configs;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class SelectedAbilitiesUi : MonoBehaviour
 {
     [SerializeField] private SelectedCardsManager manager;
+    [SerializeField] private Abilities abilitiesConfig;
     [SerializeField] private Button[] abilityButtons;
 
     private void OnEnable()
@@ -38,6 +40,11 @@ public class SelectedAbilitiesUi : MonoBehaviour
             int slotIndex = i;
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => manager.TryUseByIndex(slotIndex));
+
+            if (abilitiesConfig != null)
+            {
+                button.image.sprite = abilitiesConfig.GetImage(entry.Type);
+            }
 
             Text label = button.GetComponentInChildren<Text>(true);
             if (label != null)
