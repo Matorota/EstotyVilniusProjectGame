@@ -3,13 +3,6 @@ using UnityEngine;
 
 public class PlayerLifecycle : MonoBehaviour
 {
-    public static PlayerLifecycle Instance { get; private set; }
-
-    public static void ClearInstance()
-    {
-        Instance = null;
-    }
-
     [SerializeField] private Health health;
     [SerializeField] private MonoBehaviour[] componentsToDisableOnDeath;
 
@@ -24,20 +17,6 @@ public class PlayerLifecycle : MonoBehaviour
         ResolveHealth();
         if (health != null)
             health.OnDeath += HandleDeath;
-    }
-
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-            Destroy(gameObject);
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-            Instance = null;
     }
     private void ResolveHealth()
     {
@@ -63,7 +42,6 @@ public class PlayerLifecycle : MonoBehaviour
         isDead = true;
         DisableComponents();
         OnPlayerDied?.Invoke();
-        DestroyAllEnemies();
     }
 
     public void Respawn(Transform respawnLocation)
@@ -138,19 +116,4 @@ public class PlayerLifecycle : MonoBehaviour
         motor?.ResetMotion();
     }
 
-    private void DestroyAllEnemies()
-    {
-        if (QuestRunner.Instance != null)
-        {
-            QuestRunner.Instance.DestroyAllEnemies();
-            return;
-        }
-
-        Health[] allEnemies = FindObjectsByType<Health>(FindObjectsSortMode.None);
-        foreach (Health enemy in allEnemies)
-        {
-            if (enemy != null && enemy.Team == Team.Enemy)
-                Destroy(enemy.gameObject);
-        }
-    }
 }

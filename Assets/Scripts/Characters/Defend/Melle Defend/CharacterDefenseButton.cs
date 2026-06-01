@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 
 public class CharacterDefenseButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
+    [SerializeField] private PlayerLifecycle playerLifecycle;
+
     public void OnPointerDown(PointerEventData eventData)
     {
         ResolveDefense()?.SetUiDefense(true);
@@ -20,8 +22,12 @@ public class CharacterDefenseButton : MonoBehaviour, IPointerDownHandler, IPoint
 
     private CharacterDefense ResolveDefense()
     {
-        if (PlayerLifecycle.Instance == null)
+        if (playerLifecycle == null)
+            playerLifecycle = FindFirstObjectByType<PlayerLifecycle>();
+
+        if (playerLifecycle == null)
             return null;
-        return PlayerLifecycle.Instance.GetComponent<CharacterDefense>();
+
+        return playerLifecycle.GetComponent<CharacterDefense>();
     }
 }

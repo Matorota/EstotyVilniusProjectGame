@@ -19,15 +19,6 @@ public class CardDrop : MonoBehaviour
     {
         health = GetComponent<IDamageable>();
 
-        if (dropCycleState == null)
-            dropCycleState = CardDropCycleState.Instance;
-
-        if (dropCycleState == null)
-        {
-            GameObject stateObject = new GameObject("CardDropCycleState");
-            dropCycleState = stateObject.AddComponent<CardDropCycleState>();
-        }
-
         if (health == null)
             enabled = false;
     }
@@ -69,9 +60,7 @@ public class CardDrop : MonoBehaviour
     {
         selectedConfig = null;
         if (dropConfigs == null || dropConfigs.Length == 0)
-        {
             return false;
-        }
 
         List<CardConfig> uniqueConfigs = new();
         HashSet<int> seenIds = new();
@@ -79,20 +68,19 @@ public class CardDrop : MonoBehaviour
         {
             CardConfig config = dropConfigs[i];
             if (config == null)
-            {
                 continue;
-            }
 
-            int configId = config.GetInstanceID();
-            if (seenIds.Add(configId))
-            {
+            if (seenIds.Add(config.GetInstanceID()))
                 uniqueConfigs.Add(config);
-            }
         }
 
         if (uniqueConfigs.Count == 0)
-        {
             return false;
+
+        if (dropCycleState == null)
+        {
+            selectedConfig = uniqueConfigs[Random.Range(0, uniqueConfigs.Count)];
+            return true;
         }
 
         List<CardConfig> cycleCandidates = uniqueConfigs.FindAll(cfg => !dropCycleState.UsedConfigIds.Contains(cfg.GetInstanceID()));
@@ -103,14 +91,10 @@ public class CardDrop : MonoBehaviour
         }
 
         if (cycleCandidates.Count > 1 && dropCycleState.LastDroppedConfigId != -1)
-        {
             cycleCandidates.RemoveAll(cfg => cfg.GetInstanceID() == dropCycleState.LastDroppedConfigId);
-        }
 
         if (cycleCandidates.Count == 0)
-        {
             cycleCandidates = new List<CardConfig>(uniqueConfigs);
-        }
 
         selectedConfig = cycleCandidates[Random.Range(0, cycleCandidates.Count)];
         int selectedId = selectedConfig.GetInstanceID();

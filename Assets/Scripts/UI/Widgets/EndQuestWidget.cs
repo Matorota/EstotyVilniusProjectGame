@@ -1,4 +1,4 @@
-﻿using Configs;
+using Configs;
 using UnityEngine;
 using UnityEngine.UI;
 

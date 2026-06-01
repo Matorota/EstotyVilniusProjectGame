@@ -3,31 +3,41 @@ using Configs;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GuildWindow : MonoBehaviour
+namespace UI.Windows
 {
-    [SerializeField] private Transform questsContainer;
-    [SerializeField] private QuestWidget questPrefab;
-    [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
-    [SerializeField] private Button openQuestButton;
-    [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
-    [SerializeField] private QuestRunner questRunner;
-
-    private bool isQuestRunnerHooked;
-
-    private void Awake()
+    public class GuildWindow : MonoBehaviour
     {
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
+        [SerializeField] private Transform questsContainer;
+        [SerializeField] private QuestWidget questPrefab;
+        [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
+        [SerializeField] private Button openQuestButton;
+        [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
+        [SerializeField] private QuestRunner questRunner;
 
-        HookQuestRunner();
-    }
+        private void Awake()
+        {
+            questRunner ??= QuestRunner.Instance;
 
-    private void OnEnable()
-    {
-        HookQuestRunner();
-        openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
-        Refresh();
-    }
+            if (questRunner != null)
+                questRunner.OnQuestWon += HandleQuestWon;
+        }
+
+        private void OnDestroy()
+        {
+            if (questRunner != null)
+                questRunner.OnQuestWon -= HandleQuestWon;
+        }
+
+        private void OnEnable()
+        {
+            openQuestButton.onClick.AddListener(HandleOpenQuestButtonClicked);
+            Refresh();
+        }
+
+        private void OnDisable()
+        {
+            openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
+        }
 
     public void Refresh()
     {
@@ -71,16 +81,6 @@ public class GuildWindow : MonoBehaviour
         gameObject.SetActive(false);
     }
     
-    private void OnDisable()
-    {
-        openQuestButton.onClick.RemoveListener(HandleOpenQuestButtonClicked);
-    }
-
-    private void OnDestroy()
-    {
-        UnhookQuestRunner();
-    }
-
     private void HandleOpenQuestButtonClicked()
     {
         inventoryGuildSideWindowGameObject.SetActive(true);
@@ -94,22 +94,5 @@ public class GuildWindow : MonoBehaviour
 
         RemoveQuest(questRunner.CurrentQuest);
     }
-
-    private void HookQuestRunner()
-    {
-        if (isQuestRunnerHooked || questRunner == null)
-            return;
-
-        questRunner.OnQuestWon += HandleQuestWon;
-        isQuestRunnerHooked = true;
-    }
-
-    private void UnhookQuestRunner()
-    {
-        if (!isQuestRunnerHooked || questRunner == null)
-            return;
-
-        questRunner.OnQuestWon -= HandleQuestWon;
-        isQuestRunnerHooked = false;
-    }
+}
 }

@@ -30,7 +30,7 @@ public class CardInventoryUi : MonoBehaviour
         if (inventory != null)
             return;
 
-        inventory = CardInventory.Instance;
+        inventory = FindFirstObjectByType<CardInventory>();
     }
 
     private void Refresh()

@@ -11,6 +11,7 @@ public class QuestRunner : MonoBehaviour
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private PlayerLifecycle playerLifecycle;
     [SerializeField] private Health playerHealth;
+    [SerializeField] private PlayerCamera playerCamera;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform playerSpawnPoint;
 
@@ -29,50 +30,24 @@ public class QuestRunner : MonoBehaviour
     public event Action OnQuestWon;
     public event Action OnQuestEnded;
     public event Action OnAliveCountChanged;
+    public event Action OnPlayerDied;
 
     private void Awake()
     {
         Instance = this;
-
-        enemySpawner ??= EnemySpawner.Instance;
-        playerLifecycle ??= PlayerLifecycle.Instance;
-        playerHealth ??= Health.PlayerInstance;
-
         PauseGame();
-
-        if (playerLifecycle != null)
-            playerLifecycle.DisableMovement();
-    }
-
-    private void OnEnable()
-    {
-        SubscribeToPlayerDeath();
     }
 
     private void OnDisable()
     {
-        UnsubscribeFromPlayerDeath();
         UnsubscribeFromEnemySpawner();
         ClearTrackedEnemies();
-        DestroyPlayer();
 
         CurrentQuest = null;
         Status = QuestStatus.None;
         spawnedEnemies = 0;
         AliveEnemies = 0;
         TotalEnemies = 0;
-    }
-
-    private void SubscribeToPlayerDeath()
-    {
-        if (playerLifecycle != null)
-            playerLifecycle.OnPlayerDied += HandlePlayerDied;
-    }
-
-    private void UnsubscribeFromPlayerDeath()
-    {
-        if (playerLifecycle != null)
-            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
     }
 
     public void StartQuest(QuestConfig quest)
@@ -93,10 +68,10 @@ public class QuestRunner : MonoBehaviour
 
         DestroyPlayer();
         SpawnPlayer();
-        UpdatePlayerReferences();
-        SubscribeToPlayerDeath();
 
-        enemySpawner ??= EnemySpawner.Instance;
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied += HandlePlayerDied;
+
         if (enemySpawner == null)
         {
             AbortQuestStart();
@@ -130,11 +105,13 @@ public class QuestRunner : MonoBehaviour
 
         DestroyAllCardPickups();
         DestroyAllEnemies();
-        DestroyPlayer();
 
         UnsubscribeFromEnemySpawner();
         ClearTrackedEnemies();
-        UnsubscribeFromPlayerDeath();
+
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+        DestroyPlayer();
 
         CurrentQuest = null;
         Status = QuestStatus.None;
@@ -236,6 +213,7 @@ public class QuestRunner : MonoBehaviour
         if (Status != QuestStatus.Active)
             return;
 
+        OnPlayerDied?.Invoke();
         AbortQuest();
     }
 
@@ -243,9 +221,11 @@ public class QuestRunner : MonoBehaviour
     {
         UnsubscribeFromEnemySpawner();
         DestroyAllEnemies();
-        DestroyPlayer();
         ClearTrackedEnemies();
-        UnsubscribeFromPlayerDeath();
+
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+        DestroyPlayer();
 
         Status = QuestStatus.None;
 
@@ -263,9 +243,11 @@ public class QuestRunner : MonoBehaviour
     {
         UnsubscribeFromEnemySpawner();
         DestroyAllEnemies();
-        DestroyPlayer();
         ClearTrackedEnemies();
-        UnsubscribeFromPlayerDeath();
+
+        if (playerLifecycle != null)
+            playerLifecycle.OnPlayerDied -= HandlePlayerDied;
+        DestroyPlayer();
 
         CurrentQuest = null;
         Status = QuestStatus.None;
@@ -313,14 +295,28 @@ public class QuestRunner : MonoBehaviour
 
     private void SpawnPlayer()
     {
-        if (playerPrefab == null)
+        if (playerPrefab == null) // just for player
+        {
             return;
+        }
 
         Vector3 spawnPos = playerSpawnPoint != null ? playerSpawnPoint.position : Vector3.zero;
         Quaternion spawnRot = playerSpawnPoint != null ? playerSpawnPoint.rotation : Quaternion.identity;
 
         spawnedPlayer = Instantiate(playerPrefab, spawnPos, spawnRot);
         spawnedPlayer.name = "Player";
+
+        playerLifecycle = spawnedPlayer.GetComponentInChildren<PlayerLifecycle>(true);
+        playerHealth = spawnedPlayer.GetComponentInChildren<Health>(true);
+
+
+
+        if (enemySpawner != null && playerLifecycle != null)
+            enemySpawner.SetPlayerTarget(playerLifecycle.transform);
+
+        playerCamera ??= FindFirstObjectByType<PlayerCamera>(); // cannot put it from inspector
+        if (playerCamera != null && playerLifecycle != null)
+            playerCamera.SetTarget(playerLifecycle.transform);
     }
 
     private void DestroyPlayer()
@@ -331,24 +327,12 @@ public class QuestRunner : MonoBehaviour
             spawnedPlayer = null;
         }
 
-        PlayerLifecycle.ClearInstance();
-    }
-
-    private void UpdatePlayerReferences()
-    {
-        playerLifecycle = PlayerLifecycle.Instance;
-        playerHealth = Health.PlayerInstance;
-
-        if (enemySpawner != null && playerLifecycle != null)
-            enemySpawner.SetPlayerTarget(playerLifecycle.transform);
-
-        if (PlayerCamera.Instance != null && playerLifecycle != null)
-            PlayerCamera.Instance.SetTarget(playerLifecycle.transform);
+        playerLifecycle = null;
+        playerHealth = null;
     }
 
     private void HealPlayer()
     {
-        playerHealth ??= Health.PlayerInstance;
         if (playerHealth == null)
             return;
 
@@ -380,7 +364,6 @@ public class QuestRunner : MonoBehaviour
 
     private void EnablePlayerMovement()
     {
-        playerLifecycle ??= PlayerLifecycle.Instance;
         playerLifecycle?.EnableMovement();
     }
 
