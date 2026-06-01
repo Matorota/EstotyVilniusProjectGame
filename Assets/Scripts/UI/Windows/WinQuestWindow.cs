@@ -18,7 +18,6 @@ namespace UI.Windows
 
     private void Awake()
     {
-        questRunner ??= QuestRunner.Instance;
         EnsureInitialized();
         HideWindow();
 

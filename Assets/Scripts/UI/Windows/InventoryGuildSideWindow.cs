@@ -13,9 +13,6 @@ public class InventoryGuildSideWindow : MonoBehaviour
 
     private void OnEnable()
     {
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
-
         if (questRunner != null)
         {
             questRunner.OnQuestStarted += HandleQuestStarted;

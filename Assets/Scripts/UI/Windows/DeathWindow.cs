@@ -25,9 +25,6 @@ namespace UI.Windows
         EnsureInitialized();
         HideWindow();
 
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
-
         if (questRunner != null)
         {
             questRunner.OnPlayerDied += HandlePlayerDied;
