@@ -16,8 +16,6 @@ namespace UI.Windows
 
         private void Awake()
         {
-            questRunner ??= QuestRunner.Instance;
-
             if (questRunner != null)
                 questRunner.OnQuestWon += HandleQuestWon;
         }
@@ -71,9 +69,6 @@ namespace UI.Windows
 
     private void HandleQuestClicked(QuestConfig quest)
     {
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
-
         if (questRunner == null || questRunner.Status != QuestStatus.None)
             return;
 

@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class QuestRunner : MonoBehaviour
 {
-    public static QuestRunner Instance { get; private set; }
-
     [SerializeField] private EnemySpawner enemySpawner;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private PlayerLifecycle playerLifecycle;
@@ -34,7 +32,6 @@ public class QuestRunner : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
         PauseGame();
     }
 

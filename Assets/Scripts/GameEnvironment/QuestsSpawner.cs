@@ -17,8 +17,6 @@ public class QuestsSpawner : MonoBehaviour
 
     private void Awake()
     {
-        questRunner ??= QuestRunner.Instance;
-
         if (questRunner != null)
         {
             questRunner.OnQuestStarted += HandleQuestStarted;
