@@ -1,4 +1,5 @@
-﻿using Configs;
+using Configs;
+using UI.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -74,22 +75,8 @@ namespace UI.Windows
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
-            
-            Transform parent = endGameButton.transform.parent;
-            while (parent != null)
-            {
-                if (!parent.gameObject.activeSelf)
-                    parent.gameObject.SetActive(true);
 
-                CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
-                if (parentCG != null)
-                {
-                    parentCG.alpha = 1f;
-                    parentCG.interactable = true;
-                    parentCG.blocksRaycasts = true;
-                }
-                parent = parent.parent;
-            }
+            UiVisibility.ShowWithParents(endGameButton.transform);
         }
 
         public void HideButton()

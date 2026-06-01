@@ -1,5 +1,6 @@
 ﻿using System;
 using Configs;
+using UI.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,8 +19,22 @@ namespace UI.Windows
         {
             Instance = this;
             questRunner ??= QuestRunner.Instance;
-            SubscribeToQuestRunner();
             EnsureCanvasGroup();
+
+            if (questRunner != null)
+            {
+                questRunner.OnQuestStarted += HandleQuestStarted;
+                questRunner.OnQuestEnded += HandleQuestEnded;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (questRunner != null)
+            {
+                questRunner.OnQuestStarted -= HandleQuestStarted;
+                questRunner.OnQuestEnded -= HandleQuestEnded;
+            }
         }
 
         private void OnEnable()
@@ -30,17 +45,6 @@ namespace UI.Windows
         private void OnDisable()
         {
             gameGubMenuWindowButton.onClick.RemoveListener(HandleMenuButtonClicked);
-        }
-
-        private void SubscribeToQuestRunner()
-        {
-            if (questRunner == null)
-                return;
-
-            questRunner.OnQuestStarted -= HandleQuestStarted;
-            questRunner.OnQuestStarted += HandleQuestStarted;
-            questRunner.OnQuestEnded -= HandleQuestEnded;
-            questRunner.OnQuestEnded += HandleQuestEnded;
         }
         
         private void HandleMenuButtonClicked()
@@ -66,7 +70,7 @@ namespace UI.Windows
         {
             gameObject.SetActive(true);
             EnsureCanvasGroup();
-            EnsureParentsActive();
+            UiVisibility.ShowWithParents(transform);
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
@@ -90,26 +94,6 @@ namespace UI.Windows
             canvasGroup = gameObject.GetComponent<CanvasGroup>();
             if (canvasGroup == null)
                 canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-
-        private void EnsureParentsActive()
-        {
-            Transform current = transform.parent;
-            while (current != null)
-            {
-                if (!current.gameObject.activeSelf)
-                    current.gameObject.SetActive(true);
-
-                CanvasGroup parentCG = current.GetComponent<CanvasGroup>();
-                if (parentCG != null)
-                {
-                    parentCG.alpha = 1f;
-                    parentCG.interactable = true;
-                    parentCG.blocksRaycasts = true;
-                }
-
-                current = current.parent;
-            }
         }
 
     }

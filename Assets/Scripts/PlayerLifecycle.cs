@@ -63,7 +63,6 @@ public class PlayerLifecycle : MonoBehaviour
         isDead = true;
         DisableComponents();
         OnPlayerDied?.Invoke();
-        DestroyAllEnemies();
     }
 
     public void Respawn(Transform respawnLocation)
@@ -138,19 +137,4 @@ public class PlayerLifecycle : MonoBehaviour
         motor?.ResetMotion();
     }
 
-    private void DestroyAllEnemies()
-    {
-        if (QuestRunner.Instance != null)
-        {
-            QuestRunner.Instance.DestroyAllEnemies();
-            return;
-        }
-
-        Health[] allEnemies = FindObjectsByType<Health>(FindObjectsSortMode.None);
-        foreach (Health enemy in allEnemies)
-        {
-            if (enemy != null && enemy.Team == Team.Enemy)
-                Destroy(enemy.gameObject);
-        }
-    }
 }

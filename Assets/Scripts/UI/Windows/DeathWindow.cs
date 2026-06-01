@@ -1,9 +1,12 @@
 using Configs;
+using UI.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DeathWindow : MonoBehaviour
+namespace UI.Windows
 {
+    public class DeathWindow : MonoBehaviour
+    {
     [SerializeField] private GameObject deathScreenGameObject;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button guildButton;
@@ -95,21 +98,7 @@ public class DeathWindow : MonoBehaviour
         canvasGroup.interactable = true;
         canvasGroup.blocksRaycasts = true;
 
-        Transform parent = screenRoot.transform.parent;
-        while (parent != null)
-        {
-            if (!parent.gameObject.activeSelf)
-                parent.gameObject.SetActive(true);
-
-            CanvasGroup parentCG = parent.GetComponent<CanvasGroup>();
-            if (parentCG != null)
-            {
-                parentCG.alpha = 1f;
-                parentCG.interactable = true;
-                parentCG.blocksRaycasts = true;
-            }
-            parent = parent.parent;
-        }
+        UiVisibility.ShowWithParents(screenRoot.transform);
 
     }
 
@@ -195,4 +184,4 @@ public class DeathWindow : MonoBehaviour
         return deathScreenGameObject != null ? deathScreenGameObject : gameObject;
     }
 }
-
+}

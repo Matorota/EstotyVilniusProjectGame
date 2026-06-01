@@ -1,3 +1,4 @@
+using Characters.Player.Inventory;
 using Configs;
 using UnityEngine;
 using UnityEngine.UI;

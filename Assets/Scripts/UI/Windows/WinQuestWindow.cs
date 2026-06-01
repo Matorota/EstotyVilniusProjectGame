@@ -1,11 +1,13 @@
 using System;
 using Configs;
+using UI.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-using UI.Windows;
 
-public class WinQuestWindow : MonoBehaviour
+namespace UI.Windows
 {
+    public class WinQuestWindow : MonoBehaviour
+    {
     public static WinQuestWindow Instance { get; private set; }
 
     [SerializeField] private QuestRunner questRunner;
@@ -14,7 +16,6 @@ public class WinQuestWindow : MonoBehaviour
 
     private CanvasGroup canvasGroup;
     private bool isVisible;
-    private bool isSubscribed;
 
     private void Awake()
     {
@@ -22,54 +23,35 @@ public class WinQuestWindow : MonoBehaviour
         questRunner ??= QuestRunner.Instance;
         EnsureInitialized();
         HideWindow();
+
+        if (questRunner != null)
+        {
+            questRunner.OnQuestWon += HandleQuestWon;
+            questRunner.OnQuestEnded += HandleQuestEnded;
+            questRunner.OnQuestStarted += HandleQuestStarted;
+        }
     }
+
+    private void OnDestroy()
+    {
+        if (questRunner != null)
+        {
+            questRunner.OnQuestWon -= HandleQuestWon;
+            questRunner.OnQuestEnded -= HandleQuestEnded;
+            questRunner.OnQuestStarted -= HandleQuestStarted;
+        }
+    }
+
     private void OnEnable()
     {
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
-
-        SubscribeEvents();
-
         if (buttonContinue != null)
             buttonContinue.onClick.AddListener(HandleContinueButtonClick);
     }
 
-    private void Start()
-    {
-        if (questRunner == null)
-            questRunner = QuestRunner.Instance;
-
-        SubscribeEvents();
-    }
-
     private void OnDisable()
     {
-        UnsubscribeEvents();
-
         if (buttonContinue != null)
             buttonContinue.onClick.RemoveListener(HandleContinueButtonClick);
-    }
-
-    private void SubscribeEvents()
-    {
-        if (questRunner == null || isSubscribed)
-            return;
-
-        questRunner.OnQuestWon += HandleQuestWon;
-        questRunner.OnQuestEnded += HandleQuestEnded;
-        questRunner.OnQuestStarted += HandleQuestStarted;
-        isSubscribed = true;
-    }
-
-    private void UnsubscribeEvents()
-    {
-        if (questRunner == null || !isSubscribed)
-            return;
-
-        questRunner.OnQuestWon -= HandleQuestWon;
-        questRunner.OnQuestEnded -= HandleQuestEnded;
-        questRunner.OnQuestStarted -= HandleQuestStarted;
-        isSubscribed = false;
     }
 
     private void HandleQuestWon()
@@ -92,7 +74,7 @@ public class WinQuestWindow : MonoBehaviour
         gameObject.SetActive(true);
         transform.SetAsLastSibling();
 
-        EnsureParentsActive();
+        UiVisibility.ShowWithParents(transform);
 
         canvasGroup.alpha = 1f;
         canvasGroup.interactable = true;
@@ -135,25 +117,5 @@ public class WinQuestWindow : MonoBehaviour
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
-
-    private void EnsureParentsActive()
-    {
-        Transform current = transform.parent;
-        while (current != null)
-        {
-            if (!current.gameObject.activeSelf)
-                current.gameObject.SetActive(true);
-
-            CanvasGroup parentCG = current.GetComponent<CanvasGroup>();
-            if (parentCG != null)
-            {
-                parentCG.alpha = 1f;
-                parentCG.interactable = true;
-                parentCG.blocksRaycasts = true;
-            }
-
-            current = current.parent;
-        }
-    }
-
+}
 }
