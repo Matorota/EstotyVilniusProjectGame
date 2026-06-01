@@ -1512,6 +1512,7 @@ MonoBehaviour:
   timeScaleManager: {fileID: 463901196}
   playerLifecycle: {fileID: 438775823087481737, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
   playerHealth: {fileID: 1499086799194934694, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+  playerCamera: {fileID: 330585549}
   playerPrefab: {fileID: 6708540197888594989, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
   playerSpawnPoint: {fileID: 1227685225}
 --- !u!4 &85753116 stripped
@@ -3110,6 +3111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WinQuestWindow
   questRunner: {fileID: 81800372}
+  endQuestWidget: {fileID: 0}
   timeScaleManager: {fileID: 463901196}
   buttonContinue: {fileID: 4533689}
 --- !u!1001 &159317987
@@ -7120,6 +7122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d8360da47375f74099a0112e406c32b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraControls
+  playerLifecycle: {fileID: 1646653341}
   player: {fileID: 6220127944176848535, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
   offset: {x: -0.7, y: 2, z: -1}
 --- !u!114 &330585550
@@ -18383,7 +18386,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960.01, y: -118.4}
+  m_AnchoredPosition: {x: 960.01, y: -118.3999}
   m_SizeDelta: {x: 1920, y: -228.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &977270122
@@ -30000,7 +30003,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 339.4088}
+  m_AnchoredPosition: {x: 0, y: 339.4087}
   m_SizeDelta: {x: 0, y: -1407.4468}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1637009784
@@ -30292,6 +30295,28 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
   m_PrefabInstance: {fileID: 178711020}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1646653341 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 438775823087481737, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+  m_PrefabInstance: {fileID: 8448880987794792877}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d40f88b50d2e1940b661bbb0652194b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLifecycle
+--- !u!114 &1646653360 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2281658734349838882, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+  m_PrefabInstance: {fileID: 8448880987794792877}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 036f4069b56ab5642b3e70c636b9fe8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterInputReader
 --- !u!4 &1646891709 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7071284071277491202, guid: 64a89adc10fa66a469f27f52f8203a9e, type: 3}
@@ -31715,7 +31740,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 137.52019}
+  m_AnchoredPosition: {x: 0, y: 137.52002}
   m_SizeDelta: {x: 0, y: 256.94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1734840443
@@ -34919,7 +34944,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 13.130005}
+  m_AnchoredPosition: {x: 0, y: 13.129883}
   m_SizeDelta: {x: 0, y: -491.30005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1925505901
@@ -39118,7 +39143,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1302630080551749783, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 200.26099
+      value: 200.26123
       objectReference: {fileID: 0}
     - target: {fileID: 2312903748860031140, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
       propertyPath: m_IsActive
@@ -39330,7 +39355,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8556093044469263142, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -11.8498535
+      value: -11.849609
       objectReference: {fileID: 0}
     - target: {fileID: 8556093044469263142, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -39370,7 +39395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8769097974793712057, guid: ba8e4172fa7764741bed1becd4e2697e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.012451172
+      value: 0.012207031
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -40368,7 +40393,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5093917229903126335, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 226.19995
+      value: 226.2002
       objectReference: {fileID: 0}
     - target: {fileID: 5093917229903126335, guid: c2be74168cb7b864b93129e176819c58, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -40979,6 +41004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectedCardsManager
   inventory: {fileID: 556427796962726719, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+  playerLifecycle: {fileID: 1646653341}
   stats: {fileID: 686287150409837598, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
   maxSelected: 3
 --- !u!114 &2558551092025754510
@@ -41494,7 +41520,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00030517578, y: -992.0397}
+  m_AnchoredPosition: {x: -0.00048828125, y: -992.03955}
   m_SizeDelta: {x: 0.001, y: 992.08}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2886832689421002920
@@ -41521,7 +41547,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 960.01, y: -118.4}
+  m_AnchoredPosition: {x: 960.01, y: -118.3999}
   m_SizeDelta: {x: 1920, y: -228.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3071629573726453588
@@ -41817,6 +41843,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectedCardsManager
   inventory: {fileID: 556427796962726719, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+  playerLifecycle: {fileID: 1646653341}
   stats: {fileID: 686287150409837598, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
   maxSelected: 3
 --- !u!224 &3349196952162078472
@@ -42974,7 +43001,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -23.699951}
+  m_AnchoredPosition: {x: 0, y: -23.700195}
   m_SizeDelta: {x: 0, y: 23.7}
   m_Pivot: {x: 0, y: 0}
 --- !u!224 &4928104348854794893
@@ -43113,7 +43140,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -23.699951}
+  m_AnchoredPosition: {x: 0, y: -23.700195}
   m_SizeDelta: {x: 0, y: 23.7}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &5308432771234971825
@@ -43643,7 +43670,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefense
   defendAnimation: {fileID: 0}
-  inputReader: {fileID: 0}
+  inputReader: {fileID: 1646653360}
   attackAnimation: {fileID: 0}
 --- !u!224 &5754861590467313721
 RectTransform:
@@ -43861,7 +43888,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00061035156, y: -195.42688}
+  m_AnchoredPosition: {x: -0.00048828125, y: -195.42676}
   m_SizeDelta: {x: 0, y: -775.4441}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6109221278148760869
@@ -44083,6 +44110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d2a1c2d4f1b4c9b9f8c5a6f7e8d9a10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefenseButton
+  playerLifecycle: {fileID: 1646653341}
 --- !u!224 &6555011558913560203
 RectTransform:
   m_ObjectHideFlags: 0
@@ -44119,7 +44147,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -725.6831, y: 193.906}
+  m_AnchoredPosition: {x: -725.6831, y: 193.90625}
   m_SizeDelta: {x: 1546, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6630855381459045586
@@ -45362,6 +45390,10 @@ PrefabInstance:
       propertyPath: joystick
       value: 
       objectReference: {fileID: 4872681720695287478}
+    - target: {fileID: 3559082115933336949, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
+      propertyPath: defense
+      value: 
+      objectReference: {fileID: 5738533604651530644}
     - target: {fileID: 6220127944176848535, guid: 1434ea6d5bc4f904cbbe4fe0af520322, type: 3}
       propertyPath: m_LocalPosition.x
       value: 9.51219
@@ -45735,7 +45767,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 137.52026}
+  m_AnchoredPosition: {x: 0, y: 137.52002}
   m_SizeDelta: {x: 0, y: 256.94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8871550726721733836

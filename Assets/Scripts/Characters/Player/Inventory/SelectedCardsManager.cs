@@ -9,6 +9,7 @@ namespace Characters.Player.Inventory
     public class SelectedCardsManager : MonoBehaviour
     {
         [SerializeField] private CardInventory inventory;
+        [SerializeField] private PlayerLifecycle playerLifecycle;
         [SerializeField] private PlayerStats stats;
 
         public struct SelectedCardInfo
@@ -40,7 +41,7 @@ namespace Characters.Player.Inventory
             if (inventory != null)
                 return;
 
-            inventory = CardInventory.Instance;
+            inventory = FindFirstObjectByType<CardInventory>();
         }
 
         private void ResolvePlayerStats()
@@ -48,8 +49,15 @@ namespace Characters.Player.Inventory
             if (stats != null && stats.gameObject.activeInHierarchy)
                 return;
 
-            stats = PlayerLifecycle.Instance != null
-                ? PlayerLifecycle.Instance.GetComponent<PlayerStats>()
+            if (playerLifecycle != null && playerLifecycle.gameObject.activeInHierarchy)
+            {
+                stats = playerLifecycle.GetComponent<PlayerStats>();
+                return;
+            }
+
+            playerLifecycle = FindFirstObjectByType<PlayerLifecycle>();
+            stats = playerLifecycle != null
+                ? playerLifecycle.GetComponent<PlayerStats>()
                 : null;
         }
 

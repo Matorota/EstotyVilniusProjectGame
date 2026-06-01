@@ -3,13 +3,6 @@ using UnityEngine;
 
 public class PlayerLifecycle : MonoBehaviour
 {
-    public static PlayerLifecycle Instance { get; private set; }
-
-    public static void ClearInstance()
-    {
-        Instance = null;
-    }
-
     [SerializeField] private Health health;
     [SerializeField] private MonoBehaviour[] componentsToDisableOnDeath;
 
@@ -24,20 +17,6 @@ public class PlayerLifecycle : MonoBehaviour
         ResolveHealth();
         if (health != null)
             health.OnDeath += HandleDeath;
-    }
-
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-            Destroy(gameObject);
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-            Instance = null;
     }
     private void ResolveHealth()
     {

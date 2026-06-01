@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public static EnemySpawner Instance { get; private set; }
     public static Action<Health> OnEnemySpawned;
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField] private float spawnDelay = 0.5f;
@@ -26,8 +25,9 @@ public class EnemySpawner : MonoBehaviour
 
         if (playerTarget == null)
         {
-            if (PlayerLifecycle.Instance != null)
-                playerTarget = PlayerLifecycle.Instance.transform;
+            PlayerLifecycle lifecycle = FindFirstObjectByType<PlayerLifecycle>();
+            if (lifecycle != null)
+                playerTarget = lifecycle.transform;
             else
                 return false;
         }
@@ -36,13 +36,6 @@ public class EnemySpawner : MonoBehaviour
         enemiesSpawned = 0;
         spawnTimer = 0f;
         return true;
-    }
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-            Destroy(gameObject);
     }
     private void Update()
     {
@@ -106,9 +99,10 @@ public class EnemySpawner : MonoBehaviour
         if (playerTarget != null)
             return;
 
-        if (PlayerLifecycle.Instance != null)
+        PlayerLifecycle lifecycle = FindFirstObjectByType<PlayerLifecycle>();
+        if (lifecycle != null)
         {
-            playerTarget = PlayerLifecycle.Instance.transform;
+            playerTarget = lifecycle.transform;
             return;
         }
     }

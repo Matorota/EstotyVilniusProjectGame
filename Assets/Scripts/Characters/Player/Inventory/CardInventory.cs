@@ -6,25 +6,12 @@ using UnityEngine;
 
 public class CardInventory : MonoBehaviour
 {
-    public static CardInventory Instance { get; private set; }
-
     private static readonly List<CardModel> collectedCards = new();
     private static readonly List<CardModel> equippedCards = new();
     private static readonly Dictionary<CardType, List<CardModel>> cardModelsByType = new();
 
     public event Action OnInventoryChanged;
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-    }
-
-    private void OnDestroy()
-    {
-        if (Instance == this)
-            Instance = null;
-    }
 
     public static void ResetInventory()
     {

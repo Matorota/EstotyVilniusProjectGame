@@ -8,7 +8,6 @@ namespace UI.Windows
 {
     public class GameHubWindow : MonoBehaviour
     {
-        public static GameHubWindow Instance { get; private set; }
         [SerializeField] private MenuWindow menuWindow;
         [SerializeField] private Button gameGubMenuWindowButton;
         [SerializeField] private QuestRunner questRunner;
@@ -17,7 +16,6 @@ namespace UI.Windows
 
         private void Awake()
         {
-            Instance = this;
             questRunner ??= QuestRunner.Instance;
             EnsureCanvasGroup();
 

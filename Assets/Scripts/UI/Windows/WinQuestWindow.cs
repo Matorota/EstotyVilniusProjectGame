@@ -8,9 +8,8 @@ namespace UI.Windows
 {
     public class WinQuestWindow : MonoBehaviour
     {
-    public static WinQuestWindow Instance { get; private set; }
-
     [SerializeField] private QuestRunner questRunner;
+    [SerializeField] private EndQuestWidget endQuestWidget;
     [SerializeField] private TimeScale timeScaleManager;
     [SerializeField] private Button buttonContinue;
 
@@ -19,7 +18,6 @@ namespace UI.Windows
 
     private void Awake()
     {
-        Instance = this;
         questRunner ??= QuestRunner.Instance;
         EnsureInitialized();
         HideWindow();
@@ -105,8 +103,7 @@ namespace UI.Windows
         HideWindow();
         questRunner?.ResetQuestState();
 
-        if (EndQuestWidget.Instance != null)
-            EndQuestWidget.Instance.ShowButton();
+        endQuestWidget?.ShowButton();
     }
 
     private void EnsureInitialized()
