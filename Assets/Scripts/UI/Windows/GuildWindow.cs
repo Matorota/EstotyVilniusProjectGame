@@ -11,7 +11,7 @@ namespace UI.Windows
         [SerializeField] private QuestWidget questPrefab;
         [SerializeField] private List<QuestConfig> availableQuests = new List<QuestConfig>();
         [SerializeField] private Button openQuestButton;
-        [SerializeField] private GameObject inventoryGuildSideWindowGameObject;
+        [SerializeField] private InventoryGuildSideWindow inventoryGuildSideWindow;
         [SerializeField] private QuestRunner questRunner;
 
         private void Awake()
@@ -72,13 +72,20 @@ namespace UI.Windows
         if (questRunner == null || questRunner.Status != QuestStatus.None)
             return;
 
-        questRunner.StartQuest(quest);
+        if (inventoryGuildSideWindow == null)
+            return;
+
+        inventoryGuildSideWindow.Setup(quest);
+        inventoryGuildSideWindow.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
     
     private void HandleOpenQuestButtonClicked()
     {
-        inventoryGuildSideWindowGameObject.SetActive(true);
+        if (inventoryGuildSideWindow == null)
+            return;
+
+        inventoryGuildSideWindow.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
 

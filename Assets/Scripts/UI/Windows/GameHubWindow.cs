@@ -8,8 +8,10 @@ namespace UI.Windows
 {
     public class GameHubWindow : MonoBehaviour
     {
-        [SerializeField] private MenuWindow menuWindow;
+        [SerializeField] private PauseWindow pauseWindow;
         [SerializeField] private Button gameGubMenuWindowButton;
+        [SerializeField] private Button abilityDescriptionButton;
+        [SerializeField] private AbilityWindow abilityWindow;
         [SerializeField] private QuestRunner questRunner;
         
         private CanvasGroup canvasGroup;
@@ -37,20 +39,48 @@ namespace UI.Windows
         private void OnEnable()
         {
             gameGubMenuWindowButton.onClick.AddListener(HandleMenuButtonClicked);
+            if (abilityDescriptionButton != null)
+                abilityDescriptionButton.onClick.AddListener(HandleAbilityDescriptionButtonClicked);
+            else
+                Debug.LogWarning("[GameHubWindow] abilityDescriptionButton is not assigned.", this);
         }
 
         private void OnDisable()
         {
             gameGubMenuWindowButton.onClick.RemoveListener(HandleMenuButtonClicked);
+            if (abilityDescriptionButton != null)
+                abilityDescriptionButton.onClick.RemoveListener(HandleAbilityDescriptionButtonClicked);
         }
         
         private void HandleMenuButtonClicked()
         {
-            if (menuWindow == null)
+            if (pauseWindow == null)
                 return;
 
-            menuWindow.Open();
+            pauseWindow.Open();
             Close();
+        }
+
+        private void HandleAbilityDescriptionButtonClicked()
+        {
+            ResolveAbilityWindow();
+
+            if (abilityWindow == null)
+            {
+                Debug.LogWarning("[GameHubWindow] AbilityWindow is not assigned and could not be found in the scene.", this);
+                return;
+            }
+
+            abilityWindow.Open();
+            Close();
+        }
+
+        private void ResolveAbilityWindow()
+        {
+            if (abilityWindow != null)
+                return;
+
+            abilityWindow = FindFirstObjectByType<AbilityWindow>();
         }
 
         private void HandleQuestStarted(QuestConfig config)
