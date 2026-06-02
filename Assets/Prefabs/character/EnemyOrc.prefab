@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3136011760587995153}
   - component: {fileID: 4115570903736776567}
   - component: {fileID: 323494172488377170}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: ArrowTrigered
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -249,7 +249,7 @@ GameObject:
   - component: {fileID: 1586752964623733405}
   - component: {fileID: 1717163955961050491}
   - component: {fileID: 2065911993236150257}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: OrcHealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -366,7 +366,7 @@ GameObject:
   - component: {fileID: 8406851195641444362}
   - component: {fileID: 2168259763385568530}
   - component: {fileID: 8992820347170720526}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -413,7 +413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.100962415, g: 0.4245283, b: 0.030037375, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -472,7 +472,7 @@ GameObject:
   - component: {fileID: 40684276962092318}
   - component: {fileID: 7890858843279475728}
   - component: {fileID: 8226125322828281387}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -821,6 +821,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d94b3c1685400d44db4e0953976bc41c, type: 2}
   - {fileID: 11400000, guid: ecae070f72756124fb5017bb3aa71920, type: 2}
   - {fileID: 11400000, guid: e84a21f929b2f074a8aa9edbf52ec3c8, type: 2}
+  dropCycleState: {fileID: 0}
 --- !u!95 &5836615709394353151
 Animator:
   serializedVersion: 7
@@ -957,7 +958,7 @@ GameObject:
   - component: {fileID: 9013898347146271342}
   - component: {fileID: 1366404663028480008}
   - component: {fileID: 7821917619716476535}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
