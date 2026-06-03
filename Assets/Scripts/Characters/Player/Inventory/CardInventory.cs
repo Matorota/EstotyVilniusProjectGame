@@ -4,20 +4,46 @@ using System.Linq;
 using Characters.Player.Inventory;
 using UnityEngine;
 
-public class CardInventory : MonoBehaviour
+public class CardInventory : MonoBehaviour // sadly but i cannot live without statistics here doesn't store cards if no static
 {
     private static readonly List<CardModel> collectedCards = new();
     private static readonly List<CardModel> equippedCards = new();
     private static readonly Dictionary<CardType, List<CardModel>> cardModelsByType = new();
+    private static readonly List<CardModel> currentQuestCards = new();
 
     public event Action OnInventoryChanged;
-
 
     public static void ResetInventory()
     {
         collectedCards.Clear();
         equippedCards.Clear();
         cardModelsByType.Clear();
+        currentQuestCards.Clear();
+    }
+
+    public static void BeginQuestCardTracking()
+    {
+        currentQuestCards.Clear();
+    }
+
+    public static void ResetCurrentQuestCards()
+    {
+        foreach (CardModel model in currentQuestCards)
+        {
+            if (model == null || model.config == null)
+                continue;
+
+            model.MarkUnequipped();
+            equippedCards.Remove(model);
+            collectedCards.Remove(model);
+
+            if (cardModelsByType.TryGetValue(model.config.Type, out List<CardModel> models))
+            {
+                models.Remove(model);
+            }
+        }
+
+        currentQuestCards.Clear();
     }
 
     public bool Collect(CardModel model)
@@ -37,6 +63,7 @@ public class CardInventory : MonoBehaviour
         model.MarkCollected();
         models.Add(model);
         collectedCards.Add(model);
+        currentQuestCards.Add(model);
         OnInventoryChanged?.Invoke();
         return true;
     }
