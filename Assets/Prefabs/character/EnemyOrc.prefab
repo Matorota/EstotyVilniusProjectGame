@@ -788,6 +788,11 @@ MonoBehaviour:
   resumeDistanceBuffer: 0.2
   smoothTime: 0.12
   rotationLerpSpeed: 14
+  obstacleCheckDistance: 2
+  obstacleCheckAngle: 45
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!114 &2060402711275794343
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -875,7 +880,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 5836615709394353151}
-  defense: {fileID: 0}
 --- !u!114 &6734288609458139667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,6 +924,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDefendAnimation
   animator: {fileID: 5836615709394353151}
   defendBoolParameter: IsDefending
+  defendAnimatorSpeed: 0.5
 --- !u!114 &388096934549548369
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -933,7 +938,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAttackAnimation
   animator: {fileID: 5836615709394353151}
-  defense: {fileID: 0}
 --- !u!114 &9181141459711578193
 MonoBehaviour:
   m_ObjectHideFlags: 0

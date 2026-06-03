@@ -10,7 +10,6 @@ public class PlayerLifecycle : MonoBehaviour
 
     public bool IsDead => isDead;
     public event Action OnPlayerDied;
-    public event Action OnPlayerRespawned;
 
     private void OnEnable()
     {
@@ -42,24 +41,6 @@ public class PlayerLifecycle : MonoBehaviour
         isDead = true;
         DisableComponents();
         OnPlayerDied?.Invoke();
-    }
-
-    public void Respawn(Transform respawnLocation)
-    {
-        if (respawnLocation == null)
-            return;
-
-        isDead = false;
-
-        ResetCharacterController();
-        transform.SetPositionAndRotation(respawnLocation.position, respawnLocation.rotation);
-        ResetCharacterMotor();
-
-        if (health != null)
-            health.Heal(health.MaxHealth);
-
-        EnableComponents();
-        OnPlayerRespawned?.Invoke();
     }
 
     public void DisableMovement()

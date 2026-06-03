@@ -2,7 +2,6 @@ using UnityEngine;
 
 [RequireComponent(typeof(CharacterAttackAnimation))]
 [RequireComponent(typeof(Combat))]
-[RequireComponent(typeof(FindTargetables))]
 public class CharacterMeleeAttack : MonoBehaviour
 {
     [SerializeField] private float damage = 10f;
@@ -13,8 +12,10 @@ public class CharacterMeleeAttack : MonoBehaviour
     [SerializeField] private float hitDelay = 0.45f;
     [SerializeField] private float attackDuration = 0.8f;
 
+    [SerializeField] private LayerMask targetMask = ~0;
+
     private CharacterAttackAnimation attackAnimation;
-    private ICombat combat;
+    private Combat combat;
     private FindTargetables targetables;
     private PlayerStats stats;
     private Health selfHealth;
@@ -33,8 +34,8 @@ public class CharacterMeleeAttack : MonoBehaviour
     private void Awake()
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
-        combat = GetComponent<ICombat>();
-        targetables = GetComponent<FindTargetables>();
+        combat = GetComponent<Combat>();
+        targetables = new FindTargetables();
         stats = GetComponent<PlayerStats>();
         selfHealth = GetComponent<Health>();
         range = Mathf.Max(0f, range);
@@ -53,7 +54,7 @@ public class CharacterMeleeAttack : MonoBehaviour
         if (isAttacking)
         {
             if (!hasHitThisAttack && Time.time >= hitTime)
-            {
+            {   
                 TryApplyDamage();
             }
 
@@ -72,7 +73,7 @@ public class CharacterMeleeAttack : MonoBehaviour
         }
 
         IDamageable target = combat.Target;
-        if (target == null || combat.IsSelfDefending)
+        if (target == null || IsSelfDefending)
         {
             return;
         }
@@ -125,7 +126,7 @@ public class CharacterMeleeAttack : MonoBehaviour
 
         IDamageable self = combat.Self;
         IDamageable target = combat.Target;
-        if (target == null || combat.IsSelfDefending || combat.IsTargetDefending)
+        if (target == null || IsSelfDefending || IsTargetDefending(target))
         {
             return;
         }
@@ -151,6 +152,15 @@ public class CharacterMeleeAttack : MonoBehaviour
         }
     }
 
+    private bool IsSelfDefending => GetComponent<CharacterDefense>()?.IsDefending ?? false;
+
+    private bool IsTargetDefending(IDamageable target)
+    {
+        if (target is Component comp)
+            return comp.GetComponent<CharacterDefense>()?.IsDefending ?? false;
+        return false;
+    }
+
     private void ResolveTarget()
     {
         IDamageable self = combat.Self;
@@ -160,7 +170,7 @@ public class CharacterMeleeAttack : MonoBehaviour
             return;
         }
 
-        target = targetables.FindTarget(transform, self, EffectiveRange);
+        target = targetables.FindTarget(transform, self, EffectiveRange, targetMask);
 
         if (target == null)
         {

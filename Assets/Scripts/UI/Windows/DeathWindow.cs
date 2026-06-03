@@ -13,7 +13,6 @@ namespace UI.Windows
     [SerializeField] private Button quitButton;
     [SerializeField] private GameObject guildWindowGameObject;
     [SerializeField] private QuestRunner questRunner;
-    [SerializeField] private Transform respawnLocationCube;
     [SerializeField] private TimeScale timeScaleManager;
 
     private CanvasGroup canvasGroup;

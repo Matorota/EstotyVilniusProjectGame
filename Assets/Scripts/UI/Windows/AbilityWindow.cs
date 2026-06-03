@@ -26,8 +26,6 @@ namespace UI.Windows
                 Debug.LogWarning("[AbilityWindow] resumeButton is not assigned.", this);
 
             ResolveSelectedCardsManager();
-            if (selectedCardsManager != null)
-                selectedCardsManager.OnSelectedChanged += Refresh;
             Refresh();
         }
 
@@ -51,14 +49,21 @@ namespace UI.Windows
 
         private void ResolveSelectedCardsManager()
         {
-            if (selectedCardsManager != null)
+            SelectedCardsManager found = FindFirstObjectByType<SelectedCardsManager>();
+            if (found == selectedCardsManager)
                 return;
 
-            selectedCardsManager = FindFirstObjectByType<SelectedCardsManager>();
+            if (selectedCardsManager != null)
+                selectedCardsManager.OnSelectedChanged -= Refresh;
+            selectedCardsManager = found;
+            if (selectedCardsManager != null)
+                selectedCardsManager.OnSelectedChanged += Refresh;
         }
 
         private void Refresh()
         {
+            ResolveSelectedCardsManager();
+
             if (abilitiesContainer == null)
             {
                 Debug.LogWarning("[AbilityWindow] abilitiesContainer is not assigned.", this);
@@ -80,10 +85,9 @@ namespace UI.Windows
                 Destroy(child.gameObject);
             }
 
-            ResolveSelectedCardsManager();
             if (selectedCardsManager == null)
             {
-                Debug.LogWarning("[AbilityWindow] SelectedCardsManager not found.", this);
+                Debug.LogWarning("[AbilityWindow] SelectedCardsManager not assigned.", this);
                 return;
             }
 
@@ -117,7 +121,6 @@ namespace UI.Windows
         public void Open()
         {
             gameObject.SetActive(true);
-            ResolveTimeScale();
             timeScaleManager?.Pause();
         }
 
@@ -125,16 +128,6 @@ namespace UI.Windows
         {
             gameObject.SetActive(false);
             timeScaleManager?.Resume();
-        }
-
-        private void ResolveTimeScale()
-        {
-            if (timeScaleManager != null)
-                return;
-
-            timeScaleManager = FindFirstObjectByType<TimeScale>();
-            if (timeScaleManager == null)
-                Debug.LogWarning("[AbilityWindow] TimeScale not found in scene.", this);
         }
 
         public bool IsOpen => gameObject.activeSelf;
