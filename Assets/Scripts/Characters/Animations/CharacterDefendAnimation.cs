@@ -7,12 +7,15 @@ public class CharacterDefendAnimation : MonoBehaviour
 
     [SerializeField] private Animator animator;
     [SerializeField] private string defendBoolParameter = DefaultDefendBool;
+    [SerializeField] private float defendAnimatorSpeed = 0.5f;
 
     private int defendParameterHash;
+    private float defaultAnimatorSpeed;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        defaultAnimatorSpeed = animator.speed;
         if (string.IsNullOrWhiteSpace(defendBoolParameter))
             defendBoolParameter = DefaultDefendBool;
 
@@ -37,5 +40,6 @@ public class CharacterDefendAnimation : MonoBehaviour
     public void SetDefending(bool value)
     {
         animator.SetBool(defendParameterHash, value);
+        animator.speed = value ? defendAnimatorSpeed : defaultAnimatorSpeed;
     }
 }

@@ -13,6 +13,10 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private float smoothTime = 0.12f;
     [SerializeField] private float rotationLerpSpeed = 14f;
 
+    [SerializeField] private float obstacleCheckDistance = 2.5f;
+    [SerializeField] private float sideCheckDistance = 1.2f;
+    [SerializeField] private LayerMask obstacleMask = ~0;
+
     private Vector3 currentMove;
     private Vector3 moveVelocity;
     private bool isStoppedByDistance;
@@ -56,12 +60,15 @@ public class EnemyMovement : MonoBehaviour
         }
 
         Vector3 desiredDirection = isStoppedByDistance ? Vector3.zero : toTarget / distanceToTarget;
+        desiredDirection = AvoidObstacles(desiredDirection);
         Vector3 desiredMove = desiredDirection * speed;
 
         currentMove = Vector3.SmoothDamp(currentMove, desiredMove, ref moveVelocity, smoothTime);
-        if (toTarget.sqrMagnitude > 0.001f)
+
+        Vector3 lookDir = desiredDirection.sqrMagnitude > 0.0001f ? desiredDirection : toTarget.normalized;
+        if (lookDir.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(toTarget.normalized);
+            Quaternion targetRotation = Quaternion.LookRotation(lookDir);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationLerpSpeed * Time.deltaTime);
         }
 
@@ -88,5 +95,54 @@ public class EnemyMovement : MonoBehaviour
 
         Vector3 finalMove = currentMove + Vector3.up * verticalVelocity;
         controller.Move(finalMove * dt);
+
+        if (controller.collisionFlags.HasFlag(CollisionFlags.Sides))
+        {
+            currentMove *= 0.5f;
+            moveVelocity *= 0.5f;
+        }
+    }
+
+    private Vector3 AvoidObstacles(Vector3 direction)
+    {
+        if (direction.sqrMagnitude < 0.0001f)
+            return direction;
+
+        Vector3 origin = transform.position + Vector3.up * (controller.height * 0.3f);
+        float radius = controller.radius * 0.85f;
+
+        if (!Physics.SphereCast(origin, radius, direction, out RaycastHit forwardHit, obstacleCheckDistance, obstacleMask))
+            return direction;
+
+        float[] testAngles = { -90f, -60f, -45f, -30f, 30f, 45f, 60f, 90f };
+        Vector3 bestDir = direction;
+        float bestScore = -999f;
+
+        foreach (float angle in testAngles)
+        {
+            Vector3 testDir = Quaternion.Euler(0, angle, 0) * direction;
+            bool blocked = Physics.SphereCast(origin, radius, testDir, out RaycastHit sideHit, sideCheckDistance, obstacleMask);
+
+            float score = Vector3.Dot(testDir, direction);
+            if (!blocked)
+                score += 2f; 
+            else
+                score += sideHit.distance; 
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestDir = testDir;
+            }
+        }
+
+        if (bestScore < 0f && forwardHit.normal.sqrMagnitude > 0.001f)
+        {
+            Vector3 slide = Vector3.ProjectOnPlane(direction, forwardHit.normal);
+            if (slide.sqrMagnitude > 0.0001f)
+                bestDir = slide.normalized;
+        }
+
+        return bestDir.normalized;
     }
 }
