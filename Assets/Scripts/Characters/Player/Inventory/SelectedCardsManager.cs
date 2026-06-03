@@ -118,6 +118,10 @@ namespace Characters.Player.Inventory
             {
                 StartCoroutine(ActivateForDuration(model));
             }
+            else if (stats.isActiveAndEnabled)
+            {
+                stats.StartCoroutine(ActivateForDuration(model));
+            }
             else
             {
                 return false;

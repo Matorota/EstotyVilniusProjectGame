@@ -14,7 +14,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     [SerializeField] private float attackDuration = 0.8f;
 
     private CharacterAttackAnimation attackAnimation;
-    private ICombat combat;
+    private Combat combat;
     private FindTargetables targetables;
     private PlayerStats stats;
     private Health selfHealth;
@@ -33,7 +33,7 @@ public class CharacterMeleeAttack : MonoBehaviour
     private void Awake()
     {
         attackAnimation = GetComponent<CharacterAttackAnimation>();
-        combat = GetComponent<ICombat>();
+        combat = GetComponent<Combat>();
         targetables = GetComponent<FindTargetables>();
         stats = GetComponent<PlayerStats>();
         selfHealth = GetComponent<Health>();
@@ -72,7 +72,7 @@ public class CharacterMeleeAttack : MonoBehaviour
         }
 
         IDamageable target = combat.Target;
-        if (target == null || combat.IsSelfDefending)
+        if (target == null || IsSelfDefending)
         {
             return;
         }
@@ -125,7 +125,7 @@ public class CharacterMeleeAttack : MonoBehaviour
 
         IDamageable self = combat.Self;
         IDamageable target = combat.Target;
-        if (target == null || combat.IsSelfDefending || combat.IsTargetDefending)
+        if (target == null || IsSelfDefending || IsTargetDefending(target))
         {
             return;
         }
@@ -149,6 +149,15 @@ public class CharacterMeleeAttack : MonoBehaviour
         {
             combat.ClearTarget();
         }
+    }
+
+    private bool IsSelfDefending => GetComponent<CharacterDefense>()?.IsDefending ?? false;
+
+    private bool IsTargetDefending(IDamageable target)
+    {
+        if (target is Component comp)
+            return comp.GetComponent<CharacterDefense>()?.IsDefending ?? false;
+        return false;
     }
 
     private void ResolveTarget()
