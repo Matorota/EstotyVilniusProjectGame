@@ -51,6 +51,7 @@ namespace UI.Windows
     private void HandleQuestStarted(QuestConfig config)
     {
         HideWindow();
+        CardInventory.BeginQuestCardTracking();
     }
 
     private void OnDestroy()
@@ -104,6 +105,7 @@ namespace UI.Windows
 
     private void HandleGuildButtonClick()
     {
+        CardInventory.ResetCurrentQuestCards();
         questRunner?.EndQuest();
         timeScaleManager?.Resume();
         HideWindow();
@@ -113,7 +115,7 @@ namespace UI.Windows
     private void HandleRestartButtonClick()
     {
         QuestConfig questToRestart = questRunner?.CurrentQuest;
-        CardInventory.ResetInventory();
+        CardInventory.ResetCurrentQuestCards();
         timeScaleManager?.Resume();
         HideWindow();
 

@@ -1,8 +1,14 @@
+using System;
 using UnityEngine;
 
 public class TimeScale : MonoBehaviour
 {
     private int _pauseCount;
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60; // reminder
+    }
 
     public void Pause()
     {
