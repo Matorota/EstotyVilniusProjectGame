@@ -63,24 +63,14 @@ namespace UI.Windows
 
         private void HandleAbilityDescriptionButtonClicked()
         {
-            ResolveAbilityWindow();
-
             if (abilityWindow == null)
             {
-                Debug.LogWarning("[GameHubWindow] AbilityWindow is not assigned and could not be found in the scene.", this);
+                Debug.LogWarning("[GameHubWindow] AbilityWindow is not assigned.", this);
                 return;
             }
 
             abilityWindow.Open();
             Close();
-        }
-
-        private void ResolveAbilityWindow()
-        {
-            if (abilityWindow != null)
-                return;
-
-            abilityWindow = FindFirstObjectByType<AbilityWindow>();
         }
 
         private void HandleQuestStarted(QuestConfig config)

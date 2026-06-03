@@ -30,7 +30,6 @@ public class InventoryGuildSideWindow : MonoBehaviour
         openGuildButton.onClick.AddListener(HandleOpenGuildButtonClicked);
         if (startQuestButton != null)
             startQuestButton.onClick.AddListener(HandleStartQuestButtonClicked);
-        ResolveSelectedAbilitiesUi();
         selectedAbilitiesUi?.gameObject.SetActive(true);
         RefreshQuestDisplay();
     }
@@ -91,37 +90,7 @@ public class InventoryGuildSideWindow : MonoBehaviour
         if (questRunner == null || selectedQuest == null)
             return;
 
-        ResolveHub();
-
         questRunner.StartQuest(selectedQuest);
         hub?.Open(true);
-    }
-
-    private void ResolveHub()
-    {
-        if (hub != null)
-            return;
-
-        hub = FindFirstObjectByType<GameHubWindow>();
-        if (hub == null)
-            Debug.LogWarning("[InventoryGuildSideWindow] GameHubWindow not found in scene.", this);
-    }
-
-    private void ResolveSelectedAbilitiesUi()
-    {
-        if (selectedAbilitiesUi != null)
-            return;
-
-        selectedAbilitiesUi = GetComponentInChildren<SelectedAbilitiesUi>(true);
-        if (selectedAbilitiesUi != null)
-            return;
-
-        GameObject[] roots = gameObject.scene.GetRootGameObjects();
-        foreach (GameObject root in roots)
-        {
-            selectedAbilitiesUi = root.GetComponentInChildren<SelectedAbilitiesUi>(true);
-            if (selectedAbilitiesUi != null)
-                return;
-        }
     }
 }
