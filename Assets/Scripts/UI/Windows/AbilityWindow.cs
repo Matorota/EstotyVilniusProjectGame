@@ -25,8 +25,7 @@ namespace UI.Windows
             else
                 Debug.LogWarning("[AbilityWindow] resumeButton is not assigned.", this);
 
-            if (selectedCardsManager != null)
-                selectedCardsManager.OnSelectedChanged += Refresh;
+            ResolveSelectedCardsManager();
             Refresh();
         }
 
@@ -48,8 +47,23 @@ namespace UI.Windows
                 selectedCardsManager.OnSelectedChanged -= Refresh;
         }
 
+        private void ResolveSelectedCardsManager()
+        {
+            SelectedCardsManager found = FindFirstObjectByType<SelectedCardsManager>();
+            if (found == selectedCardsManager)
+                return;
+
+            if (selectedCardsManager != null)
+                selectedCardsManager.OnSelectedChanged -= Refresh;
+            selectedCardsManager = found;
+            if (selectedCardsManager != null)
+                selectedCardsManager.OnSelectedChanged += Refresh;
+        }
+
         private void Refresh()
         {
+            ResolveSelectedCardsManager();
+
             if (abilitiesContainer == null)
             {
                 Debug.LogWarning("[AbilityWindow] abilitiesContainer is not assigned.", this);
