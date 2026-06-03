@@ -4,7 +4,6 @@ using UnityEngine;
 public class EnemyMovement : MonoBehaviour
 {
     private CharacterController controller;
-    private CharacterMovementAnimation movementAnimation;
 
     [SerializeField] private Transform target;
 
@@ -18,27 +17,28 @@ public class EnemyMovement : MonoBehaviour
     private Vector3 moveVelocity;
     private bool isStoppedByDistance;
 
+    public Vector3 HorizontalVelocity => currentMove;
+    public float NormalizedHorizontalSpeed => speed > 0f ? Mathf.Clamp01(currentMove.magnitude / speed) : 0f;
+
     private float verticalVelocity;
     private const float Gravity = -9.81f;
     private const float GroundStick = -1f;
 
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+    }
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        movementAnimation = GetComponent<CharacterMovementAnimation>();
         if (resumeDistanceBuffer < 0f) resumeDistanceBuffer = 0f;
     }
 
     private void Update()
     {
         if (target == null)
-        {
-            if (movementAnimation != null)
-            {
-                movementAnimation.Tick(Vector2.zero, Vector3.zero, 0f, Vector3.zero);
-            }
             return;
-        }
         
         Vector3 toTarget = target.position - transform.position;
         toTarget = Vector3.ProjectOnPlane(toTarget, Vector3.up);
@@ -88,17 +88,5 @@ public class EnemyMovement : MonoBehaviour
 
         Vector3 finalMove = currentMove + Vector3.up * verticalVelocity;
         controller.Move(finalMove * dt);
-
-        if (movementAnimation == null)
-        {
-            return;
-        }
-
-        Vector3 animationDirection = desiredDirection;
-        Vector2 movementInput = new Vector2(desiredDirection.x, desiredDirection.z);
-        float normalizedSpeed = speed > 0f ? desiredMove.magnitude / speed : 0f;
-        normalizedSpeed = Mathf.Clamp01(normalizedSpeed);
-
-        movementAnimation.Tick(movementInput, animationDirection, normalizedSpeed, currentMove);
     }
 }

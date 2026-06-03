@@ -8,41 +8,34 @@ public class CharacterDefendAnimation : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private string defendBoolParameter = DefaultDefendBool;
 
-    private bool hasDefendParameter;
     private int defendParameterHash;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         if (string.IsNullOrWhiteSpace(defendBoolParameter))
-        {
             defendBoolParameter = DefaultDefendBool;
-        }
 
-        hasDefendParameter = false;
         defendParameterHash = Animator.StringToHash(defendBoolParameter);
 
-        AnimatorControllerParameter[] parameters = animator.parameters;
-        for (int i = 0; i < parameters.Length; i++)
+        bool found = false;
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
-            AnimatorControllerParameter parameter = parameters[i];
-            if (parameter.type == AnimatorControllerParameterType.Bool && parameter.name == defendBoolParameter)
+            if (parameter.type == AnimatorControllerParameterType.Bool && parameter.nameHash == defendParameterHash)
             {
-                hasDefendParameter = true;
+                found = true;
                 break;
             }
         }
+
+        if (!found)
+            Debug.LogWarning($"[CharacterDefendAnimation] Animator '{animator.name}' is missing bool parameter '{defendBoolParameter}'.", this);
     }
 
-    public bool IsDefending => hasDefendParameter ? animator.GetBool(defendParameterHash) : false;
+    public bool IsDefending => animator.GetBool(defendParameterHash);
 
     public void SetDefending(bool value)
     {
-        if (!hasDefendParameter)
-        {
-            return;
-        }
-
         animator.SetBool(defendParameterHash, value);
     }
 }

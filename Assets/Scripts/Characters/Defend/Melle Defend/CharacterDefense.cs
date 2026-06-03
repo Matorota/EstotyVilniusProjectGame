@@ -4,7 +4,6 @@ public class CharacterDefense : MonoBehaviour
 {
     [SerializeField] private CharacterDefendAnimation defendAnimation;
     [SerializeField] private CharacterInputReader inputReader;
-    [SerializeField] private CharacterAttackAnimation attackAnimation;
 
     public bool IsDefending { get; private set; }
 
@@ -12,7 +11,6 @@ public class CharacterDefense : MonoBehaviour
     {
         defendAnimation ??= GetComponent<CharacterDefendAnimation>();
         inputReader ??= GetComponent<CharacterInputReader>();
-        attackAnimation ??= GetComponent<CharacterAttackAnimation>();
     }
 
     private void Update()
@@ -31,21 +29,9 @@ public class CharacterDefense : MonoBehaviour
         bool wantsDefense = inputReader != null && inputReader.WantsDefense;
 
         if (IsDefending == wantsDefense)
-        {
-            if (IsDefending)
-            {
-                attackAnimation?.ClearAttackTrigger();
-            }
-
             return;
-        }
 
         IsDefending = wantsDefense;
         defendAnimation?.SetDefending(IsDefending);
-
-        if (IsDefending)
-        {
-            attackAnimation?.ClearAttackTrigger();
-        }
     }
 }

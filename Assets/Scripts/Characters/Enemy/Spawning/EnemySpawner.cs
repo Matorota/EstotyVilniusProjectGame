@@ -23,15 +23,6 @@ public class EnemySpawner : MonoBehaviour
         if (spawnPoints == null || spawnPoints.Count == 0)
             spawnPoints = new List<Transform> { transform };
 
-        if (playerTarget == null)
-        {
-            PlayerLifecycle lifecycle = FindFirstObjectByType<PlayerLifecycle>();
-            if (lifecycle != null)
-                playerTarget = lifecycle.transform;
-            else
-                return false;
-        }
-
         enemiesToSpawn = amount;
         enemiesSpawned = 0;
         spawnTimer = 0f;
@@ -73,14 +64,7 @@ public class EnemySpawner : MonoBehaviour
         newEnemy.name = $"Enemy_{enemiesSpawned + 1}";
 
         EnemyMovement enemyMovement = newEnemy.GetComponent<EnemyMovement>();
-        if (enemyMovement != null)
-        {
-            var targetField = typeof(EnemyMovement).GetField("target", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (targetField != null)
-            {
-                targetField.SetValue(enemyMovement, playerTarget);
-            }
-        }
+        enemyMovement?.SetTarget(playerTarget);
 
         Health health = newEnemy.GetComponent<Health>();
         if (health != null)

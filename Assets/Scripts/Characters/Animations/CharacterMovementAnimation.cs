@@ -13,108 +13,92 @@ public class CharacterMovementAnimation : MonoBehaviour
 
     [SerializeField] private float parameterDampTime = 0.05f;
     [SerializeField] private float minimumMovingAnimationSpeed = 0.25f;
-    private bool hasSpeedParameter;
-    private bool hasMoveXParameter;
-    
+
+    private int speedHash;
+    private int moveXHash;
+    private CharacterMotor motor;
+    private EnemyMovement enemyMovement;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
+        motor = GetComponent<CharacterMotor>();
+        enemyMovement = GetComponent<EnemyMovement>();
+
         if (string.IsNullOrWhiteSpace(speedParameter))
-        {
             speedParameter = DefaultSpeedParameter;
-        }
-
         if (string.IsNullOrWhiteSpace(moveXParameter))
-        {
             moveXParameter = DefaultMoveXParameter;
-        }
 
-        if (parameterDampTime < 0f)
-        {
-            parameterDampTime = 0f;
-        }
-        if (minimumMovingAnimationSpeed < 0f)
-        {
-            minimumMovingAnimationSpeed = 0f;
-        }
-        else if (minimumMovingAnimationSpeed > 1f)
-        {
-            minimumMovingAnimationSpeed = 1f;
-        }
-        hasSpeedParameter = false;
-        hasMoveXParameter = false;
+        parameterDampTime = Mathf.Max(0f, parameterDampTime);
+        minimumMovingAnimationSpeed = Mathf.Clamp01(minimumMovingAnimationSpeed);
 
-        AnimatorControllerParameter[] parameters = animator.parameters;
-        for (int i = 0; i < parameters.Length; i++)
-        {
-            AnimatorControllerParameter parameter = parameters[i];
-            if (parameter.type != AnimatorControllerParameterType.Float)
-            {
-                continue;
-            }
+        speedHash = Animator.StringToHash(speedParameter);
+        moveXHash = Animator.StringToHash(moveXParameter);
 
-            if (parameter.name == speedParameter)
-            {
-                hasSpeedParameter = true;
-            }
-            else if (parameter.name == moveXParameter)
-            {
-                hasMoveXParameter = true;
-            }
-        }
+        if (animator != null)
+            ValidateParameters();
     }
 
-    public void Tick(Vector2 movementInput, Vector3 worldMoveDirection, float normalizedSpeed, Vector3 worldVelocity)
+    private void ValidateParameters()
     {
-        float inputSpeed = movementInput.magnitude;
-        if (inputSpeed > 1f)
+        bool hasSpeed = false;
+        bool hasMoveX = false;
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
-            inputSpeed = 1f;
+            if (parameter.type != AnimatorControllerParameterType.Float)
+                continue;
+            if (parameter.nameHash == speedHash)
+                hasSpeed = true;
+            else if (parameter.nameHash == moveXHash)
+                hasMoveX = true;
         }
 
-        float cappedNormalizedSpeed = normalizedSpeed;
-        if (cappedNormalizedSpeed < 0f)
-        {
-            cappedNormalizedSpeed = 0f;
-        }
-        else if (cappedNormalizedSpeed > 1f)
-        {
-            cappedNormalizedSpeed = 1f;
-        }
+        if (!hasSpeed)
+            Debug.LogWarning($"[CharacterMovementAnimation] Animator '{animator.name}' is missing float parameter '{speedParameter}'.", this);
+        if (useDirectionalParameters && !hasMoveX)
+            Debug.LogWarning($"[CharacterMovementAnimation] Animator '{animator.name}' is missing float parameter '{moveXParameter}'.", this);
+    }
 
-        bool hasMovementInput = movementInput.sqrMagnitude > 0.0001f || worldMoveDirection.sqrMagnitude > 0.0001f;
-        float targetSpeed = inputSpeed > cappedNormalizedSpeed ? inputSpeed : cappedNormalizedSpeed;
-        if (hasMovementInput && targetSpeed < minimumMovingAnimationSpeed)
-        {
-            targetSpeed = minimumMovingAnimationSpeed;
-        }
-        else if (!hasMovementInput)
-        {
-            targetSpeed = 0f;
-        }
-
-        if (hasSpeedParameter)
-        {
-            animator.SetFloat(speedParameter, targetSpeed);
-        }
-
-        if (!useDirectionalParameters || !hasMoveXParameter)
-        {
+    private void LateUpdate()
+    {
+        if (animator == null)
             return;
+
+        Vector3 velocity = Vector3.zero;
+        float normalizedSpeed = 0f;
+        bool hasSource = false;
+
+        if (motor != null)
+        {
+            velocity = motor.HorizontalVelocity;
+            normalizedSpeed = motor.NormalizedHorizontalSpeed;
+            hasSource = true;
+        }
+        else if (enemyMovement != null)
+        {
+            velocity = enemyMovement.HorizontalVelocity;
+            normalizedSpeed = enemyMovement.NormalizedHorizontalSpeed;
+            hasSource = true;
         }
 
-        Vector3 directionSource = worldVelocity.sqrMagnitude > 0.0001f ? worldVelocity : worldMoveDirection;
-        Vector3 localDirection = transform.InverseTransformDirection(directionSource);
-        float moveX = localDirection.x;
-        if (moveX < -1f)
+        if (!hasSource)
+            return;
+
+        bool isMoving = velocity.sqrMagnitude > 0.0001f;
+        float targetSpeed = isMoving ? Mathf.Max(normalizedSpeed, minimumMovingAnimationSpeed) : 0f;
+        animator.SetFloat(speedHash, Mathf.Clamp01(targetSpeed));
+
+        if (!useDirectionalParameters)
+            return;
+
+        float moveX = 0f;
+        if (velocity.sqrMagnitude > 0.000001f)
         {
-            moveX = -1f;
-        }
-        else if (moveX > 1f)
-        {
-            moveX = 1f;
+            Vector3 localDirection = transform.InverseTransformDirection(velocity.normalized);
+            moveX = Mathf.Clamp(localDirection.x, -1f, 1f);
         }
 
-        animator.SetFloat(moveXParameter, moveX, parameterDampTime, Time.deltaTime);
+        animator.SetFloat(moveXHash, moveX, parameterDampTime, Time.deltaTime);
     }
 }

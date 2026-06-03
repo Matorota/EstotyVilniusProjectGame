@@ -6,17 +6,13 @@ public class CharacterAttackAnimation : MonoBehaviour
     private const string AttackParameter = "Attack";
 
     [SerializeField] private Animator animator;
-    [SerializeField] private CharacterDefense defense;
 
     private bool hasAttackParameter;
     private int attackHash;
 
-    public bool IsDefending => defense != null && defense.IsDefending;
-
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        defense = GetComponent<CharacterDefense>();
         attackHash = Animator.StringToHash(AttackParameter);
 
         foreach (AnimatorControllerParameter parameter in animator.parameters)
@@ -31,12 +27,6 @@ public class CharacterAttackAnimation : MonoBehaviour
 
     public bool TryPlayAttack()
     {
-        if (IsDefending)
-        {
-            ClearAttackTrigger();
-            return false;
-        }
-
         return ForcePlayAttack();
     }
 
