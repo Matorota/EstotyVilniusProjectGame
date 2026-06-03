@@ -114,14 +114,9 @@ namespace Characters.Player.Inventory
             if (stats == null)
                 return false;
 
-            stats.ApplyCardEffect(model.config);
             if (isActiveAndEnabled)
             {
                 StartCoroutine(ActivateForDuration(model));
-            }
-            else if (stats.isActiveAndEnabled)
-            {
-                stats.StartCoroutine(ActivateForDuration(model));
             }
             else
             {
@@ -134,11 +129,13 @@ namespace Characters.Player.Inventory
 
         private System.Collections.IEnumerator ActivateForDuration(CardModel model)
         {
+            stats.ApplyCardBuff(model.config);
             model.MarkActive();
             OnSelectedChanged?.Invoke();
-            
+
             yield return new WaitForSeconds(model.config.Duration);
-            
+
+            stats.RemoveCardBuff(model.config);
             model.MarkInactive();
             OnSelectedChanged?.Invoke();
         }
