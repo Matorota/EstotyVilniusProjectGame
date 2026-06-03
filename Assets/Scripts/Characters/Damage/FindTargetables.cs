@@ -1,16 +1,16 @@
 using UnityEngine;
 
-public class FindTargetables : MonoBehaviour
+public class FindTargetables
 {
     private const float FaceDotThreshold = 0.8f;
 
-    public IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range)
+    public IDamageable FindTarget(Transform origin, IDamageable selfDamageable, float range, LayerMask targetMask)
     {
         IDamageable best = null;
         float bestDistance = float.MaxValue;
         float rangeSqr = range * range;
 
-        foreach (Collider hit in Physics.OverlapSphere(origin.position, range, ~0, QueryTriggerInteraction.Ignore))
+        foreach (Collider hit in Physics.OverlapSphere(origin.position, range, targetMask, QueryTriggerInteraction.Ignore))
         {
             IDamageable target = hit.GetComponentInParent<IDamageable>();
             if (target == null || !IsHostile(selfDamageable, target))
