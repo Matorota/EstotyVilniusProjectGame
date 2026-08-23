@@ -16,7 +16,7 @@ You play as a guild hero in a world overrun by ork forces. Battle through levels
 ## Launch on Phone (APK)
 
 ### Easy install
-1. Build the Android APK in Unity: **File → Build Settings → Android → Build**, or use a prebuilt `.apk`.
+1. Build the Android APK in Unity: **File → Build Settings → Android → Build**.
 2. On the phone, enable **Install unknown apps** for your file manager/browser.
 3. Copy the `.apk` to the phone (USB, cloud, or SD card).
 4. Open the file and tap **Install**.
